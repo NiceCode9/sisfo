@@ -1,7 +1,7 @@
     <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
         <a class="navbar-brand me-lg-5" href="../index.html">
-            <img class="navbar-brand-dark" src="{{ asset('assets') }}/assets/img/brand/light.svg" alt="Volt logo" />
-            <img class="navbar-brand-light" src="{{ asset('assets') }}/assets/img/brand/dark.svg" alt="Volt logo" />
+            <img class="navbar-brand-dark" src="../assets/img/brand/light.svg" alt="Volt logo" /> <img
+                class="navbar-brand-light" src="../assets/img/brand/dark.svg" alt="Volt logo" />
         </a>
         <div class="d-flex align-items-center">
             <button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse"
@@ -12,19 +12,20 @@
         </div>
     </nav>
 
-
     <nav id="sidebarMenu" class="sidebar d-lg-block bg-gray-800 text-white collapse" data-simplebar>
         <div class="sidebar-inner px-4 pt-3">
+            <!-- User Card (Mobile) -->
             <div
                 class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
                 <div class="d-flex align-items-center">
                     <div class="avatar-lg me-4">
                         <img src="{{ asset('assets') }}/assets/img/team/profile-picture-3.jpg"
-                            class="card-img-top rounded-circle border-white" alt="Bonnie Green">
+                            class="card-img-top rounded-circle border-white" alt="User Profile">
                     </div>
                     <div class="d-block">
-                        <h2 class="h5 mb-3">Hi, Jane</h2>
-                        <a href="../pages/examples/sign-in.html"
+                        <h2 class="h5 mb-3">Hi, {{ Auth::user()->name }}</h2>
+                        <a href="{{ route('logout') }}"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                             class="btn btn-secondary btn-sm d-inline-flex align-items-center">
                             <svg class="icon icon-xxs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -34,6 +35,9 @@
                             </svg>
                             Sign Out
                         </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                     </div>
                 </div>
                 <div class="collapse-close d-md-none">
@@ -48,60 +52,78 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Logo Brand -->
             <ul class="nav flex-column pt-3 pt-md-0">
                 <li class="nav-item">
-                    <a href="../index.html" class="nav-link d-flex align-items-center">
+                    <a href="{{ route('dashboard') }}" class="nav-link d-flex align-items-center">
                         <span class="sidebar-icon">
                             <img src="{{ asset('assets') }}/assets/img/brand/light.svg" height="20" width="20"
-                                alt="Volt Logo">
+                                alt="App Logo">
                         </span>
-                        <span class="mt-1 ms-1 sidebar-text">Volt Overview</span>
+                        <span class="mt-1 ms-1 sidebar-text">PPDB System</span>
                     </a>
                 </li>
-                <li class="nav-item ">
-                    <a href="../pages/dashboard/dashboard.html" class="nav-link">
-                        <span class="sidebar-icon">
-                            <i class="fas fa-home me-3 icon icon-xs"></i>
-                        </span>
-                        <span class="sidebar-text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <span class="nav-link  collapsed  d-flex justify-content-between align-items-center"
-                        data-bs-toggle="collapse" data-bs-target="#submenu-app">
-                        <span>
-                            <span class="sidebar-icon">
-                                <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
+
+                <!-- Dynamic Menu Items -->
+                @foreach ($sidebarMenu as $menu)
+                    @if ($menu->is_header)
+                        <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
+                        <li class="nav-item">
+                            <span class="nav-link text-uppercase text-xs font-weight-bold">
+                                {{ $menu->name }}
                             </span>
-                            <span class="sidebar-text">Tables</span>
-                        </span>
-                        <span class="link-arrow">
-                            <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                    clip-rule="evenodd"></path>
-                            </svg>
-                        </span>
-                    </span>
-                    <div class="multi-level collapse " role="list" id="submenu-app" aria-expanded="false">
-                        <ul class="flex-column nav">
-                            <li class="nav-item ">
-                                <a class="nav-link" href="../pages/tables/bootstrap-tables.html">
-                                    <span class="sidebar-text">Bootstrap Tables</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+                        </li>
+                    @elseif($menu->hasActiveChildren())
+                        <li class="nav-item @if ($menu->isActive()) active @endif">
+                            <span class="nav-link collapsed d-flex justify-content-between align-items-center"
+                                data-bs-toggle="collapse" data-bs-target="#submenu-{{ $menu->id }}">
+                                <span>
+                                    <span class="sidebar-icon">
+                                        {!! $menu->icon_html !!}
+                                    </span>
+                                    <span class="sidebar-text">{{ $menu->name }}</span>
+                                </span>
+                                <span class="link-arrow">
+                                    <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                            </span>
+                            <div class="multi-level collapse @if ($menu->isActive()) show @endif"
+                                role="list" id="submenu-{{ $menu->id }}"
+                                aria-expanded="@if ($menu->isActive()) true @else false @endif">
+                                <ul class="flex-column nav">
+                                    @foreach ($menu->children as $child)
+                                        <li class="nav-item @if ($child->isActive()) active @endif">
+                                            <a class="nav-link" href="{{ $child->full_url }}">
+                                                <span class="sidebar-text">{{ $child->name }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </li>
+                    @else
+                        <li class="nav-item @if ($menu->isActive()) active @endif">
+                            <a href="{{ $menu->full_url }}" class="nav-link">
+                                <span class="sidebar-icon">
+                                    {!! $menu->icon_html !!}
+                                </span>
+                                <span class="sidebar-text">{{ $menu->name }}</span>
+                            </a>
+                        </li>
+                    @endif
+                @endforeach
+
+                <!-- Logout Button -->
                 <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
                 <li class="nav-item">
-                    <a href="../pages/upgrade-to-pro.html"
+                    <a href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();"
                         class="btn btn-secondary d-flex align-items-center justify-content-center btn-upgrade-pro">
                         <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
                             <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20"
@@ -113,6 +135,10 @@
                         </span>
                         <span>Logout</span>
                     </a>
+                    <form id="logout-form-sidebar" action="{{ route('logout') }}" method="POST"
+                        style="display: none;">
+                        @csrf
+                    </form>
                 </li>
             </ul>
         </div>

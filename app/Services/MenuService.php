@@ -14,24 +14,24 @@ class MenuService
                 ->orderBy('order');
         }])
             ->parents()
-            ->get()
-            ->filter(function ($menu) {
-                // Filter berdasarkan permission
-                if ($menu->permission && !Auth::user()->can($menu->permission)) {
-                    return false;
-                }
+            ->get();
+        // ->filter(function ($menu) {
+        //     // Filter berdasarkan permission
+        //     if ($menu->permission && !Auth::user()->can($menu->permission)) {
+        //         return false;
+        //     }
 
-                // Jika punya children, filter yang punya children aktif
-                if ($menu->children->count() > 0) {
-                    $menu->children = $menu->children->filter(function ($child) {
-                        return !$child->permission || Auth::user()->can($child->permission);
-                    });
+        //     // Jika punya children, filter yang punya children aktif
+        //     if ($menu->children->count() > 0) {
+        //         $menu->children = $menu->children->filter(function ($child) {
+        //             return !$child->permission || Auth::user()->can($child->permission);
+        //         });
 
-                    return $menu->children->count() > 0;
-                }
+        //         return $menu->children->count() > 0;
+        //     }
 
-                return true;
-            });
+        //     return true;
+        // });
     }
 
     public function getAllMenus()

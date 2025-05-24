@@ -17,7 +17,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' => 'admin.'], function () {
     Route::resource('roles', \App\Http\Controllers\RoleController::class);
     Route::resource('permissions', \App\Http\Controllers\PermissionController::class);
 });

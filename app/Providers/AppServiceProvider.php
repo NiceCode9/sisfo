@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,5 +25,11 @@ class AppServiceProvider extends ServiceProvider
             ['layouts.sidebar'], // Sesuaikan dengan template Anda
             \App\View\Composers\MenuComposer::class
         );
+
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('admin') ? true : null;
+        });
+
+        Paginator::useBootstrapFive();
     }
 }

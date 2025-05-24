@@ -66,7 +66,7 @@
 
         @yield('content')
 
-        <footer class="bg-white rounded shadow p-5 mb-4 mt-4">
+        {{-- <footer class="bg-white rounded shadow p-5 mb-4 mt-4 bottom-0">
             <div class="row">
                 <div class="col-12 col-md-4 col-xl-6 mb-4 mb-md-0">
                     <p class="mb-0 text-center text-lg-start">© 2019-<span class="current-year"></span> <a
@@ -91,7 +91,7 @@
                     </ul>
                 </div>
             </div>
-        </footer>
+        </footer> --}}
     </main>
 
     <!-- Core -->
@@ -137,6 +137,40 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js"></script>
+
+    <script>
+        const notyf = new Notyf({
+            position: {
+                x: 'right',
+                y: 'top',
+            },
+            types: [{
+                type: 'info',
+                background: '#0948B3',
+                icon: {
+                    className: 'fas fa-info-circle',
+                    tagName: 'span',
+                    color: '#fff'
+                },
+                dismissible: false
+            }]
+        });
+    </script>
+    <script>
+        @if (session('success'))
+            notyf.open({
+                type: 'success',
+                message: '{{ session('success') }}'
+            });
+        @endif
+
+        @if (session('error'))
+            notyf.open({
+                type: 'error',
+                message: '{{ session('error') }}'
+            });
+        @endif
+    </script>
 
 </body>
 

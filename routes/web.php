@@ -20,6 +20,8 @@ Route::middleware('auth')->group(function () {
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' => 'admin.'], function () {
     Route::resource('roles', \App\Http\Controllers\RoleController::class);
     Route::resource('permissions', \App\Http\Controllers\PermissionController::class);
+    Route::resource('menus', \App\Http\Controllers\MenuController::class);
+    Route::post('/menus/update-order', [\App\Http\Controllers\MenuController::class, 'updateOrder'])->name('menus.update-order');
 });
 
 require __DIR__ . '/auth.php';

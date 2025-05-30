@@ -52,6 +52,9 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 
+    <!-- Datatable -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.1/css/dataTables.bootstrap5.css">
+
     @stack('styles')
 
 </head>
@@ -99,6 +102,13 @@
     <!-- Core -->
     <script src="{{ asset('assets') }}/vendor/@popperjs/core/dist/umd/popper.min.js"></script>
     <script src="{{ asset('assets') }}/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <!-- Datatable -->
+    <script src="https://cdn.datatables.net/2.3.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.1/js/dataTables.bootstrap5.js"></script>
 
     <!-- Vendor JS -->
     <script src="{{ asset('assets') }}/vendor/onscreen/dist/on-screen.umd.min.js"></script>
@@ -172,6 +182,26 @@
                 message: '{{ session('error') }}'
             });
         @endif
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('.dataTable').DataTable({
+                responsive: true,
+                "language": {
+                    "search": "Cari:",
+                    "lengthMenu": "Tampilkan _MENU_ entri",
+                    "info": "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
+                    "infoEmpty": "Tidak ada entri yang ditemukan",
+                    "infoFiltered": "(disaring dari _MAX_ total entri)",
+                    "paginate": {
+                        "next": "Selanjutnya",
+                        "previous": "Sebelumnya"
+                    }
+                }
+            });
+        });
     </script>
 
     @stack('scripts')

@@ -95,40 +95,70 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuTable = document.getElementById('menuTable');
             const tbody = menuTable.querySelector('tbody');
 
-            new Sortable(tbody, {
-                handle: '.handle',
-                animation: 150,
-                onEnd: function() {
-                    const rows = tbody.querySelectorAll('tr');
-                    const order = Array.from(rows).map(row => row.getAttribute('data-id'));
+            // Inisialisasi Sortable
+            const initSortable = () => {
+                new Sortable(tbody, {
+                    handle: '.handle',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    onEnd: function(evt) {
+                        const rows = tbody.querySelectorAll('tr');
+                        const order = Array.from(rows).map(row => row.getAttribute('data-id'));
 
-                    fetch('{{ route('admin.menus.update-order') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                order: order
+                        fetch('{{ route('admin.menus.update-order') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    order: order
+                                })
                             })
-                        }).then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Update order numbers
-                                rows.forEach((row, index) => {
-                                    row.querySelector('td:first-child').textContent =
-                                        index + 1;
-                                });
-                            }
-                        });
-                }
-            });
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    // Perbarui nomor urut
+                                    rows.forEach((row, index) => {
+                                        const orderCell = row.querySelector(
+                                            'td:first-child');
+                                        if (orderCell) {
+                                            const handleIcon =
+                                                '<i class="fas fa-arrows-alt handle" style="cursor: move;"></i>';
+                                            orderCell.innerHTML = handleIcon + ' ' + (
+                                                index + 1);
+                                        }
+                                    });
+
+                                    // Re-inisialisasi Sortable setelah update
+                                    initSortable();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                // Reload halaman jika terjadi error
+                                window.location.reload();
+                            });
+                    }
+                });
+            };
+
+            // Inisialisasi pertama
+            initSortable();
         });
     </script>
 @endpush
@@ -137,10 +167,22 @@
     <style>
         .handle {
             cursor: move;
+            margin-right: 5px;
         }
 
-        tr.sortable-chosen {
+        .sortable-ghost {
+            opacity: 0.5;
+            background: #c8ebfb;
+        }
+
+        .sortable-chosen {
             background-color: #f8f9fa;
+        }
+
+        .sortable-drag {
+            opacity: 1 !important;
+            background-color: #e9ecef;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 @endpush

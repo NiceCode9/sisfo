@@ -12,7 +12,8 @@ class JalurPendaftaranController extends Controller
      */
     public function index()
     {
-        //
+        $jalurPendaftarans = JalurPendaftaran::all();
+        return view('master.jalur-pendaftaran.index', compact('jalurPendaftarans'));
     }
 
     /**
@@ -28,7 +29,16 @@ class JalurPendaftaranController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_jalur' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'aktif' => 'required|boolean'
+        ]);
+
+        JalurPendaftaran::create($request->all());
+
+        return redirect()->route('admin.jalur-pendaftaran.index')
+            ->with('success', 'Jalur Pendaftaran berhasil ditambahkan');
     }
 
     /**
@@ -52,7 +62,16 @@ class JalurPendaftaranController extends Controller
      */
     public function update(Request $request, JalurPendaftaran $jalurPendaftaran)
     {
-        //
+        $request->validate([
+            'nama_jalur' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'aktif' => 'required|boolean'
+        ]);
+
+        $jalurPendaftaran->update($request->all());
+
+        return redirect()->route('admin.jalur-pendaftaran.index')
+            ->with('success', 'Jalur Pendaftaran berhasil diperbarui');
     }
 
     /**
@@ -60,6 +79,9 @@ class JalurPendaftaranController extends Controller
      */
     public function destroy(JalurPendaftaran $jalurPendaftaran)
     {
-        //
+        $jalurPendaftaran->delete();
+
+        return redirect()->route('admin.jalur-pendaftaran.index')
+            ->with('success', 'Jalur Pendaftaran berhasil dihapus');
     }
 }

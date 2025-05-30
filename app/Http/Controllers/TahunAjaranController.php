@@ -10,9 +10,10 @@ class TahunAjaranController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $tahunAjarans = TahunAjaran::latest()->get();
+        return view('master.tahunajaran.index', compact('tahunAjarans'));
     }
 
     /**
@@ -28,7 +29,16 @@ class TahunAjaranController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_tahun_ajaran' => 'required|string|max:255',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'status_aktif' => 'required|boolean',
+        ]);
+
+        TahunAjaran::create($request->all());
+
+        return redirect()->route('admin.tahun-ajaran.index')->with('success', 'Tahun Ajaran berhasil ditambahkan.');
     }
 
     /**
@@ -44,7 +54,7 @@ class TahunAjaranController extends Controller
      */
     public function edit(TahunAjaran $tahunAjaran)
     {
-        //
+        return response()->json($tahunAjaran);
     }
 
     /**
@@ -52,7 +62,23 @@ class TahunAjaranController extends Controller
      */
     public function update(Request $request, TahunAjaran $tahunAjaran)
     {
-        //
+        $request->validate([
+            'nama_tahun_ajaran' => 'required|string|max:255',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'status_aktif' => 'required|boolean',
+        ]);
+
+        // Jika status diubah menjadi aktif, nonaktifkan semua tahun ajaran lain
+        if ($request->status_aktif == true) {
+            TahunAjaran::where('id', '!=', $tahunAjaran->id)
+                ->update(['status_aktif' => false]);
+        }
+
+        $tahunAjaran->update($request->all());
+
+        return redirect()->route('admin.tahun-ajaran.index')
+            ->with('success', 'Tahun Ajaran berhasil diperbarui.');
     }
 
     /**
@@ -60,6 +86,8 @@ class TahunAjaranController extends Controller
      */
     public function destroy(TahunAjaran $tahunAjaran)
     {
-        //
+        $tahunAjaran->delete();
+        return redirect()->route('admin.tahun-ajaran.index')
+            ->with('success', 'Tahun Ajaran berhasil dihapus.');
     }
 }

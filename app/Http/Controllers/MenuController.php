@@ -113,10 +113,20 @@ class MenuController extends Controller
 
     public function updateOrder(Request $request)
     {
-        foreach ($request->order as $order => $id) {
-            Menu::where('id', $id)->update(['order' => $order]);
-        }
+        try {
+            foreach ($request->order as $order => $id) {
+                Menu::where('id', $id)->update(['order' => $order]);
+            }
 
-        return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Urutan menu berhasil diperbarui'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui urutan menu'
+            ], 500);
+        }
     }
 }

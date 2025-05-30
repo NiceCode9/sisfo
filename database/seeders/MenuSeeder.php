@@ -13,6 +13,7 @@ class MenuSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create main menus
         $setting = Menu::create([
             'name' => 'Pengaturan Sistem',
             'icon' => 'fas fa-cog',
@@ -20,32 +21,38 @@ class MenuSeeder extends Seeder
             'order' => 100,
         ]);
 
-        // Submenu Setting
-        Menu::create([
-            'name' => 'Manajemen Menu',
-            'icon' => 'fas fa-bars',
-            'route' => 'admin.menus.index',
-            'permission' => 'setting.menu.manage',
-            'parent_id' => $setting->id,
-            'order' => 1,
+        $master = Menu::create([
+            'name' => 'Master',
+            'icon' => 'fas fa-database',
+            'permission' => 'master.view',
+            'order' => 200,
         ]);
 
-        Menu::create([
-            'name' => 'Manajemen Role',
-            'icon' => 'fas fa-user-tag',
-            'route' => 'admin.roles.index',
-            'permission' => 'setting.role.manage',
-            'parent_id' => $setting->id,
-            'order' => 2,
-        ]);
+        // Create master submenus
+        $masterMenus = ['Tahun Ajaran', 'Jadwal PPDB', 'Jalur Pendaftaran', 'Kuota Pendaftaran', 'Biaya Pendaftaran', 'Calon Siswa'];
+        foreach ($masterMenus as $index => $name) {
+            Menu::create([
+                'name' => $name,
+                'parent_id' => $master->id,
+                'order' => $index + 1,
+            ]);
+        }
 
-        Menu::create([
-            'name' => 'Manajemen User',
-            'icon' => 'fas fa-users',
-            'route' => 'admin.users.index',
-            'permission' => 'setting.user.manage',
-            'parent_id' => $setting->id,
-            'order' => 3,
-        ]);
+        // Create setting submenus
+        $settingMenus = [
+            ['Menu', 'admin.menus.index'],
+            ['Role', 'admin.roles.index'],
+            ['Permission', 'admin.permissions.index'],
+            ['User', 'admin.users.index'],
+        ];
+
+        foreach ($settingMenus as $index => $menu) {
+            Menu::create([
+                'name' => $menu[0],
+                'route' => $menu[1],
+                'parent_id' => $setting->id,
+                'order' => $index + 1,
+            ]);
+        }
     }
 }

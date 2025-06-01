@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('kuota_pendaftaran', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->onDelete('cascade');
-            $table->string('jalur_pendaftaran'); // Contoh: Zonasi, Prestasi, Afirmasi, dll
+            $table->foreignId('jalur_pendaftaran_id')->constrained('jalur_pendaftaran')->onDelete('cascade'); // Contoh: Zonasi, Prestasi, Afirmasi, dll
             $table->integer('kuota');
             $table->integer('terisi')->default(0);
             $table->text('keterangan')->nullable(); // Keterangan tambahan tentang kuota

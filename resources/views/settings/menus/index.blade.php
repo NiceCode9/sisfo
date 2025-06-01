@@ -10,8 +10,8 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="menuTable">
-                    <thead class="thead-light">
+                <table class="table table-bordered table-hover display nowrap responsive dataTable" id="menuTable">
+                    <thead>
                         <tr>
                             <th width="50">#</th>
                             <th>Nama Menu</th>

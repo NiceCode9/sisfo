@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('pembayaran', function (Blueprint $table) {
             $table->id();
             $table->foreignId('calon_siswa_id')->constrained('calon_siswa')->onDelete('cascade');
+            $table->foreignId('biaya_pendaftaran_id')->nullable()->constrained('biaya_pendaftaran')->onDelete('set null');
             $table->string('kode_pembayaran')->unique();
             $table->decimal('jumlah', 10, 2);
             $table->string('metode_pembayaran'); // transfer, tunai

@@ -15,11 +15,21 @@ class FrontController extends Controller
     public function pendaftaran()
     {
         $tahunAjaranAktif = TahunAjaran::where('status_aktif', true)->first();
+        $jalurPendaftarans = \App\Models\JalurPendaftaran::where('aktif', true)
+            ->with(['kuotaPendaftaran' => function ($query) use ($tahunAjaranAktif) {
+                $query->where('tahun_ajaran_id', $tahunAjaranAktif->id);
+            }])
+            ->get();
+
+        // Get PPDB schedules
+        $jadwalPpdb = \App\Models\JadwalPpdb::where('tahun_ajaran_id', $tahunAjaranAktif->id)
+            ->orderBy('tanggal_mulai')
+            ->get();
 
         return view('landing.pendaftaran', [
-            'jadwalPendaftaran' => $tahunAjaranAktif->pendaftaran_mulai . ' - ' . $tahunAjaranAktif->pendaftaran_selesai,
-            'jadwalTesMasuk' => $tahunAjaranAktif->tes_mulai,
-            'jadwalPengumuman' => $tahunAjaranAktif->pengumuman_mulai
+            'tahunAjaranAktif' => $tahunAjaranAktif,
+            'jalurPendaftarans' => $jalurPendaftarans,
+            'jadwalPpdb' => $jadwalPpdb
         ]);
     }
 }

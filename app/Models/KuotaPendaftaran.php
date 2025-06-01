@@ -20,11 +20,11 @@ class KuotaPendaftaran extends Model
 
     public function tahunAjaran()
     {
-        return $this->belongsTo(TahunAjaran::class);
+        return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id');
     }
 
     public function jalurPendaftaran()
     {
-        return $this->belongsTo(JalurPendaftaran::class);
+        return $this->belongsTo(JalurPendaftaran::class, 'jalur_pendaftaran_id');
     }
 }

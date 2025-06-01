@@ -63,4 +63,9 @@ class CalonSiswa extends Model
     {
         return $this->hasOne(Siswa::class);
     }
+
+    public function pembayaranLainnya()
+    {
+        return $this->hasMany(PembayaranLainnya::class);
+    }
 }

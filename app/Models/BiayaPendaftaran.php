@@ -24,8 +24,8 @@ class BiayaPendaftaran extends Model
         return $this->belongsTo(TahunAjaran::class);
     }
 
-    public function pembayaranLainnya()
+    public function pembayaran()
     {
-        return $this->hasMany(PembayaranLainnya::class);
+        return $this->hasMany(Pembayaran::class);
     }
 }

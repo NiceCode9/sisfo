@@ -14,8 +14,11 @@ class CalonSiswaController extends Controller
      */
     public function index(Request $request)
     {
+        $tahunAjaran = TahunAjaran::orderBy('nama_tahun_ajaran', 'desc')->get();
+        $tahunAjaranId = $request->tahun_ajaran_id ?? TahunAjaran::where('status_aktif', true)->first()->id;
+
         $query = CalonSiswa::with('berkasCalonSiswa')
-            ->where('tahun_ajaran_id', TahunAjaran::where('status_aktif', true)->first()->id);
+            ->where('tahun_ajaran_id', $tahunAjaranId);
 
         // Filter berdasarkan status
         if ($request->status && in_array($request->status, ['menunggu', 'diterima', 'ditolak'])) {
@@ -35,7 +38,7 @@ class CalonSiswaController extends Controller
 
         $calonSiswa = $query->get();
 
-        return view('pendaftaran.index', compact('calonSiswa'));
+        return view('pendaftaran.index', compact('calonSiswa', 'tahunAjaran', 'tahunAjaranId'));
     }
 
     /**
@@ -110,6 +113,12 @@ class CalonSiswaController extends Controller
                 'skl_path' => $sklPath,
             ]);
 
+            // Log Calon Siswa
+            $calonSiswa->logStatusPendaftaran()->create([
+                'status_baru' => 'menunggu',
+                'catatan' => 'Pendaftaran baru',
+            ]);
+
             DB::commit();
 
             return redirect()->route('pendaftaran')
@@ -167,21 +176,26 @@ class CalonSiswaController extends Controller
             DB::beginTransaction();
 
             $calonSiswa = CalonSiswa::findOrFail($id);
+            $jalurPendaftaran = $calonSiswa->jalurPendaftaran;
+            $jalurPendaftaran->load('kuotaPendaftaran');
+            $jalurPendaftaran->kuotaPendaftaran->update([
+                'terisi' => $jalurPendaftaran->kuotaPendaftaran->terisi + 1,
+            ]);
+
+            $calonSiswa->logStatusPendaftaran()->create([
+                'status_sebelumnya' => $calonSiswa->status_pendaftaran,
+                'status_baru' => $request->status_pendaftaran,
+                'catatan' => $request->catatan ?? null,
+                'user_id' => auth()->id(),
+            ]);
 
             $validated = $request->validate([
                 'status_pendaftaran' => 'required|in:diterima,ditolak',
-                'catatan' => 'nullable|string|max:255'
+                'catatan' => 'nullable|string|max:255',
             ]);
 
             $calonSiswa->update([
                 'status_pendaftaran' => $validated['status_pendaftaran']
-            ]);
-
-            // Log the status change
-            $calonSiswa->logStatusPendaftaran()->create([
-                'status' => $validated['status_pendaftaran'],
-                'catatan' => $validated['catatan'] ?? null,
-                'user_id' => auth()->id()
             ]);
 
             DB::commit();

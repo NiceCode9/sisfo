@@ -29,7 +29,7 @@
     <div class="table-settings mb-4">
         <div class="row align-items-center justify-content-between">
             <form action="{{ route('admin.calon-siswa.index') }}" method="GET" class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="input-group me-2 me-lg-3">
                         <span class="input-group-text">
                             <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
@@ -44,7 +44,17 @@
                             placeholder="Cari berdasarkan nama, NIK, NISN..." aria-label="Search">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <select class="form-select" name="tahun_ajaran_id" onchange="this.form.submit()">
+                        @foreach ($tahunAjaran as $ta)
+                            <option value="{{ $ta->id }}"
+                                {{ request('tahun_ajaran_id', $tahunAjaranId) == $ta->id ? 'selected' : '' }}>
+                                {{ $ta->nama_tahun_ajaran }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <select class="form-select" name="status" onchange="this.form.submit()">
                         <option value="">Semua Status</option>
                         <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
@@ -52,7 +62,7 @@
                         <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                {{-- <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">
                         <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -60,7 +70,7 @@
                         </svg>
                         Cari
                     </button>
-                </div>
+                </div> --}}
             </form>
         </div>
     </div>

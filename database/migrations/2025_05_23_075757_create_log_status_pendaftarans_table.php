@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('log_status_pendaftaran', function (Blueprint $table) {
             $table->id();
             $table->foreignId('calon_siswa_id')->constrained('calon_siswa')->onDelete('cascade');
-            $table->string('status_sebelumnya');
-            $table->string('status_baru');
+            $table->string('status_sebelumnya')->nullable();
+            $table->string('status_baru')->nullable();
             $table->foreignId('user_id')->nullable()->constrained(); // Admin yang mengubah
             $table->text('catatan')->nullable();
             $table->timestamps();

@@ -19,7 +19,8 @@ class Menu extends Model
         'order',
         'is_active',
         'is_header',
-        'url'
+        'group',
+        'url',
     ];
 
     protected $casts = [

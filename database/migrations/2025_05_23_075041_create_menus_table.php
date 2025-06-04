@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_header')->default(false);
+            $table->string('group')->nullable();
             $table->timestamps();
 
             $table->foreign('parent_id')

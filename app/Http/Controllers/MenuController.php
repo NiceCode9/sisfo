@@ -41,6 +41,7 @@ class MenuController extends Controller
             'order' => 'required|integer',
             'is_active' => 'boolean',
             'is_header' => 'boolean',
+            'group' => 'nullable|string|max:255',
         ]);
 
         Menu::create($validated);
@@ -83,6 +84,7 @@ class MenuController extends Controller
             'order' => 'required|integer',
             'is_active' => 'boolean',
             'is_header' => 'boolean',
+            'group' => 'nullable|string|max:255',
         ]);
 
         // Prevent menu from being its own parent

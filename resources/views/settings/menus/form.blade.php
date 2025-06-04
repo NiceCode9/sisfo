@@ -70,7 +70,33 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="group">Group Module</label>
+                            <select class="form-control @error('group') is-invalid @enderror" id="group" name="group">
+                                <option value="">-- Pilih Group Module --</option>
+                                <option value="Dashboard"
+                                    {{ old('group', $menu->group ?? '') == 'Dashboard' ? 'selected' : '' }}>Dashboard
+                                </option>
+                                <option value="Master Data"
+                                    {{ old('group', $menu->group ?? '') == 'Master Data' ? 'selected' : '' }}>Master Data
+                                </option>
+                                <option value="PPDB" {{ old('group', $menu->group ?? '') == 'PPDB' ? 'selected' : '' }}>
+                                    Module PPDB</option>
+                                <option value="E-Learning"
+                                    {{ old('group', $menu->group ?? '') == 'E-Learning' ? 'selected' : '' }}>Module
+                                    E-Learning</option>
+                                <option value="Pengaturan"
+                                    {{ old('group', $menu->group ?? '') == 'Pengaturan' ? 'selected' : '' }}>Pengaturan
+                                </option>
+                            </select>
+                            @error('group')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted">Group digunakan untuk mengelompokkan menu di sidebar</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="mb-3">
                             <label for="parent_id">Parent Menu</label>
                             <select class="form-control @error('parent_id') is-invalid @enderror" id="parent_id"
@@ -90,7 +116,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="mb-3">
                             <label for="permission">Permission</label>
                             <select class="form-control @error('permission') is-invalid @enderror" id="permission"

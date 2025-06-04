@@ -14,6 +14,8 @@ class MenuService
                 ->orderBy('order');
         }])
             ->parents()
+            ->orderBy('group')
+            ->orderBy('order')
             ->get();
         // ->filter(function ($menu) {
         //     // Filter berdasarkan permission

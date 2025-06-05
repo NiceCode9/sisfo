@@ -858,7 +858,6 @@
         }
     </style>
 
-    <!-- JavaScript for enhanced UX -->
     <script>
         // File upload preview and validation
         document.querySelectorAll('input[type="file"]').forEach(input => {
@@ -882,7 +881,6 @@
             });
         });
 
-        // Smooth scroll to form
         document.querySelector('a[href="#form-pendaftaran"]')?.addEventListener('click', function(e) {
             e.preventDefault();
             document.getElementById('form-pendaftaran').scrollIntoView({
@@ -890,7 +888,6 @@
             });
         });
 
-        // Form validation feedback
         document.querySelectorAll('input, select, textarea').forEach(field => {
             field.addEventListener('blur', function() {
                 if (this.value && this.checkValidity()) {

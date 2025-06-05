@@ -20,6 +20,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'siswa_id',
+        'guru_id',
         'name',
         'username',
         'email',
@@ -52,6 +53,11 @@ class User extends Authenticatable
     public function siswa()
     {
         return $this->belongsTo(Siswa::class);
+    }
+
+    public function guru()
+    {
+        return $this->belongsTo(Guru::class, 'guru_id', 'id');
     }
 
     public function logStatusPendaftaran()

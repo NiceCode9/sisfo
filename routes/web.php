@@ -35,6 +35,22 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' =>
     Route::resource('biaya-pendaftaran', \App\Http\Controllers\BiayaPendaftaranController::class);
     Route::resource('jadwal-ppdb', \App\Http\Controllers\JadwalPpdbController::class);
     Route::resource('kuota-pendaftaran', \App\Http\Controllers\KuotaPendaftaranController::class);
+    Route::resource('guru', \App\Http\Controllers\GuruController::class);
+    Route::resource('kelas', \App\Http\Controllers\KelasController::class);
+    Route::resource('mata-pelajaran', \App\Http\Controllers\MataPelajaranController::class);
+    Route::resource('guru-mata-pelajaran', \App\Http\Controllers\GuruMataPelajaranController::class);
+    Route::resource('jadwal', \App\Http\Controllers\JadwalController::class);
+    Route::resource('materi', \App\Http\Controllers\MateriController::class);
+
+    Route::get('guru-data', [\App\Http\Controllers\GuruController::class, 'datatable'])->name('guru.datatable');
+    Route::get('kelas-data', [\App\Http\Controllers\KelasController::class, 'datatable'])->name('kelas.datatable');
+    Route::get('mata-pelajaran-data', [\App\Http\Controllers\MataPelajaranController::class, 'datatable'])->name('mata-pelajaran.datatable');
+    Route::get('guru-mata-pelajaran-data', [\App\Http\Controllers\GuruMataPelajaranController::class, 'datatable'])->name('guru-mata-pelajaran.datatable');
+    Route::get('jadwal-data', [\App\Http\Controllers\JadwalController::class, 'datatable'])->name('jadwal.datatable');
+    Route::get('materi-data', [\App\Http\Controllers\MateriController::class, 'datatable'])->name('materi.datatable');
+
+    Route::get('guru-options', [\App\Http\Controllers\GuruController::class, 'options'])->name('guru.options');
+    Route::get('mata-pelajaran-options', [\App\Http\Controllers\MataPelajaranController::class, 'options'])->name('mata-pelajaran.options');
 
     Route::put('/users/{user}/update-password', [\App\Http\Controllers\UserController::class, 'updatePassword'])->name('users.update-password');
     Route::post('/menus/update-order', [\App\Http\Controllers\MenuController::class, 'updateOrder'])->name('menus.update-order');
@@ -63,6 +79,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' =>
         Route::get('/laporan/pembayaran/excel', 'exportExcel')->name('laporan.pembayaran.excel');
         Route::get('/laporan/pembayaran/pdf', 'exportPdf')->name('laporan.pembayaran.pdf');
     });
+
+    Route::get('materi/{materi}/download', [\App\Http\Controllers\MateriController::class, 'download'])->name('materi.download');
 });
 
 

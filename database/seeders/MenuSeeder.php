@@ -97,7 +97,7 @@ class MenuSeeder extends Seeder
                     // ],
                     [
                         'name' => 'Laporan Pembayaran',
-                        // 'route' => 'admin.pembayaran.laporan',
+                        'route' => 'admin.laporan.pembayaran',
                         'permission' => 'pembayaran.report',
                         'icon' => 'fas fa-chart-bar',
                         'group' => 'PPDB',
@@ -218,6 +218,22 @@ class MenuSeeder extends Seeder
                         'route' => 'admin.permissions.index',
                         'permission' => 'permissions.view',
                         'icon' => 'fas fa-key',
+                        'group' => 'Pengaturan Sistem',
+                    ],
+                ]
+            ],
+            [
+                'name' => 'Data Master',
+                'icon' => 'fas fa-database',
+                'permission' => 'data-master.view',
+                'group' => 'Pengaturan Sistem',
+                'order' => 6,
+                'children' => [
+                    [
+                        'name' => 'Guru',
+                        'route' => 'admin.guru.index',
+                        'permission' => 'guru.view',
+                        'icon' => 'fas fa-chalkboard-teacher',
                         'group' => 'Pengaturan Sistem',
                     ],
                 ]

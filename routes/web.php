@@ -56,6 +56,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' =>
         Route::post('/pembayaran/{calonSiswa}', 'store')->name('pembayaran.store');
         Route::post('/pembayaran/{id}', 'show')->name('pembayaran.show');
     });
+
+    // Laporan Routes
+    Route::controller('\App\Http\Controllers\LaporanPembayaranController')->group(function () {
+        Route::get('/laporan/pembayaran', 'index')->name('laporan.pembayaran');
+        Route::get('/laporan/pembayaran/excel', 'exportExcel')->name('laporan.pembayaran.excel');
+        Route::get('/laporan/pembayaran/pdf', 'exportPdf')->name('laporan.pembayaran.pdf');
+    });
 });
 
 

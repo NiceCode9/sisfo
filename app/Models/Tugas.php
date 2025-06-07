@@ -14,21 +14,27 @@ class Tugas extends Model
         'deskripsi',
         'batas_waktu',
         'total_nilai',
-        'jenis'
+        'jenis',
+        'metode_pengerjaan',
+        'file_tugas'
+    ];
+
+    protected $casts = [
+        'batas_waktu' => 'datetime'
     ];
 
     public function guruMataPelajaran()
     {
-        return $this->belongsTo(GuruMataPelajaran::class, 'id_guru_mata_pelajaran');
+        return $this->belongsTo(GuruMataPelajaran::class, 'guru_mata_pelajaran_id');
     }
 
     public function soal()
     {
-        return $this->hasMany(Soal::class, 'id_tugas');
+        return $this->hasMany(Soal::class);
     }
 
-    // public function pengumpulanTugas()
-    // {
-    //     return $this->hasMany(PengumpulanTugas::class, 'id_tugas');
-    // }
+    public function pengumpulanTugas()
+    {
+        return $this->hasMany(PengumpulanTugas::class);
+    }
 }

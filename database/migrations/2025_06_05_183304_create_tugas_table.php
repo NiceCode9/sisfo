@@ -19,6 +19,8 @@ return new class extends Migration
             $table->dateTime('batas_waktu');
             $table->integer('total_nilai')->default(100);
             $table->enum('jenis', ['uraian', 'pilihan_ganda', 'campuran']);
+            $table->enum('metode_pengerjaan', ['online', 'upload_file']);
+            $table->string('file_tugas')->nullable(); // Untuk menyimpan file tugas yang diupload guru
             $table->timestamps();
         });
     }

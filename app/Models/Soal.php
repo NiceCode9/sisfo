@@ -12,17 +12,27 @@ class Soal extends Model
         'tugas_id',
         'pertanyaan',
         'jenis_soal',
-        'poin'
+        'poin',
+        'urutan',
+    ];
+
+    protected $casts = [
+        'poin' => 'integer',
+        'urutan' => 'integer'
     ];
 
     public function tugas()
     {
-        return $this->belongsTo(Tugas::class, 'tugas_id');
+        return $this->belongsTo(Tugas::class);
     }
 
-    // Uncomment if you have a model for jawaban
-    // public function jawaban()
-    // {
-    //     return $this->hasMany(Jawaban::class, 'soal_id');
-    // }
+    public function jawaban()
+    {
+        return $this->hasMany(Jawaban::class);
+    }
+
+    public function jawabanSiswa()
+    {
+        return $this->hasMany(JawabanSiswa::class);
+    }
 }

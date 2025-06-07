@@ -236,6 +236,34 @@ class MenuSeeder extends Seeder
                         'icon' => 'fas fa-chalkboard-teacher',
                         'group' => 'Pengaturan Sistem',
                     ],
+                    [
+                        'name' => 'Kelas',
+                        'route' => 'admin.kelas.index',
+                        'permission' => 'kelas.view',
+                        'icon' => 'fas fa-school',
+                        'group' => 'Pengaturan Sistem',
+                    ],
+                    [
+                        'name' => 'Mata Pelajaran',
+                        'route' => 'admin.mata-pelajaran.index',
+                        'permission' => 'mata-pelajaran.view',
+                        'icon' => 'fas fa-book',
+                        'group' => 'Pengaturan Sistem',
+                    ],
+                    [
+                        'name' => 'Guru Mata Pelajaran',
+                        'route' => 'admin.guru-mata-pelajaran.index',
+                        'permission' => 'mata-pelajaran.view',
+                        'icon' => 'fas fa-user-graduate',
+                        'group' => 'Pengaturan Sistem',
+                    ],
+                    [
+                        'name' => 'Jadwal Pelajaran',
+                        'route' => 'admin.jadwal.index',
+                        'permission' => 'jadwal.view',
+                        'icon' => 'fas fa-calendar-alt',
+                        'group' => 'Pengaturan Sistem',
+                    ],
                 ]
             ],
             [

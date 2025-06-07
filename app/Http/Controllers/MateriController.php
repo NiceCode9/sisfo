@@ -252,6 +252,6 @@ class MateriController extends Controller
             abort(404, 'File not found');
         }
 
-        return Storage::disk('public')->download($materi->path_file);
+        return response()->download(storage_path('app/public/' . $materi->path_file));
     }
 }

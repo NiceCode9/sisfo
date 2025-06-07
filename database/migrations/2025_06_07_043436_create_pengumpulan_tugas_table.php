@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('soal', function (Blueprint $table) {
+        Schema::create('pengumpulan_tugas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tugas_id')->constrained('tugas')->onDelete('cascade');
-            $table->text('pertanyaan');
-            $table->enum('jenis_soal', ['uraian', 'pilihan_ganda']);
-            $table->integer('poin')->default(10);
-            $table->integer('urutan')->default(1);
+            $table->foreignId('siswa_id')->constrained('siswa')->onDelete('cascade');
+            $table->text('teks_pengumpulan')->nullable();
+            $table->string('path_file')->nullable();
+            $table->dateTime('waktu_pengumpulan');
+            $table->integer('nilai')->nullable();
+            $table->text('umpan_balik')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('soal');
+        Schema::dropIfExists('pengumpulan_tugas');
     }
 };

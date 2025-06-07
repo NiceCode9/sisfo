@@ -41,6 +41,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' =>
     Route::resource('guru-mata-pelajaran', \App\Http\Controllers\GuruMataPelajaranController::class);
     Route::resource('jadwal', \App\Http\Controllers\JadwalController::class);
     Route::resource('materi', \App\Http\Controllers\MateriController::class);
+    Route::resource('tugas', \App\Http\Controllers\TugasController::class);
+    Route::resource('soal', \App\Http\Controllers\SoalController::class);
+    Route::resource('jawaban', \App\Http\Controllers\JawabanController::class);
+    Route::resource('pengumpulan-tugas', \App\Http\Controllers\PengumpulanTugasController::class);
+    Route::resource('jawaban-siswa', \App\Http\Controllers\JawabanSiswaController::class);
 
     Route::get('guru-data', [\App\Http\Controllers\GuruController::class, 'datatable'])->name('guru.datatable');
     Route::get('kelas-data', [\App\Http\Controllers\KelasController::class, 'datatable'])->name('kelas.datatable');
@@ -81,6 +86,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' =>
     });
 
     Route::get('materi/{materi}/download', [\App\Http\Controllers\MateriController::class, 'download'])->name('materi.download');
+    Route::get('tugas/{tugas}/download', [\App\Http\Controllers\TugasController::class, 'download'])->name('tugas.download');
 });
 
 

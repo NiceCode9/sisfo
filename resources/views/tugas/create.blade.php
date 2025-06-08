@@ -19,7 +19,8 @@
                                     id="guru_mata_pelajaran_id" name="guru_mata_pelajaran_id" required>
                                     <option value="">Pilih Mata Pelajaran</option>
                                     @foreach ($guruMapel as $gmp)
-                                        <option value="{{ $gmp->id }}">{{ $gmp->mataPelajaran->nama }}</option>
+                                        <option value="{{ $gmp->id }}">{{ $gmp->mataPelajaran->nama_pelajaran }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('guru_mata_pelajaran_id')

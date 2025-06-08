@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Soal')
+@section('title', 'Edit Soal')
 
 @section('content')
     <div class="container-fluid">
@@ -13,38 +13,24 @@
                     @endforeach
                 </ul>
             </div>
-
         @endif
+
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Tambah Soal untuk Tugas: {{ $tugas->judul }}</h3>
+                        <h3 class="card-title">Edit Soal untuk Tugas: {{ $soal->tugas->judul }}</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.soal.store') }}" method="POST" id="formSoal">
+                        <form action="{{ route('admin.soal.update', $soal->id) }}" method="POST" id="formSoal">
                             @csrf
-                            <input type="hidden" name="tugas_id" value="{{ $tugas->id }}">
+                            @method('PUT')
 
                             <div class="form-group mb-3">
                                 <label for="pertanyaan">Pertanyaan</label>
                                 <textarea class="form-control @error('pertanyaan') is-invalid @enderror" id="pertanyaan" name="pertanyaan"
-                                    rows="3" required>{{ old('pertanyaan') }}</textarea>
+                                    rows="3" required>{{ old('pertanyaan', $soal->pertanyaan) }}</textarea>
                                 @error('pertanyaan')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label for="jenis_soal">Jenis Soal</label>
-                                <select class="form-control @error('jenis_soal') is-invalid @enderror" id="jenis_soal"
-                                    name="jenis_soal" required>
-                                    <option value="uraian" {{ $tugas->jenis === 'uraian' ? 'selected' : '' }}>Uraian
-                                    </option>
-                                    <option value="pilihan_ganda" {{ $tugas->jenis === 'pilihan_ganda' ? 'selected' : '' }}>
-                                        Pilihan Ganda</option>
-                                </select>
-                                @error('jenis_soal')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -52,7 +38,8 @@
                             <div class="form-group mb-3">
                                 <label for="poin">Poin</label>
                                 <input type="number" class="form-control @error('poin') is-invalid @enderror"
-                                    id="poin" name="poin" value="{{ old('poin', 10) }}" min="1" required>
+                                    id="poin" name="poin" value="{{ old('poin', $soal->poin) }}" min="1"
+                                    max="100" required>
                                 @error('poin')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -61,34 +48,60 @@
                             <div class="form-group mb-3">
                                 <label for="urutan">Urutan</label>
                                 <input type="number" class="form-control @error('urutan') is-invalid @enderror"
-                                    id="urutan" name="urutan" value="{{ old('urutan', 1) }}" min="1" required>
+                                    id="urutan" name="urutan" value="{{ old('urutan', $soal->urutan) }}" min="1"
+                                    required>
                                 @error('urutan')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div id="jawaban-container" style="display: none;">
-                                <h4>Pilihan Jawaban</h4>
-                                <div class="mb-2">
-                                    <small class="text-muted">
-                                        * Minimal 2 pilihan jawaban
-                                        * Satu jawaban harus dipilih sebagai jawaban benar
-                                    </small>
+                            @if ($soal->jenis_soal === 'pilihan_ganda')
+                                <div id="jawaban-container">
+                                    <h4>Pilihan Jawaban</h4>
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            * Minimal 2 pilihan jawaban
+                                            * Satu jawaban harus dipilih sebagai jawaban benar
+                                        </small>
+                                    </div>
+                                    <div class="jawaban-list">
+                                        @foreach ($soal->jawaban as $index => $jawaban)
+                                            <div class="jawaban-item mb-3">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control"
+                                                        name="jawaban[{{ $index }}][teks_jawaban]"
+                                                        placeholder="Teks jawaban" value="{{ $jawaban->teks_jawaban }}"
+                                                        required>
+                                                    <div class="input-group-append">
+                                                        <div class="input-group-text">
+                                                            <input type="radio" name="jawaban_benar"
+                                                                value="{{ $index }}"
+                                                                onchange="updateJawabanBenar({{ $index }})"
+                                                                {{ $jawaban->jawaban_benar ? 'checked' : '' }}>
+                                                            <label class="mb-0 ml-2">Jawaban Benar</label>
+                                                        </div>
+                                                        <button type="button" class="btn btn-danger"
+                                                            onclick="hapusJawaban(this)">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                    <input type="hidden"
+                                                        name="jawaban[{{ $index }}][jawaban_benar]"
+                                                        value="{{ $jawaban->jawaban_benar ? '1' : '0' }}">
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="btn btn-secondary mb-3" onclick="tambahJawaban()">
+                                        <i class="fas fa-plus"></i> Tambah Pilihan Jawaban
+                                    </button>
                                 </div>
-                                <div class="jawaban-list">
-                                </div>
-                                <button type="button" class="btn btn-secondary mb-3" onclick="tambahJawaban()">
-                                    <i class="fas fa-plus"></i> Tambah Pilihan Jawaban
-                                </button>
-                            </div>
+                            @endif
 
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary">Simpan</button>
-                                <button type="submit" class="btn btn-info" name="add_more" value="true">
-                                    Simpan & Tambah Soal Lain
-                                </button>
-                                <a href="{{ route('admin.tugas.show', $tugas->id) }}" class="btn btn-secondary">
-                                    Selesai
+                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                <a href="{{ route('admin.tugas.show', $soal->tugas_id) }}" class="btn btn-secondary">
+                                    Batal
                                 </a>
                             </div>
                         </form>
@@ -101,23 +114,7 @@
 
 @push('scripts')
     <script>
-        let jawabanCounter = 0;
-
-        function toggleJawabanContainer() {
-            const jenisSoal = $('#jenis_soal').val();
-            const container = $('#jawaban-container');
-
-            if (jenisSoal === 'pilihan_ganda') {
-                container.show();
-                if ($('.jawaban-item').length < 2) {
-                    while ($('.jawaban-item').length < 2) {
-                        tambahJawaban();
-                    }
-                }
-            } else {
-                container.hide();
-            }
-        }
+        let jawabanCounter = {{ $soal->jawaban->count() }};
 
         function tambahJawaban() {
             const jawabanHtml = `
@@ -128,14 +125,14 @@
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <input type="radio" name="jawaban_benar" value="${jawabanCounter}"
-                                onchange="updateJawabanBenar(${jawabanCounter})" ${jawabanCounter === 0 ? 'checked' : ''}>
+                                onchange="updateJawabanBenar(${jawabanCounter})">
                             <label class="mb-0 ml-2">Jawaban Benar</label>
                         </div>
                         <button type="button" class="btn btn-danger" onclick="hapusJawaban(this)">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                    <input type="hidden" name="jawaban[${jawabanCounter}][jawaban_benar]" value="${jawabanCounter === 0 ? '1' : '0'}">
+                    <input type="hidden" name="jawaban[${jawabanCounter}][jawaban_benar]" value="0">
                 </div>
             </div>
             `;
@@ -166,14 +163,9 @@
         }
 
         $(document).ready(function() {
-            $('#jenis_soal').change(toggleJawabanContainer);
-            toggleJawabanContainer();
-
             // Validasi form sebelum submit
             $('#formSoal').on('submit', function(e) {
-                const jenisSoal = $('#jenis_soal').val();
-
-                if (jenisSoal === 'pilihan_ganda') {
+                @if ($soal->jenis_soal === 'pilihan_ganda')
                     // Cek minimal 2 pilihan jawaban
                     if ($('.jawaban-item').length < 2) {
                         e.preventDefault();
@@ -202,7 +194,7 @@
                         alert('Harus memilih satu jawaban yang benar!');
                         return false;
                     }
-                }
+                @endif
             });
         });
     </script>

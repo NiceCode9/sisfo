@@ -7,6 +7,7 @@ use App\Models\GuruMataPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class TugasController extends Controller
 {
@@ -78,70 +79,100 @@ class TugasController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tugas $tugas)
+    public function show(Tugas $tuga)
     {
-        $tugas->load(['soal.jawaban', 'pengumpulanTugas']);
-        return view('admin.tugas.show', compact('tugas'));
+        $tuga->load(['soal.jawaban', 'pengumpulanTugas']);
+        return view('tugas.show', compact('tuga'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tugas $tugas)
+    public function edit(Tugas $tuga)
     {
         $guruMapel = GuruMataPelajaran::with('mataPelajaran')
             ->where('guru_id', auth()->user()->guru->id)
             ->get();
 
-        return view('admin.tugas.edit', compact('tugas', 'guruMapel'));
+        return view('tugas.edit', compact('tuga', 'guruMapel'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tugas $tugas)
+    public function update(Request $request, Tugas $tuga)
     {
-        $validator = Validator::make($request->all(), [
-            'guru_mata_pelajaran_id' => 'required|exists:guru_mata_pelajaran,id',
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'batas_waktu' => 'required|date',
-            'total_nilai' => 'required|integer|min:0|max:100',
-            'file_tugas' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
-        ]);
+        try {
+            $rules = [
+                'guru_mata_pelajaran_id' => 'required|exists:guru_mata_pelajaran,id',
+                'judul' => 'required|string|max:255',
+                'deskripsi' => 'required|string',
+                'batas_waktu' => 'required|date',
+                'total_nilai' => 'required|integer|min:0|max:100',
+            ];
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        if ($request->hasFile('file_tugas')) {
-            // Hapus file lama jika ada
-            if ($tugas->file_tugas) {
-                Storage::disk('public')->delete($tugas->file_tugas);
+            // Hanya validasi file jika tugas tipe upload file
+            if ($tuga->metode_pengerjaan === 'upload_file') {
+                $rules['file_tugas'] = 'nullable|file|mimes:pdf,doc,docx|max:2048';
             }
-            $file = $request->file('file_tugas');
-            $path = $file->store('tugas', 'public');
-            $tugas->file_tugas = $path;
+
+            $validator = Validator::make($request->all(), $rules, [
+                'guru_mata_pelajaran_id.required' => 'Mata pelajaran wajib dipilih',
+                'judul.required' => 'Judul tugas wajib diisi',
+                'judul.max' => 'Judul tugas maksimal 255 karakter',
+                'deskripsi.required' => 'Deskripsi tugas wajib diisi',
+                'batas_waktu.required' => 'Batas waktu wajib diisi',
+                'batas_waktu.date' => 'Format batas waktu tidak valid',
+                'total_nilai.required' => 'Total nilai wajib diisi',
+                'total_nilai.integer' => 'Total nilai harus berupa angka',
+                'total_nilai.min' => 'Total nilai minimal 0',
+                'total_nilai.max' => 'Total nilai maksimal 100',
+                'file_tugas.mimes' => 'File tugas harus berformat PDF, DOC, atau DOCX',
+                'file_tugas.max' => 'Ukuran file tugas maksimal 2MB'
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            DB::beginTransaction();
+
+            if ($request->hasFile('file_tugas')) {
+                // Hapus file lama jika ada
+                if ($tuga->file_tugas) {
+                    Storage::disk('public')->delete($tuga->file_tugas);
+                }
+                $file = $request->file('file_tugas');
+                $path = $file->store('tugas', 'public');
+                $tuga->file_tugas = $path;
+            }
+
+            $tuga->update($request->except(['file_tugas', 'metode_pengerjaan', 'jenis']));
+
+            DB::commit();
+
+            return redirect()->route('admin.tugas.show', $tuga->id)
+                ->with('success', 'Tugas berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $tugas->update($request->except('file_tugas'));
-
-        return redirect()->route('tugas.index')
-            ->with('success', 'Tugas berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tugas $tugas)
+    public function destroy(Tugas $tuga)
     {
-        if ($tugas->file_tugas) {
-            Storage::disk('public')->delete($tugas->file_tugas);
+        if ($tuga->file_tugas) {
+            Storage::disk('public')->delete($tuga->file_tugas);
         }
 
-        $tugas->delete();
+        $tuga->delete();
 
         return redirect()->route('tugas.index')
             ->with('success', 'Tugas berhasil dihapus.');

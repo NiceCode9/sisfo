@@ -28,7 +28,7 @@ class Soal extends Model
 
     public function jawaban()
     {
-        return $this->hasMany(Jawaban::class);
+        return $this->hasMany(Jawaban::class, 'id_soal');
     }
 
     public function jawabanSiswa()

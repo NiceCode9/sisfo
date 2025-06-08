@@ -135,7 +135,7 @@ class MateriController extends Controller
     {
         // Check authorization
         if (!Auth::user()->hasRole('superadmin')) {
-            $authorized = $materi->guruMataPelajaran->guru->user_id === Auth::id();
+            $authorized = $materi->guruMataPelajaran->guru->user->id === Auth::id();
             if (!$authorized) {
                 return response()->json([
                     'status' => 'error',
@@ -155,7 +155,7 @@ class MateriController extends Controller
     {
         // Check authorization
         if (!Auth::user()->hasRole('superadmin')) {
-            $authorized = $materi->guruMataPelajaran->guru->user_id === Auth::id();
+            $authorized = $materi->guruMataPelajaran->guru->user->id === Auth::id();
             if (!$authorized) {
                 return response()->json([
                     'status' => 'error',
@@ -207,7 +207,7 @@ class MateriController extends Controller
     {
         // Check authorization
         if (!Auth::user()->hasRole('superadmin')) {
-            $authorized = $materi->guruMataPelajaran->guru->user_id === Auth::id();
+            $authorized = $materi->guruMataPelajaran->guru->user->id === Auth::id();
             if (!$authorized) {
                 return response()->json([
                     'status' => 'error',
@@ -242,7 +242,7 @@ class MateriController extends Controller
     {
         // Check authorization
         if (!Auth::user()->hasRole('superadmin')) {
-            $authorized = $materi->guruMataPelajaran->guru->user_id === Auth::id();
+            $authorized = $materi->guruMataPelajaran->guru->user->id === Auth::id();
             if (!$authorized) {
                 abort(403, 'Unauthorized');
             }

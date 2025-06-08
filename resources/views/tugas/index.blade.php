@@ -36,7 +36,7 @@
                                     @forelse($tugas as $t)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $t->guruMataPelajaran->mataPelajaran->nama }}</td>
+                                            <td>{{ $t->guruMataPelajaran->mataPelajaran->nama_pelajaran }}</td>
                                             <td>{{ $t->judul }}</td>
                                             <td>
                                                 <span class="badge bg-info">
@@ -85,11 +85,11 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <a href="{{ route('admin.tugas.show', $t->id) }}"
+                                                    <a href="{{ route('admin.tugas.show', ['tuga' => $t->id]) }}"
                                                         class="btn btn-sm btn-info" title="Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    @if (auth()->user()->hasRole('guru') && $t->guruMataPelajaran->guru->user_id === auth()->id())
+                                                    @if (auth()->user()->hasRole('guru') && $t->guruMataPelajaran->guru->user->id === auth()->id())
                                                         <a href="{{ route('admin.tugas.edit', $t->id) }}"
                                                             class="btn btn-sm btn-warning" title="Edit">
                                                             <i class="fas fa-edit"></i>
@@ -108,7 +108,7 @@
                                                     @endif
                                                 </div>
 
-                                                @if (auth()->user()->hasRole('guru') && $t->guruMataPelajaran->guru->user_id === auth()->id())
+                                                @if (auth()->user()->hasRole('guru') && $t->guruMataPelajaran->guru->user->id === auth()->id())
                                                     <form id="delete-form-{{ $t->id }}"
                                                         action="{{ route('admin.tugas.destroy', $t->id) }}" method="POST"
                                                         class="d-none">

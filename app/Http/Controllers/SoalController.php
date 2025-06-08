@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Soal;
 use App\Models\Tugas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class SoalController extends Controller
 {
@@ -32,15 +34,33 @@ class SoalController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'tugas_id' => 'required|exists:tugas,id',
-            'pertanyaan' => 'required|string',
+            'pertanyaan' => 'required|string|min:3',
             'jenis_soal' => 'required|in:uraian,pilihan_ganda',
-            'poin' => 'required|integer|min:1',
-            'urutan' => 'required|integer|min:1',
-            'jawaban' => 'required_if:jenis_soal,pilihan_ganda|array',
-            'jawaban.*.teks_jawaban' => 'required_if:jenis_soal,pilihan_ganda|string',
+            'poin' => 'required|integer|min:1|max:100',
+            'urutan' => [
+                'required',
+                'integer',
+                'min:1',
+                Rule::unique('soal')->where(function ($query) use ($request) {
+                    return $query->where('tugas_id', $request->tugas_id);
+                })
+            ],
+            'jawaban' => 'required_if:jenis_soal,pilihan_ganda|array|min:2',
+            'jawaban.*.teks_jawaban' => 'required_if:jenis_soal,pilihan_ganda|string|min:1',
             'jawaban.*.jawaban_benar' => 'required_if:jenis_soal,pilihan_ganda|boolean'
+        ], [
+            'pertanyaan.required' => 'Pertanyaan wajib diisi',
+            'pertanyaan.min' => 'Pertanyaan minimal 3 karakter',
+            'poin.min' => 'Poin minimal 1',
+            'poin.max' => 'Poin maksimal 100',
+            'urutan.unique' => 'Urutan soal sudah digunakan pada tugas ini',
+            'jawaban.required_if' => 'Pilihan jawaban wajib diisi untuk soal pilihan ganda',
+            'jawaban.min' => 'Minimal harus ada 2 pilihan jawaban',
+            'jawaban.*.teks_jawaban.required_if' => 'Teks jawaban tidak boleh kosong',
+            'jawaban.*.teks_jawaban.min' => 'Teks jawaban tidak boleh kosong'
         ]);
 
         if ($validator->fails()) {
@@ -49,20 +69,42 @@ class SoalController extends Controller
                 ->withInput();
         }
 
-        $soal = Soal::create($request->only(['tugas_id', 'pertanyaan', 'jenis_soal', 'poin', 'urutan']));
+        try {
+            DB::beginTransaction();
 
-        // Jika soal pilihan ganda, simpan jawaban
-        if ($request->jenis_soal === 'pilihan_ganda' && !empty($request->jawaban)) {
-            foreach ($request->jawaban as $jawaban) {
-                $soal->jawaban()->create([
-                    'teks_jawaban' => $jawaban['teks_jawaban'],
-                    'jawaban_benar' => $jawaban['jawaban_benar'] ?? false
-                ]);
+            $soal = Soal::create($request->only(['tugas_id', 'pertanyaan', 'jenis_soal', 'poin', 'urutan']));
+
+            // Jika soal pilihan ganda, simpan jawaban
+            if ($request->jenis_soal === 'pilihan_ganda' && !empty($request->jawaban)) {
+                // Validasi harus ada tepat satu jawaban benar
+                $jawabanBenar = collect($request->jawaban)->where('jawaban_benar', true)->count();
+                if ($jawabanBenar !== 1) {
+                    throw new \Exception('Harus ada tepat satu jawaban yang benar');
+                }
+
+                foreach ($request->jawaban as $jawaban) {
+                    $soal->jawaban()->create([
+                        'teks_jawaban' => trim($jawaban['teks_jawaban']),
+                        'jawaban_benar' => $jawaban['jawaban_benar'] ?? false
+                    ]);
+                }
             }
-        }
 
-        return redirect()->route('admin.soal.create', ['tugas' => $request->tugas_id])
-            ->with('success', 'Soal berhasil ditambahkan');
+            DB::commit();
+
+            if ($request->has('add_more')) {
+                return redirect()->route('admin.soal.create', ['tugas' => $request->tugas_id])
+                    ->with('success', 'Soal berhasil ditambahkan. Silahkan tambah soal lainnya.');
+            }
+
+            return redirect()->route('admin.tugas.show', $request->tugas_id)
+                ->with('success', 'Soal berhasil ditambahkan');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -89,12 +131,30 @@ class SoalController extends Controller
     public function update(Request $request, Soal $soal)
     {
         $validator = Validator::make($request->all(), [
-            'pertanyaan' => 'required|string',
-            'poin' => 'required|integer|min:1',
-            'urutan' => 'required|integer|min:1',
-            'jawaban' => 'required_if:jenis_soal,pilihan_ganda|array',
-            'jawaban.*.teks_jawaban' => 'required_if:jenis_soal,pilihan_ganda|string',
+            'pertanyaan' => 'required|string|min:3',
+            'poin' => 'required|integer|min:1|max:100',
+            'urutan' => [
+                'required',
+                'integer',
+                'min:1',
+                Rule::unique('soal')->where(function ($query) use ($request, $soal) {
+                    return $query->where('tugas_id', $soal->tugas_id)
+                        ->where('id', '!=', $soal->id);
+                })
+            ],
+            'jawaban' => 'required_if:jenis_soal,pilihan_ganda|array|min:2',
+            'jawaban.*.teks_jawaban' => 'required_if:jenis_soal,pilihan_ganda|string|min:1',
             'jawaban.*.jawaban_benar' => 'required_if:jenis_soal,pilihan_ganda|boolean'
+        ], [
+            'pertanyaan.required' => 'Pertanyaan wajib diisi',
+            'pertanyaan.min' => 'Pertanyaan minimal 3 karakter',
+            'poin.min' => 'Poin minimal 1',
+            'poin.max' => 'Poin maksimal 100',
+            'urutan.unique' => 'Urutan soal sudah digunakan pada tugas ini',
+            'jawaban.required_if' => 'Pilihan jawaban wajib diisi untuk soal pilihan ganda',
+            'jawaban.min' => 'Minimal harus ada 2 pilihan jawaban',
+            'jawaban.*.teks_jawaban.required_if' => 'Teks jawaban tidak boleh kosong',
+            'jawaban.*.teks_jawaban.min' => 'Teks jawaban tidak boleh kosong'
         ]);
 
         if ($validator->fails()) {
@@ -103,24 +163,41 @@ class SoalController extends Controller
                 ->withInput();
         }
 
-        $soal->update($request->only(['pertanyaan', 'poin', 'urutan']));
+        try {
+            DB::beginTransaction();
 
-        // Update jawaban jika soal pilihan ganda
-        if ($soal->jenis_soal === 'pilihan_ganda' && !empty($request->jawaban)) {
-            // Hapus jawaban lama
-            $soal->jawaban()->delete();
+            $soal->update($request->only(['pertanyaan', 'poin', 'urutan']));
 
-            // Tambah jawaban baru
-            foreach ($request->jawaban as $jawaban) {
-                $soal->jawaban()->create([
-                    'teks_jawaban' => $jawaban['teks_jawaban'],
-                    'jawaban_benar' => $jawaban['jawaban_benar'] ?? false
-                ]);
+            // Update jawaban jika soal pilihan ganda
+            if ($soal->jenis_soal === 'pilihan_ganda' && !empty($request->jawaban)) {
+                // Validasi harus ada tepat satu jawaban benar
+                $jawabanBenar = collect($request->jawaban)->where('jawaban_benar', true)->count();
+                if ($jawabanBenar !== 1) {
+                    throw new \Exception('Harus ada tepat satu jawaban yang benar');
+                }
+
+                // Hapus jawaban lama
+                $soal->jawaban()->delete();
+
+                // Tambah jawaban baru
+                foreach ($request->jawaban as $jawaban) {
+                    $soal->jawaban()->create([
+                        'teks_jawaban' => trim($jawaban['teks_jawaban']),
+                        'jawaban_benar' => $jawaban['jawaban_benar'] ?? false
+                    ]);
+                }
             }
-        }
 
-        return redirect()->route('admin.soal.show', $soal->id)
-            ->with('success', 'Soal berhasil diperbarui');
+            DB::commit();
+
+            return redirect()->route('admin.soal.show', $soal->id)
+                ->with('success', 'Soal berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -128,10 +205,30 @@ class SoalController extends Controller
      */
     public function destroy(Soal $soal)
     {
-        $tugasId = $soal->tugas_id;
-        $soal->delete();
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('admin.tugas.show', $tugasId)
-            ->with('success', 'Soal berhasil dihapus');
+            // Cek apakah soal sudah memiliki jawaban siswa
+            if ($soal->jawabanSiswa()->exists()) {
+                throw new \Exception('Soal tidak dapat dihapus karena sudah memiliki jawaban dari siswa');
+            }
+
+            $tugasId = $soal->tugas_id;
+
+            // Hapus jawaban pilihan ganda jika ada
+            $soal->jawaban()->delete();
+
+            // Hapus soal
+            $soal->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.tugas.show', $tugasId)
+                ->with('success', 'Soal berhasil dihapus');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

@@ -210,7 +210,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'Siswa',
-                        'route' => 'admin.siswa.index',
+                        // 'route' => 'admin.siswa.index',
                         // 'permission' => 'siswa.view',
                         'icon' => 'fas fa-users',
                         'group' => 'E-Learning',
@@ -227,6 +227,13 @@ class MenuSeeder extends Seeder
                         'route' => 'admin.guru-mata-pelajaran.index',
                         // 'permission' => 'mata-pelajaran.view',
                         'icon' => 'fas fa-user-graduate',
+                        'group' => 'Pengaturan Sistem',
+                    ],
+                    [
+                        'name' => 'Guru Kelas',
+                        'route' => 'admin.guru-kelas.index',
+                        // 'permission' => 'mata-pelajaran.view',
+                        'icon' => 'fas fa-chalkboard-teacher',
                         'group' => 'Pengaturan Sistem',
                     ],
                     [

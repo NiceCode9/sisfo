@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Siswa extends Model
 {
@@ -31,5 +32,22 @@ class Siswa extends Model
     public function user()
     {
         return $this->hasOne(User::class);
+    }
+
+    public function riwayatKelas(): HasMany
+    {
+        return $this->hasMany(RiwayatKelas::class);
+    }
+
+    // Method helper untuk mendapatkan kelas aktif
+    public function kelasAktif($tahunAjaranId = null)
+    {
+        $query = $this->riwayatKelas()->where('status', 'aktif');
+
+        if ($tahunAjaranId) {
+            $query->where('tahun_ajaran_id', $tahunAjaranId);
+        }
+
+        return $query->first();
     }
 }

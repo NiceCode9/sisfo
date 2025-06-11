@@ -17,6 +17,7 @@ class Soal extends Model
     ];
 
     protected $casts = [
+        'jenis_soal' => 'string',
         'poin' => 'integer',
         'urutan' => 'integer'
     ];

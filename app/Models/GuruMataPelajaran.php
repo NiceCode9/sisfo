@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GuruMataPelajaran extends Model
 {
@@ -11,6 +12,7 @@ class GuruMataPelajaran extends Model
     protected $fillable = [
         'guru_id',
         'mata_pelajaran_id',
+        'keterangan',
     ];
 
     /**
@@ -21,6 +23,11 @@ class GuruMataPelajaran extends Model
         return $this->belongsTo(Guru::class, 'guru_id');
     }
 
+    public function guruKelas()
+    {
+        return $this->hasMany(GuruKelas::class, 'guru_mata_pelajaran_id');
+    }
+
     /**
      * Get the mata pelajaran that owns the GuruMataPelajaran.
      */
@@ -29,9 +36,15 @@ class GuruMataPelajaran extends Model
         return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
     }
 
-    public function jadwal()
+    // public function jadwal()
+    // {
+    //     return $this->hasMany(Jadwal::class, 'guru_mata_pelajaran_id');
+    // }
+
+    public function jadwal(): HasMany
     {
-        return $this->hasMany(Jadwal::class, 'guru_mata_pelajaran_id');
+        return $this->hasMany(Jadwal::class, 'guru_kelas_id', 'id')
+            ->through('guru_kelas');
     }
 
     public function materi()

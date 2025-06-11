@@ -12,6 +12,9 @@ return new class extends Migration
             // Tambah foreign key ke guru_kelas
             $table->foreignId('guru_kelas_id')->after('guru_mata_pelajaran_id')
                 ->constrained('guru_kelas')->onDelete('cascade');
+            $table->enum('visibilitas', ['kelas', 'semua_kelas'])->default('kelas')->after('file_tugas');
+            $table->dateTime('tanggal_terbit')->nullable()->after('visibilitas');
+            $table->boolean('aktif')->default(true)->after('tanggal_terbit');
 
             // Hapus constraint lama
             $table->dropForeign(['guru_mata_pelajaran_id']);
@@ -25,6 +28,7 @@ return new class extends Migration
             $table->dropForeign(['guru_kelas_id']);
             $table->dropColumn('guru_kelas_id');
             $table->foreignId('guru_mata_pelajaran_id')->constrained('guru_mata_pelajaran')->onDelete('cascade');
+            $table->dropColumn(['visibilitas', 'tanggal_terbit', 'aktif']);
         });
     }
 };

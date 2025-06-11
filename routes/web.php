@@ -46,6 +46,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' =>
     Route::resource('jawaban', \App\Http\Controllers\JawabanController::class);
     Route::resource('pengumpulan-tugas', \App\Http\Controllers\PengumpulanTugasController::class);
     Route::resource('jawaban-siswa', \App\Http\Controllers\JawabanSiswaController::class);
+    Route::resource('guru-kelas', \App\Http\Controllers\GuruKelasController::class);
 
     Route::get('guru-data', [\App\Http\Controllers\GuruController::class, 'datatable'])->name('guru.datatable');
     Route::get('kelas-data', [\App\Http\Controllers\KelasController::class, 'datatable'])->name('kelas.datatable');
@@ -53,6 +54,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' =>
     Route::get('guru-mata-pelajaran-data', [\App\Http\Controllers\GuruMataPelajaranController::class, 'datatable'])->name('guru-mata-pelajaran.datatable');
     Route::get('jadwal-data', [\App\Http\Controllers\JadwalController::class, 'datatable'])->name('jadwal.datatable');
     Route::get('materi-data', [\App\Http\Controllers\MateriController::class, 'datatable'])->name('materi.datatable');
+    Route::get('guru-kelas-data', [\App\Http\Controllers\GuruKelasController::class, 'datatable'])->name('guru-kelas.datatable');
 
     Route::get('guru-options', [\App\Http\Controllers\GuruController::class, 'options'])->name('guru.options');
     Route::get('mata-pelajaran-options', [\App\Http\Controllers\MataPelajaranController::class, 'options'])->name('mata-pelajaran.options');

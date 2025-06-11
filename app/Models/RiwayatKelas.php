@@ -16,6 +16,11 @@ class RiwayatKelas extends Model
         'keterangan',
     ];
 
+    protected $casts = [
+        'status' => 'string'
+    ];
+
+
     public function siswa()
     {
         return $this->belongsTo(Siswa::class);

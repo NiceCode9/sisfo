@@ -6,6 +6,15 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Buat Tugas Baru</h3>
@@ -14,16 +23,17 @@
                         <form action="{{ route('admin.tugas.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group mb-3">
-                                <label for="guru_mata_pelajaran_id">Mata Pelajaran</label>
-                                <select class="form-control @error('guru_mata_pelajaran_id') is-invalid @enderror"
-                                    id="guru_mata_pelajaran_id" name="guru_mata_pelajaran_id" required>
+                                <label for="guru_kelas_id">Mata Pelajaran</label>
+                                <select class="form-control @error('guru_kelas_id') is-invalid @enderror" id="guru_kelas_id"
+                                    name="guru_kelas_id" required>
                                     <option value="">Pilih Mata Pelajaran</option>
-                                    @foreach ($guruMapel as $gmp)
-                                        <option value="{{ $gmp->id }}">{{ $gmp->mataPelajaran->nama_pelajaran }}
+                                    @foreach ($kelasYangDiajar as $kyd)
+                                        <option value="{{ $kyd->id == old('guru_kelas_id') ? 'selected' : '' }}">
+                                            {{ $kyd->guruMataPelajaran->mataPelajaran->nama_pelajaran . ' - ' . $kyd->kelas->nama_kelas }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('guru_mata_pelajaran_id')
+                                @error('guru_kelas_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

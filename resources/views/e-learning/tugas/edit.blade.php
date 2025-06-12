@@ -17,18 +17,18 @@
                             @method('PUT')
 
                             <div class="form-group mb-3">
-                                <label for="guru_mata_pelajaran_id">Mata Pelajaran</label>
-                                <select class="form-control @error('guru_mata_pelajaran_id') is-invalid @enderror"
-                                    id="guru_mata_pelajaran_id" name="guru_mata_pelajaran_id" required>
+                                <label for="guru_kelas_id">Mata Pelajaran</label>
+                                <select class="form-control @error('guru_kelas_id') is-invalid @enderror" id="guru_kelas_id"
+                                    name="guru_kelas_id" required>
                                     <option value="">Pilih Mata Pelajaran</option>
-                                    @foreach ($guruMapel as $gmp)
-                                        <option value="{{ $gmp->id }}"
-                                            {{ $tuga->guru_mata_pelajaran_id == $gmp->id ? 'selected' : '' }}>
-                                            {{ $gmp->mataPelajaran->nama_pelajaran }}
+                                    @foreach ($kelasYangDiajar as $kyd)
+                                        <option value="{{ $kyd->id }}"
+                                            {{ $kyd->id == old('guru_kelas_id', $tuga->guru_kelas_id) ? 'selected' : '' }}>
+                                            {{ $kyd->guruMataPelajaran->mataPelajaran->nama_pelajaran }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('guru_mata_pelajaran_id')
+                                @error('guru_kelas_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

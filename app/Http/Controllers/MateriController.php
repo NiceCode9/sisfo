@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GuruKelas;
 use App\Models\Materi;
 use App\Models\GuruMataPelajaran;
 use Illuminate\Http\Request;
@@ -16,15 +17,22 @@ class MateriController extends Controller
      */
     public function index()
     {
-        $guruMataPelajaran = GuruMataPelajaran::with(['guru.user', 'mataPelajaran'])
+        // $guruMataPelajaran = GuruMataPelajaran::with(['guru.user', 'mataPelajaran'])
+        //     ->when(!Auth::user()->hasRole('superadmin'), function ($query) {
+        //         return $query->whereHas('guru.user', function ($q) {
+        //             $q->where('id', Auth::id());
+        //         });
+        //     })
+        //     ->get();
+        $guruKelas = GuruKelas::with(['guruMataPelajaran.mataPelajaran', 'guruMataPelajaran.guru.user'])
             ->when(!Auth::user()->hasRole('superadmin'), function ($query) {
-                return $query->whereHas('guru.user', function ($q) {
+                return $query->whereHas('guruMataPelajaran.guru.user', function ($q) {
                     $q->where('id', Auth::id());
                 });
             })
             ->get();
 
-        return view('master.materi.index', compact('guruMataPelajaran'));
+        return view('e-learning.materi.index', compact('guruKelas'));
     }
 
     /**
@@ -32,20 +40,19 @@ class MateriController extends Controller
      */
     public function datatable()
     {
-        $materi = Materi::with(['guruMataPelajaran.guru.user', 'guruMataPelajaran.mataPelajaran'])
+        $materi = Materi::with(['guruKelas.guruMataPelajaran.guru.user', 'guruKelas.guruMataPelajaran.mataPelajaran'])
             ->when(!Auth::user()->hasRole('superadmin'), function ($query) {
-                return $query->whereHas('guruMataPelajaran.guru.user', function ($q) {
+                return $query->whereHas('guruKelas.guruMataPelajaran.guru.user', function ($q) {
                     $q->where('id', Auth::id());
                 });
             })->get();
-
         return DataTables::of($materi)
             ->addIndexColumn()
             ->addColumn('guru', function ($row) {
-                return $row->guruMataPelajaran->guru->user->name;
+                return $row->guruKelas->guruMataPelajaran->guru->user->name;
             })
             ->addColumn('mata_pelajaran', function ($row) {
-                return $row->guruMataPelajaran->mataPelajaran->nama_pelajaran;
+                return $row->guruKelas->guruMataPelajaran->mataPelajaran->nama_pelajaran;
             })
             ->addColumn('file', function ($row) {
                 return $row->path_file ? '<a href="' . route('admin.materi.download', $row->id) . '" class="btn btn-sm btn-info">
@@ -84,7 +91,7 @@ class MateriController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'guru_mata_pelajaran_id' => 'required|exists:guru_mata_pelajaran,id',
+            'guru_kelas_id' => 'required|exists:guru_kelas,id',
             'judul' => 'required|string|max:255',
             'konten' => 'required|string',
             'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx',
@@ -94,16 +101,20 @@ class MateriController extends Controller
         try {
             // Check if user is authorized to upload for this guru_mata_pelajaran
             if (!Auth::user()->hasRole('superadmin')) {
-                $guruMataPelajaran = GuruMataPelajaran::whereHas('guru.user', function ($query) {
+                $guruKelas = GuruKelas::whereHas('guruMataPelajaran.guru.user', function ($query) {
                     $query->where('id', Auth::id());
-                })->find($request->guru_mata_pelajaran_id);
+                })->find($request->guru_kelas_id);
 
-                if (!$guruMataPelajaran) {
+                if (!$guruKelas) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Anda tidak memiliki akses untuk mengunggah materi ini'
                     ], 403);
                 }
+            }
+
+            if ($request->diterbitkan == '1') {
+                $data['tanggal_terbit'] = now();
             }
 
             $data = $request->except('file');
@@ -135,7 +146,7 @@ class MateriController extends Controller
     {
         // Check authorization
         if (!Auth::user()->hasRole('superadmin')) {
-            $authorized = $materi->guruMataPelajaran->guru->user->id === Auth::id();
+            $authorized = $materi->guruKelas->guruMataPelajaran->guru->user->id === Auth::id();
             if (!$authorized) {
                 return response()->json([
                     'status' => 'error',
@@ -144,7 +155,7 @@ class MateriController extends Controller
             }
         }
 
-        $materi->load(['guruMataPelajaran.guru.user', 'guruMataPelajaran.mataPelajaran']);
+        $materi->load(['guruKelas.guruMataPelajaran.guru.user', 'guruKelas.guruMataPelajaran.mataPelajaran']);
         return response()->json($materi);
     }
 
@@ -155,7 +166,7 @@ class MateriController extends Controller
     {
         // Check authorization
         if (!Auth::user()->hasRole('superadmin')) {
-            $authorized = $materi->guruMataPelajaran->guru->user->id === Auth::id();
+            $authorized = $materi->guruKelas->guruMataPelajaran->guru->user->id === Auth::id();
             if (!$authorized) {
                 return response()->json([
                     'status' => 'error',
@@ -165,7 +176,7 @@ class MateriController extends Controller
         }
 
         $request->validate([
-            'guru_mata_pelajaran_id' => 'required|exists:guru_mata_pelajaran,id',
+            'guru_kelas_id' => 'required|exists:guru_kelas,id',
             'judul' => 'required|string|max:255',
             'konten' => 'required|string',
             'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx',
@@ -207,7 +218,7 @@ class MateriController extends Controller
     {
         // Check authorization
         if (!Auth::user()->hasRole('superadmin')) {
-            $authorized = $materi->guruMataPelajaran->guru->user->id === Auth::id();
+            $authorized = $materi->guruKelas->guruMataPelajaran->guru->user->id === Auth::id();
             if (!$authorized) {
                 return response()->json([
                     'status' => 'error',
@@ -242,7 +253,7 @@ class MateriController extends Controller
     {
         // Check authorization
         if (!Auth::user()->hasRole('superadmin')) {
-            $authorized = $materi->guruMataPelajaran->guru->user->id === Auth::id();
+            $authorized = $materi->guruKelas->guruMataPelajaran->guru->user->id === Auth::id();
             if (!$authorized) {
                 abort(403, 'Unauthorized');
             }

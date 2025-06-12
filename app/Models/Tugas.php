@@ -73,13 +73,13 @@ class Tugas extends Model
     //     return $this->belongsTo(GuruMataPelajaran::class, 'guru_mata_pelajaran_id');
     // }
 
-    // public function soal()
-    // {
-    //     return $this->hasMany(Soal::class);
-    // }
+    public function soal()
+    {
+        return $this->hasMany(Soal::class);
+    }
 
-    // public function pengumpulanTugas()
-    // {
-    //     return $this->hasMany(PengumpulanTugas::class);
-    // }
+    public function pengumpulanTugas()
+    {
+        return $this->hasMany(PengumpulanTugas::class);
+    }
 }

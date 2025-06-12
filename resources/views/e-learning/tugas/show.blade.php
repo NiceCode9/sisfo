@@ -10,7 +10,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Detail Tugas</h3>
                         <div class="card-tools">
-                            @if (auth()->user()->hasRole('guru') && $tuga->guruMataPelajaran->guru->user->id === auth()->id())
+                            @if (auth()->user()->hasRole('guru') && $tuga->guruKelas->guruMataPelajaran->guru->user->id === auth()->id())
                                 <a href="{{ route('admin.tugas.edit', $tuga->id) }}" class="btn btn-warning btn-sm">
                                     <i class="fas fa-edit"></i> Edit Tugas
                                 </a>
@@ -30,11 +30,11 @@
                                 <table class="table table-borderless">
                                     <tr>
                                         <th width="30%">Mata Pelajaran</th>
-                                        <td>{{ $tuga->guruMataPelajaran->mataPelajaran->nama_pelajaran }}</td>
+                                        <td>{{ $tuga->guruKelas->guruMataPelajaran->mataPelajaran->nama_pelajaran }}</td>
                                     </tr>
                                     <tr>
                                         <th>Guru</th>
-                                        <td>{{ $tuga->guruMataPelajaran->guru->user->name }}</td>
+                                        <td>{{ $tuga->guruKelas->guruMataPelajaran->guru->user->name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Judul</th>

@@ -38,7 +38,7 @@ class Guru extends Model
     public function guruKelas(): HasMany
     {
         return $this->hasMany(GuruKelas::class, 'guru_mata_pelajaran_id', 'id')
-            ->through('guru_mata_pelajarans');
+            ->through('guru_mata_pelajaran');
     }
 
     public function kelasYangDiajar($tahunAjaranId = null)

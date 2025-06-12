@@ -17,7 +17,7 @@ class SoalController extends Controller
     public function index()
     {
         $soals = Soal::with(['tugas', 'jawaban'])->paginate(10);
-        return view('soal.index', compact('soals'));
+        return view('e-learning.soal.index', compact('soals'));
     }
 
     /**
@@ -26,7 +26,7 @@ class SoalController extends Controller
     public function create(Request $request)
     {
         $tugas = Tugas::findOrFail($request->tugas);
-        return view('soal.create', compact('tugas'));
+        return view('e-learning.soal.create', compact('tugas'));
     }
 
     /**
@@ -113,7 +113,7 @@ class SoalController extends Controller
     public function show(Soal $soal)
     {
         $soal->load(['tugas', 'jawaban']);
-        return view('soal.show', compact('soal'));
+        return view('e-learning.soal.show', compact('soal'));
     }
 
     /**
@@ -122,7 +122,7 @@ class SoalController extends Controller
     public function edit(Soal $soal)
     {
         $soal->load(['tugas', 'jawaban']);
-        return view('soal.edit', compact('soal'));
+        return view('e-learning.soal.edit', compact('soal'));
     }
 
     /**

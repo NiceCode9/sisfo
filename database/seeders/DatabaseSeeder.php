@@ -30,6 +30,10 @@ class DatabaseSeeder extends Seeder
             // SiswaSeeder::class,
             UserSeeder::class,
             PpdbSeeder::class,
+            CalonSiswaSeeder::class,
+            BerkasCalonSeeder::class,
+            SiswaSeeder::class,
+            RiwayatKelasSeeder::class,
         ]);
     }
 }

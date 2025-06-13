@@ -41,11 +41,17 @@ class MateriController extends Controller
     public function datatable()
     {
         $materi = Materi::with(['guruKelas.guruMataPelajaran.guru.user', 'guruKelas.guruMataPelajaran.mataPelajaran'])
-            ->when(!Auth::user()->hasRole('superadmin'), function ($query) {
+            ->when(Auth::user()->hasRole('guru'), function ($query) {
                 return $query->whereHas('guruKelas.guruMataPelajaran.guru.user', function ($q) {
                     $q->where('id', Auth::id());
                 });
-            })->get();
+            })
+            ->when(Auth::user()->hasRole('siswa'), function ($query) {
+                return $query->whereHas('guruKelas.siswa', function ($q) {
+                    $q->where('id', Auth::id());
+                });
+            })
+            ->get();
         return DataTables::of($materi)
             ->addIndexColumn()
             ->addColumn('guru', function ($row) {

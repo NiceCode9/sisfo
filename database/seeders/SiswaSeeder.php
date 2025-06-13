@@ -4,80 +4,73 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Siswa;
+use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
 
 class SiswaSeeder extends Seeder
 {
     public function run(): void
     {
-        // $siswaData = [
-        //     // Siswa untuk Kelas X IPA 1 (kelas_id = 1)
-        //     [
-        //         'kelas_id' => 1,
-        //         'nisn' => '0001234567',
-        //         'nama_lengkap' => 'Ahmad Fauzi',
-        //         'tempat_lahir' => 'Jakarta',
-        //         'tanggal_lahir' => '2007-03-15',
-        //         'jenis_kelamin' => 'L',
-        //         'alamat' => 'Jl. Sudirman No. 123, Jakarta',
-        //         'no_telepon' => '081234567890',
-        //     ],
-        //     [
-        //         'kelas_id' => 1,
-        //         'nisn' => '0001234568',
-        //         'nama_lengkap' => 'Siti Nurhaliza',
-        //         'tempat_lahir' => 'Bandung',
-        //         'tanggal_lahir' => '2007-05-20',
-        //         'jenis_kelamin' => 'P',
-        //         'alamat' => 'Jl. Asia Afrika No. 456, Bandung',
-        //         'no_telepon' => '081234567891',
-        //     ],
-        //     // Siswa untuk Kelas X IPA 2 (kelas_id = 2)
-        //     [
-        //         'kelas_id' => 2,
-        //         'nisn' => '0001234569',
-        //         'nama_lengkap' => 'Budi Santoso',
-        //         'tempat_lahir' => 'Surabaya',
-        //         'tanggal_lahir' => '2007-02-10',
-        //         'jenis_kelamin' => 'L',
-        //         'alamat' => 'Jl. Pemuda No. 789, Surabaya',
-        //         'no_telepon' => '081234567892',
-        //     ],
-        //     [
-        //         'kelas_id' => 2,
-        //         'nisn' => '0001234570',
-        //         'nama_lengkap' => 'Dewi Lestari',
-        //         'tempat_lahir' => 'Yogyakarta',
-        //         'tanggal_lahir' => '2007-04-25',
-        //         'jenis_kelamin' => 'P',
-        //         'alamat' => 'Jl. Malioboro No. 321, Yogyakarta',
-        //         'no_telepon' => '081234567893',
-        //     ],
-        //     // Siswa untuk Kelas X IPS 1 (kelas_id = 3)
-        //     [
-        //         'kelas_id' => 3,
-        //         'nisn' => '0001234571',
-        //         'nama_lengkap' => 'Andi Wijaya',
-        //         'tempat_lahir' => 'Makassar',
-        //         'tanggal_lahir' => '2007-01-30',
-        //         'jenis_kelamin' => 'L',
-        //         'alamat' => 'Jl. Jenderal Sudirman No. 654, Makassar',
-        //         'no_telepon' => '081234567894',
-        //     ],
-        //     [
-        //         'kelas_id' => 3,
-        //         'nisn' => '0001234572',
-        //         'nama_lengkap' => 'Maya Sari',
-        //         'tempat_lahir' => 'Medan',
-        //         'tanggal_lahir' => '2007-06-12',
-        //         'jenis_kelamin' => 'P',
-        //         'alamat' => 'Jl. Gatot Subroto No. 987, Medan',
-        //         'no_telepon' => '081234567895',
-        //     ],
-        // ];
+        $faker = Faker::create('id_ID');
+        $data = [];
 
-        // foreach ($siswaData as $siswa) {
-        //     Siswa::create($siswa);
-        // }
+        // Ambil calon siswa yang diterima untuk dijadikan siswa baru (kelas X)
+        $calonSiswaDiterima = DB::table('calon_siswa')
+            ->where('status_pendaftaran', 'diterima')
+            ->take(30)
+            ->get();
+
+        // ID counter
+        $id = 1;
+
+        // Siswa baru dari calon siswa (kelas X)
+        foreach ($calonSiswaDiterima as $calonSiswa) {
+            $data[] = [
+                'id' => $id++,
+                'calon_siswa_id' => $calonSiswa->id,
+                'tahun_ajaran_id' => 2, // 2024/2025
+                'nis' => '2024' . str_pad($id - 1, 4, '0', STR_PAD_LEFT),
+                'nisn' => $calonSiswa->nisn,
+                'kelas_awal' => 'X',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // Siswa kelas XI (15 siswa)
+        for ($i = 1; $i <= 15; $i++) {
+            $gender = $faker->randomElement(['L', 'P']);
+            $firstName = $gender === 'L' ? $faker->firstNameMale : $faker->firstNameFemale;
+
+            $data[] = [
+                'id' => $id++,
+                'calon_siswa_id' => null,
+                'tahun_ajaran_id' => 1, // Masuk tahun lalu
+                'nis' => '2023' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'nisn' => $faker->unique()->numerify('##########'),
+                'kelas_awal' => 'X',
+                'created_at' => now()->subYear(),
+                'updated_at' => now()->subYear(),
+            ];
+        }
+
+        // Siswa kelas XII (15 siswa)
+        for ($i = 1; $i <= 15; $i++) {
+            $gender = $faker->randomElement(['L', 'P']);
+            $firstName = $gender === 'L' ? $faker->firstNameMale : $faker->firstNameFemale;
+
+            $data[] = [
+                'id' => $id++,
+                'calon_siswa_id' => null,
+                'tahun_ajaran_id' => 1, // Masuk 2 tahun lalu
+                'nis' => '2022' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'nisn' => $faker->unique()->numerify('##########'),
+                'kelas_awal' => 'X',
+                'created_at' => now()->subYears(2),
+                'updated_at' => now()->subYears(2),
+            ];
+        }
+
+        DB::table('siswa')->insert($data);
     }
 }

@@ -36,7 +36,7 @@ class Siswa extends Model
 
     public function riwayatKelas(): HasMany
     {
-        return $this->hasMany(RiwayatKelas::class);
+        return $this->hasMany(RiwayatKelas::class, 'siswa_id');
     }
 
     // Method helper untuk mendapatkan kelas aktif

@@ -36,7 +36,13 @@ class PpdbSeeder extends Seeder
                 'tanggal_mulai' => '2023-07-01',
                 'tanggal_selesai' => '2024-06-30',
                 'status_aktif' => false
-            ]
+            ],
+            [
+                'nama_tahun_ajaran' => '2022/2023',
+                'tanggal_mulai' => '2022-07-01',
+                'tanggal_selesai' => '2023-06-30',
+                'status_aktif' => false
+            ],
         ];
 
         foreach ($tahunAjaran as $ta) {

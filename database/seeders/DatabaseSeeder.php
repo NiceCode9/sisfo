@@ -25,15 +25,16 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             KelasSeeder::class,
             MataPelajaranSeeder::class,
+            PpdbSeeder::class,
             GuruSeeder::class,
             GuruMataPelajaranSeeder::class,
-            // SiswaSeeder::class,
-            UserSeeder::class,
-            PpdbSeeder::class,
+            GuruKelasSeeder::class,
+            // UserSeeder::class,
             CalonSiswaSeeder::class,
-            BerkasCalonSeeder::class,
-            SiswaSeeder::class,
+            SiswaSeeder::class,          // Pindah sebelum BerkasCalonSeeder
+            BerkasCalonSeeder::class,    // Setelah SiswaSeeder karena SiswaSeeder akan menambah calon siswa
             RiwayatKelasSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\MataPelajaran;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\MataPelajaran;
 
 class MataPelajaranSeeder extends Seeder
 {
@@ -14,17 +14,17 @@ class MataPelajaranSeeder extends Seeder
             [
                 'nama_pelajaran' => 'Matematika',
                 'kode_pelajaran' => 'MTK',
-                'deskripsi' => 'Mata pelajaran matematika untuk semua tingkat',
+                'deskripsi' => 'Mata pelajaran matematika untuk tingkat SMA',
             ],
             [
                 'nama_pelajaran' => 'Bahasa Indonesia',
-                'kode_pelajaran' => 'BIN',
-                'deskripsi' => 'Mata pelajaran bahasa Indonesia',
+                'kode_pelajaran' => 'BIND',
+                'deskripsi' => 'Mata pelajaran bahasa Indonesia untuk tingkat SMA',
             ],
             [
                 'nama_pelajaran' => 'Bahasa Inggris',
-                'kode_pelajaran' => 'BIG',
-                'deskripsi' => 'Mata pelajaran bahasa Inggris',
+                'kode_pelajaran' => 'BING',
+                'deskripsi' => 'Mata pelajaran bahasa Inggris untuk tingkat SMA',
             ],
             [
                 'nama_pelajaran' => 'Fisika',
@@ -44,22 +44,12 @@ class MataPelajaranSeeder extends Seeder
             [
                 'nama_pelajaran' => 'Sejarah',
                 'kode_pelajaran' => 'SEJ',
-                'deskripsi' => 'Mata pelajaran sejarah untuk jurusan IPS',
+                'deskripsi' => 'Mata pelajaran sejarah untuk tingkat SMA',
             ],
             [
                 'nama_pelajaran' => 'Geografi',
                 'kode_pelajaran' => 'GEO',
                 'deskripsi' => 'Mata pelajaran geografi untuk jurusan IPS',
-            ],
-            [
-                'nama_pelajaran' => 'Ekonomi',
-                'kode_pelajaran' => 'EKO',
-                'deskripsi' => 'Mata pelajaran ekonomi untuk jurusan IPS',
-            ],
-            [
-                'nama_pelajaran' => 'Sosiologi',
-                'kode_pelajaran' => 'SOS',
-                'deskripsi' => 'Mata pelajaran sosiologi untuk jurusan IPS',
             ],
         ];
 

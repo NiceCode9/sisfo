@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Siswa;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
@@ -84,6 +86,22 @@ class UserSeeder extends Seeder
                 'guru_id' => $userData['guru_id'],
             ]);
             $user->assignRole('guru');
+        }
+
+        $siswa = Siswa::all();
+
+
+        foreach ($siswa as $s) {
+            $userSiswa = User::create([
+                'name' => $s->calonSiswa->nama_lengkap,
+                'username' => strtolower(str_replace(' ', '', $s->calonSiswa->nama_lengkap)),
+                'email' => $s->calonSiswa->email ?? strtolower(str_replace(' ', '', $s->calonSiswa->nama_lengkap)) . '@sekolah.com',
+                'password' => Hash::make('password'),
+                'siswa_id' => $s->id,
+                'guru_id' => null,
+            ]);
+
+            $userSiswa->assignRole('siswa');
         }
     }
 }

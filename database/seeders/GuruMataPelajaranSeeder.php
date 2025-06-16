@@ -2,40 +2,77 @@
 
 namespace Database\Seeders;
 
+use App\Models\GuruMataPelajaran;
+use App\Models\Guru;
+use App\Models\MataPelajaran;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\GuruMataPelajaran;
 
 class GuruMataPelajaranSeeder extends Seeder
 {
     public function run(): void
     {
+        // Mendapatkan data guru dan mata pelajaran
+        $gurus = Guru::all();
+        $mataPelajarans = MataPelajaran::all();
+
+        // Mapping guru dengan mata pelajaran berdasarkan keahlian
         $guruMataPelajaranData = [
-            // Guru Matematika mengajar Matematika
-            ['guru_id' => 1, 'mata_pelajaran_id' => 1],
+            // Guru Matematika (ID 1) - NIP: 197501012000031001
+            [
+                'guru_id' => 1,
+                'mata_pelajaran_id' => $mataPelajarans->where('kode_pelajaran', 'MTK')->first()->id,
+                'keterangan' => 'Guru mata pelajaran matematika tingkat SMA',
+            ],
 
-            // Guru Bahasa Indonesia mengajar Bahasa Indonesia
-            ['guru_id' => 2, 'mata_pelajaran_id' => 2],
+            // Guru Bahasa Indonesia (ID 2) - NIP: 198203152005042002
+            [
+                'guru_id' => 2,
+                'mata_pelajaran_id' => $mataPelajarans->where('kode_pelajaran', 'BIND')->first()->id,
+                'keterangan' => 'Guru mata pelajaran bahasa Indonesia tingkat SMA',
+            ],
 
-            // Guru Bahasa Inggris mengajar Bahasa Inggris
-            ['guru_id' => 3, 'mata_pelajaran_id' => 3],
+            // Guru Bahasa Inggris (ID 3) - NIP: 198507202010121003
+            [
+                'guru_id' => 3,
+                'mata_pelajaran_id' => $mataPelajarans->where('kode_pelajaran', 'BING')->first()->id,
+                'keterangan' => 'Guru mata pelajaran bahasa Inggris tingkat SMA',
+            ],
 
-            // Guru Fisika mengajar Fisika dan Matematika
-            ['guru_id' => 4, 'mata_pelajaran_id' => 4],
-            ['guru_id' => 4, 'mata_pelajaran_id' => 1],
+            // Guru Fisika (ID 4) - NIP: 197912102005011004
+            [
+                'guru_id' => 4,
+                'mata_pelajaran_id' => $mataPelajarans->where('kode_pelajaran', 'FIS')->first()->id,
+                'keterangan' => 'Guru mata pelajaran fisika untuk jurusan IPA',
+            ],
 
-            // Guru Kimia mengajar Kimia
-            ['guru_id' => 5, 'mata_pelajaran_id' => 5],
+            // Guru Kimia (ID 5) - NIP: 198406152009022005
+            [
+                'guru_id' => 5,
+                'mata_pelajaran_id' => $mataPelajarans->where('kode_pelajaran', 'KIM')->first()->id,
+                'keterangan' => 'Guru mata pelajaran kimia untuk jurusan IPA',
+            ],
 
-            // Guru Biologi mengajar Biologi
-            ['guru_id' => 6, 'mata_pelajaran_id' => 6],
+            // Guru Biologi (ID 6) - NIP: 198105252006041006
+            [
+                'guru_id' => 6,
+                'mata_pelajaran_id' => $mataPelajarans->where('kode_pelajaran', 'BIO')->first()->id,
+                'keterangan' => 'Guru mata pelajaran biologi untuk jurusan IPA',
+            ],
 
-            // Guru Sejarah mengajar Sejarah
-            ['guru_id' => 7, 'mata_pelajaran_id' => 7],
+            // Guru Sejarah (ID 7) - NIP: 197809182003121007
+            [
+                'guru_id' => 7,
+                'mata_pelajaran_id' => $mataPelajarans->where('kode_pelajaran', 'SEJ')->first()->id,
+                'keterangan' => 'Guru mata pelajaran sejarah tingkat SMA',
+            ],
 
-            // Guru Geografi mengajar Geografi dan Ekonomi
-            ['guru_id' => 8, 'mata_pelajaran_id' => 8],
-            ['guru_id' => 8, 'mata_pelajaran_id' => 9],
+            // Guru Geografi (ID 8) - NIP: 198201202007031008
+            [
+                'guru_id' => 8,
+                'mata_pelajaran_id' => $mataPelajarans->where('kode_pelajaran', 'GEO')->first()->id,
+                'keterangan' => 'Guru mata pelajaran geografi untuk jurusan IPS',
+            ],
         ];
 
         foreach ($guruMataPelajaranData as $data) {

@@ -20,10 +20,10 @@ class RolePermissionSeeder extends Seeder
 
         $permissions = [
             'manage_pengaturan_sistem',
+            'manage_user_management',
             'manage_data_master',
             'manage_ppdb',
             'manage_calon_siswa',
-            'manage_users',
             'manage_menus',
             'manage_roles',
             'manage_permissions',

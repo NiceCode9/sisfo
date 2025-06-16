@@ -68,63 +68,72 @@
             <!-- Dynamic Menu Items -->
             @php
                 $currentGroup = null;
+                $user = auth()->user();
             @endphp
 
             @foreach ($sidebarMenu as $menu)
-                @if ($menu->group !== $currentGroup)
-                    <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
-                    <li class="nav-item">
-                        <span class="nav-link text-uppercase text-xs font-weight-bold">
-                            {{ $menu->group }}
-                        </span>
-                    </li>
-                    @php
-                        $currentGroup = $menu->group;
-                    @endphp
-                @endif
+                @if (
+                    !$menu->permission ||
+                        ($menu->permission &&
+                            ($user->hasPermissionTo($menu->permission) ||
+                                $user->hasRole(config('permission.super_admin_role', 'Super Admin')))))
+                    @if ($menu->group !== $currentGroup)
+                        <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
+                        <li class="nav-item">
+                            <span class="nav-link text-uppercase text-xs font-weight-bold">
+                                {{ $menu->group }}
+                            </span>
+                        </li>
+                        @php
+                            $currentGroup = $menu->group;
+                        @endphp
+                    @endif
 
-                @if ($menu->hasActiveChildren())
-                    <li class="nav-item @if ($menu->isActive()) active @endif">
-                        <span class="nav-link collapsed d-flex justify-content-between align-items-center"
-                            data-bs-toggle="collapse" data-bs-target="#submenu-{{ $menu->id }}">
-                            <span>
-                                <span class="sidebar-icon">
-                                    {!! $menu->icon_html !!}
+                    @if ($menu->hasActiveChildren())
+                        <li class="nav-item @if ($menu->isActive()) active @endif">
+                            <span class="nav-link collapsed d-flex justify-content-between align-items-center"
+                                data-bs-toggle="collapse" data-bs-target="#submenu-{{ $menu->id }}">
+                                <span>
+                                    <span class="sidebar-icon">{!! $menu->icon_html !!}</span>
+                                    <span class="sidebar-text">{{ $menu->name }}</span>
                                 </span>
+                                <span class="link-arrow">
+                                    <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                            </span>
+                            <div class="multi-level collapse @if ($menu->isActive()) show @endif"
+                                role="list" id="submenu-{{ $menu->id }}"
+                                aria-expanded="@if ($menu->isActive()) true @else false @endif">
+                                <ul class="flex-column nav">
+                                    @foreach ($menu->children as $child)
+                                        @if (
+                                            !$child->permission ||
+                                                ($child->permission &&
+                                                    ($user->hasPermissionTo($child->permission) ||
+                                                        $user->hasRole(config('permission.super_admin_role', 'Super Admin')))))
+                                            <li class="nav-item @if ($child->isActive()) active @endif">
+                                                <a class="nav-link" href="{{ $child->full_url }}">
+                                                    <span class="sidebar-text">{{ $child->name }}</span>
+                                                </a>
+                                            </li>
+                                        @endif
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </li>
+                    @else
+                        <li class="nav-item @if ($menu->isActive()) active @endif">
+                            <a href="{{ $menu->full_url }}" class="nav-link">
+                                <span class="sidebar-icon">{!! $menu->icon_html !!}</span>
                                 <span class="sidebar-text">{{ $menu->name }}</span>
-                            </span>
-                            <span class="link-arrow">
-                                <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </span>
-                        </span>
-                        <div class="multi-level collapse @if ($menu->isActive()) show @endif" role="list"
-                            id="submenu-{{ $menu->id }}"
-                            aria-expanded="@if ($menu->isActive()) true @else false @endif">
-                            <ul class="flex-column nav">
-                                @foreach ($menu->children as $child)
-                                    <li class="nav-item @if ($child->isActive()) active @endif">
-                                        <a class="nav-link" href="{{ $child->full_url }}">
-                                            <span class="sidebar-text">{{ $child->name }}</span>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </li>
-                @else
-                    <li class="nav-item @if ($menu->isActive()) active @endif">
-                        <a href="{{ $menu->full_url }}" class="nav-link">
-                            <span class="sidebar-icon">
-                                {!! $menu->icon_html !!}
-                            </span>
-                            <span class="sidebar-text">{{ $menu->name }}</span>
-                        </a>
-                    </li>
+                            </a>
+                        </li>
+                    @endif
                 @endif
             @endforeach
 

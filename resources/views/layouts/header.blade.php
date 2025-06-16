@@ -64,7 +64,7 @@
                             <img class="avatar rounded-circle" alt="Image placeholder"
                                 src="{{ asset('assets') }}/assets/img/team/profile-picture-3.jpg">
                             <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
-                                <span class="mb-0 font-small fw-bold text-gray-900">Bonnie Green</span>
+                                <span class="mb-0 font-small fw-bold text-gray-900">{{ auth()->user()->name }}</span>
                             </div>
                         </div>
                     </a>

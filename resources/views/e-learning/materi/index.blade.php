@@ -192,7 +192,29 @@
             var table = $('#materiTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.materi.datatable') }}",
+                ajax: {
+                    url: "{{ route('admin.materi.datatable') }}",
+                    error: function(xhr, error, thrown) {
+                        if (xhr.status === 419) { // CSRF token mismatch
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Session Expired',
+                                text: 'Please refresh the page to continue.'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to load data. Please try again.'
+                            });
+                            console.log(xhr.responseJSON.message);
+                        }
+                    }
+                },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex'
@@ -226,7 +248,10 @@
                         orderable: false,
                         searchable: false
                     }
-                ]
+                ],
+                error: function(xhr, error, thrown) {
+                    console.log(xhr.responseJSON.message);
+                }
             });
 
             // Initialize rich text editor

@@ -47,8 +47,8 @@ class MateriController extends Controller
                 });
             })
             ->when(Auth::user()->hasRole('siswa'), function ($query) {
-                return $query->whereHas('guruKelas.siswa', function ($q) {
-                    $q->where('id', Auth::id());
+                return $query->whereHas('guruKelas', function ($q) {
+                    $q->where('kelas_id', Auth::user()->siswa->kelasAktif()->kelas_id);
                 });
             })
             ->get();

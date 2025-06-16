@@ -67,6 +67,25 @@ class Menu extends Model
     }
 
     /**
+     * Scope untuk menu yang user memiliki permissionnya
+     */
+    public function scopeUserCanAccess(Builder $query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('permission')
+                ->orWhere(function ($q) {
+                    $q->whereNotNull('permission')
+                        ->where(function ($q) {
+                            $user = auth()->user();
+                            if ($user) {
+                                $q->whereIn('permission', $user->getAllPermissions()->pluck('name'));
+                            }
+                        });
+                });
+        });
+    }
+
+    /**
      * Cek apakah menu memiliki child aktif
      */
     public function hasActiveChildren()

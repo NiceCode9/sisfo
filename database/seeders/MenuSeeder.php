@@ -27,7 +27,7 @@ class MenuSeeder extends Seeder
                 'name' => 'PPDB',
                 'icon' => 'fas fa-clipboard-list',
                 'group' => 'PPDB',
-                'permission' => 'mangae_ppdb',
+                'permission' => 'manage_ppdb',
                 'order' => 2,
                 'children' => [
                     [
@@ -137,7 +137,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'E-Learning',
                 'icon' => 'fas fa-graduation-cap',
-                'permission' => 'manage_elearning',
+                // 'permission' => 'manage_elearning',
                 'group' => 'E-Learning',
                 'order' => 5,
                 'children' => [
@@ -160,28 +160,28 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'Manajemen User',
                 'icon' => 'fas fa-users-cog',
-                'permission' => 'user-management.view',
+                'permission' => 'manage_user_management',
                 'group' => 'Pengaturan Sistem',
                 'order' => 6,
                 'children' => [
                     [
                         'name' => 'User',
                         'route' => 'admin.users.index',
-                        'permission' => 'users.view',
+                        // 'permission' => 'users.view',
                         'icon' => 'fas fa-user',
                         'group' => 'Pengaturan Sistem',
                     ],
                     [
                         'name' => 'Role',
                         'route' => 'admin.roles.index',
-                        'permission' => 'roles.view',
+                        // 'permission' => 'roles.view',
                         'icon' => 'fas fa-user-tag',
                         'group' => 'Pengaturan Sistem',
                     ],
                     [
                         'name' => 'Permission',
                         'route' => 'admin.permissions.index',
-                        'permission' => 'permissions.view',
+                        // 'permission' => 'permissions.view',
                         'icon' => 'fas fa-key',
                         'group' => 'Pengaturan Sistem',
                     ],

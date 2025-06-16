@@ -31,8 +31,8 @@ class DatabaseSeeder extends Seeder
             GuruKelasSeeder::class,
             // UserSeeder::class,
             CalonSiswaSeeder::class,
-            SiswaSeeder::class,          // Pindah sebelum BerkasCalonSeeder
-            BerkasCalonSeeder::class,    // Setelah SiswaSeeder karena SiswaSeeder akan menambah calon siswa
+            SiswaSeeder::class,
+            BerkasCalonSeeder::class,
             RiwayatKelasSeeder::class,
             UserSeeder::class,
         ]);

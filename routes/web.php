@@ -13,6 +13,7 @@ Route::group(['middleware' => ['guest']], function () {
     });
 
     Route::post('/pendaftaran', [\App\Http\Controllers\CalonSiswaController::class, 'store'])->name('pendaftaran.store');
+    Route::post('/chatbot', [App\Http\Controllers\ChatbotController::class, 'chat']);
 });
 
 Route::get('/dashboard', function () {

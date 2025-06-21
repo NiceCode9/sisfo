@@ -30,14 +30,9 @@ class MataPelajaranController extends Controller
                         data-deskripsi="' . $row->deskripsi . '">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <form action="' . route('admin.mata-pelajaran.destroy', $row->id) . '" method="POST" class="d-inline"
-                        data-mata-pelajaran-name="' . $row->nama_pelajaran . '">
-                        ' . csrf_field() . '
-                        ' . method_field('DELETE') . '
-                        <button type="button" class="btn btn-sm btn-danger btn-delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-sm btn-danger btn-delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 ';
                 return $btn;
             })

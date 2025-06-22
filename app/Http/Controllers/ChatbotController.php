@@ -35,11 +35,31 @@ class ChatbotController extends Controller
             $systemPrompt = $this->buildSystemPrompt($contextData);
 
             // Kirim ke OpenAI
+            // $response = Http::withHeaders([
+            //     'Authorization' => 'Bearer ' . $this->openaiApiKey,
+            //     'Content-Type' => 'application/json',
+            // ])->post('https://api.openai.com/v1/chat/completions', [
+            //     'model' => 'gpt-3.5-turbo',
+            //     'messages' => [
+            //         [
+            //             'role' => 'system',
+            //             'content' => $systemPrompt
+            //         ],
+            //         [
+            //             'role' => 'user',
+            //             'content' => $userMessage
+            //         ]
+            //     ],
+            //     'max_tokens' => 500,
+            //     'temperature' => 0.7,
+            // ]);
+
+            // tester openrouter
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->openaiApiKey,
                 'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-3.5-turbo',
+            ])->post('https://openrouter.ai/api/v1/chat/completions', [
+                'model' => 'deepseek/deepseek-r1-0528:free',
                 'messages' => [
                     [
                         'role' => 'system',
@@ -50,17 +70,15 @@ class ChatbotController extends Controller
                         'content' => $userMessage
                     ]
                 ],
-                'max_tokens' => 500,
-                'temperature' => 0.7,
             ]);
 
             // if ($response->successful()) {
             $result = $response->json();
-            // $botReply = $result['choices'][0]['message']['content'];
+            $botReply = $result['choices'][0]['message']['content'];
 
             return response()->json([
                 'success' => true,
-                'message' => $result
+                'message' => $botReply
             ]);
             // } else {
             //     return response()->json([

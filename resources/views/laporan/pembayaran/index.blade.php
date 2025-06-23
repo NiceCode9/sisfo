@@ -205,7 +205,7 @@
                 searching: true,
                 pageLength: 10,
                 ajax: {
-                    url: "{{ route('admin.laporan.pembayaran') }}",
+                    url: "{{ route('laporan.pembayaran') }}",
                     type: "GET",
                     data: function(d) {
                         d.tahun_ajaran_id = $('#tahun_ajaran_id').val();
@@ -296,7 +296,7 @@
                     tanggal_mulai: $('#tanggal_mulai').val(),
                     tanggal_selesai: $('#tanggal_selesai').val()
                 });
-                window.location.href = "{{ route('admin.laporan.pembayaran.excel') }}?" + params
+                window.location.href = "{{ route('laporan.pembayaran.excel') }}?" + params
                     .toString();
             });
 
@@ -308,7 +308,7 @@
                     tanggal_mulai: $('#tanggal_mulai').val(),
                     tanggal_selesai: $('#tanggal_selesai').val()
                 });
-                window.location.href = "{{ route('admin.laporan.pembayaran.pdf') }}?" + params.toString();
+                window.location.href = "{{ route('laporan.pembayaran.pdf') }}?" + params.toString();
             });
         });
     </script>

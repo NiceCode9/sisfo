@@ -108,7 +108,7 @@
             let table = $('#kelas-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.kelas.datatable') }}",
+                ajax: "{{ route('kelas.datatable') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',

@@ -11,8 +11,7 @@
                         <h3 class="card-title">Edit Tugas</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.tugas.update', $tuga->id) }}" method="POST"
-                            enctype="multipart/form-data">
+                        <form action="{{ route('tugas.update', $tuga->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
 
@@ -108,9 +107,9 @@
 
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                                <a href="{{ route('admin.tugas.index') }}" class="btn btn-secondary">Batal</a>
+                                <a href="{{ route('tugas.index') }}" class="btn btn-secondary">Batal</a>
                                 @if ($tuga->metode_pengerjaan === 'online')
-                                    <a href="{{ route('admin.tugas.show', $tuga->id) }}" class="btn btn-info">
+                                    <a href="{{ route('tugas.show', $tuga->id) }}" class="btn btn-info">
                                         Kelola Soal
                                     </a>
                                 @endif

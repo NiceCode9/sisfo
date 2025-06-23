@@ -86,7 +86,7 @@ class PembayaranController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.calon-siswa.show', $calonSiswa->id)
+            return redirect()->route('calon-siswa.show', $calonSiswa->id)
                 ->with('success', 'Pembayaran berhasil disimpan');
         } catch (\Exception $e) {
             DB::rollBack();

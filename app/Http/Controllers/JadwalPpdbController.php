@@ -43,7 +43,7 @@ class JadwalPpdbController extends Controller
 
         JadwalPpdb::create($validated);
 
-        return redirect()->route('admin.jadwal-ppdb.index')
+        return redirect()->route('jadwal-ppdb.index')
             ->with('success', 'Jadwal PPDB berhasil ditambahkan');
     }
 
@@ -78,7 +78,7 @@ class JadwalPpdbController extends Controller
 
         $jadwalPpdb->update($validated);
 
-        return redirect()->route('admin.jadwal-ppdb.index')
+        return redirect()->route('jadwal-ppdb.index')
             ->with('success', 'Jadwal PPDB berhasil diperbarui');
     }
 
@@ -89,7 +89,7 @@ class JadwalPpdbController extends Controller
     {
         $jadwalPpdb->delete();
 
-        return redirect()->route('admin.jadwal-ppdb.index')
+        return redirect()->route('jadwal-ppdb.index')
             ->with('success', 'Jadwal PPDB berhasil dihapus');
     }
 }

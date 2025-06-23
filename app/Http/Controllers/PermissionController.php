@@ -44,7 +44,7 @@ class PermissionController extends Controller
             'guard_name' => 'web'
         ]);
 
-        return redirect()->route('admin.permissions.index')
+        return redirect()->route('permissions.index')
             ->with('success', 'Permission berhasil dibuat');
     }
 
@@ -86,7 +86,7 @@ class PermissionController extends Controller
             'description' => $validated['description'] ?? null
         ]);
 
-        return redirect()->route('admin.permissions.index')
+        return redirect()->route('permissions.index')
             ->with('success', 'Permission berhasil diperbarui');
     }
 
@@ -97,12 +97,12 @@ class PermissionController extends Controller
     {
         $permission = Permission::findOrFail($id);
         if ($permission->roles()->count() > 0) {
-            return redirect()->route('admin.permissions.index')
+            return redirect()->route('permissions.index')
                 ->with('error', 'Permission tidak bisa dihapus karena masih digunakan oleh role');
         }
 
         $permission->delete();
-        return redirect()->route('admin.permissions.index')
+        return redirect()->route('permissions.index')
             ->with('success', 'Permission berhasil dihapus');
     }
 }

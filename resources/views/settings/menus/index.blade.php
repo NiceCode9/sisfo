@@ -4,7 +4,7 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">Manajemen Menu</h6>
-            <a href="{{ route('admin.menus.create') }}" class="btn btn-sm btn-primary">
+            <a href="{{ route('menus.create') }}" class="btn btn-sm btn-primary">
                 <i class="fas fa-plus"></i> Tambah Menu
             </a>
         </div>
@@ -71,11 +71,10 @@
                                 </td>
                                 <td>
                                     <div class="d-flex">
-                                        <a href="{{ route('admin.menus.edit', $menu->id) }}"
-                                            class="btn btn-sm btn-warning me-2">
+                                        <a href="{{ route('menus.edit', $menu->id) }}" class="btn btn-sm btn-warning me-2">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.menus.destroy', $menu->id) }}" method="POST">
+                                        <form action="{{ route('menus.destroy', $menu->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger"
@@ -113,7 +112,7 @@
                         const rows = tbody.querySelectorAll('tr');
                         const order = Array.from(rows).map(row => row.getAttribute('data-id'));
 
-                        fetch('{{ route('admin.menus.update-order') }}', {
+                        fetch('{{ route('menus.update-order') }}', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',

@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' => 'admin.'], function () {
+Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('roles', \App\Http\Controllers\RoleController::class);
     Route::resource('permissions', \App\Http\Controllers\PermissionController::class);
     Route::resource('menus', \App\Http\Controllers\MenuController::class);
@@ -48,7 +48,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified'], 'as' =>
     Route::resource('pengumpulan-tugas', \App\Http\Controllers\PengumpulanTugasController::class);
     Route::resource('jawaban-siswa', \App\Http\Controllers\JawabanSiswaController::class);
     Route::resource('guru-kelas', \App\Http\Controllers\GuruKelasController::class);
-    Route::resource('siswa', \App\Http\Controllers\SiswaController::class);
+
+    // Tugas submission routes
+    Route::get('/tugas/{tugas}/submissions', [\App\Http\Controllers\TugasController::class, 'submissions'])->name('tugas.submissions');
+    Route::post('/tugas/grade', [\App\Http\Controllers\TugasController::class, 'grade'])->name('tugas.grade');
+    Route::get('/tugas/submission/{id}', [\App\Http\Controllers\TugasController::class, 'submissionDetail'])->name('tugas.submission.detail');
+    Route::delete('/tugas/submission/{id}', [\App\Http\Controllers\TugasController::class, 'destroySubmission'])->name('tugas.submission.destroy');
 
     Route::get('guru-data', [\App\Http\Controllers\GuruController::class, 'datatable'])->name('guru.datatable');
     Route::get('kelas-data', [\App\Http\Controllers\KelasController::class, 'datatable'])->name('kelas.datatable');

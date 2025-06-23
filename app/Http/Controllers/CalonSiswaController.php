@@ -200,7 +200,7 @@ class CalonSiswaController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.calon-siswa.show', $id)
+            return redirect()->route('calon-siswa.show', $id)
                 ->with('success', 'Status pendaftaran berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();

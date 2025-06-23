@@ -95,13 +95,13 @@
     <script>
         $(document).ready(function() {
             // Load guru and mata pelajaran options
-            $.get('/admin/guru-options', function(data) {
+            $.get('/guru-options', function(data) {
                 data.forEach(function(guru) {
                     $('#guru_id').append(new Option(guru.user.name, guru.id));
                 });
             });
 
-            $.get('/admin/mata-pelajaran-options', function(data) {
+            $.get('/mata-pelajaran-options', function(data) {
                 data.forEach(function(mapel) {
                     $('#mata_pelajaran_id').append(new Option(mapel.nama_pelajaran, mapel.id));
                 });
@@ -110,7 +110,7 @@
             let table = $('#assignment-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.guru-mata-pelajaran.datatable') }}",
+                ajax: "{{ route('guru-mata-pelajaran.datatable') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -138,7 +138,7 @@
             $('#assignmentForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#assignment_id').val();
-                let url = id ? `/admin/guru-mata-pelajaran/${id}` : '/admin/guru-mata-pelajaran';
+                let url = id ? `/guru-mata-pelajaran/${id}` : '/guru-mata-pelajaran';
                 let method = id ? 'PUT' : 'POST';
 
                 $.ajax({
@@ -178,7 +178,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/guru-mata-pelajaran/${id}`,
+                            url: `/guru-mata-pelajaran/${id}`,
                             method: 'DELETE',
                             data: {
                                 _token: '{{ csrf_token() }}'

@@ -226,7 +226,7 @@
             var table = $('#jadwalTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.jadwal.datatable') }}",
+                ajax: "{{ route('jadwal.datatable') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex'
@@ -274,7 +274,7 @@
             $('#createForm').on('submit', function(e) {
                 e.preventDefault();
                 $.ajax({
-                    url: "{{ route('admin.jadwal.store') }}",
+                    url: "{{ route('jadwal.store') }}",
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {

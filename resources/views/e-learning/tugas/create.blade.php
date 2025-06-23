@@ -20,7 +20,7 @@
                         <h3 class="card-title">Buat Tugas Baru</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.tugas.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('tugas.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group mb-3">
                                 <label for="guru_kelas_id">Mata Pelajaran</label>
@@ -28,7 +28,8 @@
                                     name="guru_kelas_id" required>
                                     <option value="">Pilih Mata Pelajaran</option>
                                     @foreach ($kelasYangDiajar as $kyd)
-                                        <option value="{{ $kyd->id == old('guru_kelas_id') ? 'selected' : '' }}">
+                                        <option value="{{ $kyd->id }}"
+                                            {{ $kyd->id == old('guru_kelas_id') ? 'selected' : '' }}>
                                             {{ $kyd->guruMataPelajaran->mataPelajaran->nama_pelajaran . ' - ' . $kyd->kelas->nama_kelas }}
                                         </option>
                                     @endforeach
@@ -111,7 +112,7 @@
 
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Simpan</button>
-                                <a href="{{ route('admin.tugas.index') }}" class="btn btn-secondary">Batal</a>
+                                <a href="{{ route('tugas.index') }}" class="btn btn-secondary">Batal</a>
                             </div>
                         </form>
                     </div>

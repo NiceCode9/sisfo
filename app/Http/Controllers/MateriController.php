@@ -61,7 +61,7 @@ class MateriController extends Controller
                 return $row->guruKelas->guruMataPelajaran->mataPelajaran->nama_pelajaran;
             })
             ->addColumn('file', function ($row) {
-                return $row->path_file ? '<a href="' . route('admin.materi.download', $row->id) . '" class="btn btn-sm btn-info">
+                return $row->path_file ? '<a href="' . route('materi.download', $row->id) . '" class="btn btn-sm btn-info">
                     <i class="fas fa-download"></i> Download</a>' : 'Tidak ada file';
             })
             ->addColumn('status', function ($row) {

@@ -24,7 +24,7 @@
             <p class="mb-0">Data Tahun Ajaran.</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('admin.roles.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center"
+            <a href="{{ route('roles.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center"
                 data-bs-toggle="modal" data-bs-target="#createTahunAjaranModal">
                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
@@ -94,7 +94,7 @@
                                         data-status="{{ $ta->status_aktif }}">
                                         Edit
                                     </button>
-                                    <form action="{{ route('admin.tahun-ajaran.destroy', $ta->id) }}" method="POST"
+                                    <form action="{{ route('tahun-ajaran.destroy', $ta->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -118,7 +118,7 @@
                     <h5 class="modal-title" id="createTahunAjaranModalLabel">Create New Tahun Ajaran</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('admin.tahun-ajaran.store') }}" method="POST">
+                <form action="{{ route('tahun-ajaran.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">

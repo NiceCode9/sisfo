@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
             'siswa_id' => null,
             'guru_id' => null,
         ]);
-        $admin->assignRole('admin');
+        $admin->assignRole('super-admin');
 
         // Guru Users
         $guruUsers = [

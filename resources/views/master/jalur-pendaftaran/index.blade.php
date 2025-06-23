@@ -67,7 +67,7 @@
                                         data-aktif="{{ $jalur->aktif }}">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
-                                    <form action="{{ route('admin.jalur-pendaftaran.destroy', $jalur->id) }}" method="POST"
+                                    <form action="{{ route('jalur-pendaftaran.destroy', $jalur->id) }}" method="POST"
                                         class="d-inline" data-jalur-name="{{ $jalur->nama_jalur }}">
                                         @csrf
                                         @method('DELETE')
@@ -92,7 +92,7 @@
                     <h5 class="modal-title" id="createJalurModalLabel">Tambah Jalur Pendaftaran</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('admin.jalur-pendaftaran.store') }}" method="POST">
+                <form action="{{ route('jalur-pendaftaran.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">

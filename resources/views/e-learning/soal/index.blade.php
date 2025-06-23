@@ -11,7 +11,7 @@
                         <h3 class="card-title">Daftar Soal - {{ $tugas->judul }}</h3>
                         @if (auth()->user()->hasRole('guru'))
                             <div class="card-tools">
-                                <a href="{{ route('admin.soal.create', ['tugas' => $tugas->id]) }}" class="btn btn-primary">
+                                <a href="{{ route('soal.create', ['tugas' => $tugas->id]) }}" class="btn btn-primary">
                                     <i class="fas fa-plus"></i> Tambah Soal
                                 </a>
                             </div>
@@ -43,12 +43,12 @@
                                             <td>{{ $soal->poin }}</td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <a href="{{ route('admin.soal.show', $soal->id) }}"
+                                                    <a href="{{ route('soal.show', $soal->id) }}"
                                                         class="btn btn-sm btn-info" title="Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     @if (auth()->user()->hasRole('guru'))
-                                                        <a href="{{ route('admin.soal.edit', $soal->id) }}"
+                                                        <a href="{{ route('soal.edit', $soal->id) }}"
                                                             class="btn btn-sm btn-warning" title="Edit">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
@@ -61,8 +61,8 @@
 
                                                 @if (auth()->user()->hasRole('guru'))
                                                     <form id="delete-form-{{ $soal->id }}"
-                                                        action="{{ route('admin.soal.destroy', $soal->id) }}"
-                                                        method="POST" class="d-none">
+                                                        action="{{ route('soal.destroy', $soal->id) }}" method="POST"
+                                                        class="d-none">
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>

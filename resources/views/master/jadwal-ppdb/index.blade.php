@@ -74,7 +74,7 @@
                                             data-keterangan="{{ $jadwal->keterangan }}">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <form action="{{ route('admin.jadwal-ppdb.destroy', $jadwal->id) }}" method="POST"
+                                        <form action="{{ route('jadwal-ppdb.destroy', $jadwal->id) }}" method="POST"
                                             class="d-inline">
                                             @csrf
                                             @method('DELETE')
@@ -102,7 +102,7 @@
                     <h5 class="modal-title" id="createJadwalModalLabel">Tambah Jadwal PPDB</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('admin.jadwal-ppdb.store') }}" method="POST">
+                <form action="{{ route('jadwal-ppdb.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">

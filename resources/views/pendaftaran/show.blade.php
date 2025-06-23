@@ -11,12 +11,12 @@
                     <nav aria-label="breadcrumb" class="mb-2">
                         <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent mb-0">
                             <li class="breadcrumb-item">
-                                <a href="{{ route('admin.calon-siswa.index') }}" class="text-white-50 text-decoration-none">
+                                <a href="{{ route('calon-siswa.index') }}" class="text-white-50 text-decoration-none">
                                     <i class="fas fa-home me-1"></i>Dashboard
                                 </a>
                             </li>
                             <li class="breadcrumb-item">
-                                <a href="{{ route('admin.calon-siswa.index') }}" class="text-white-50 text-decoration-none">
+                                <a href="{{ route('calon-siswa.index') }}" class="text-white-50 text-decoration-none">
                                     Data Pendaftaran
                                 </a>
                             </li>
@@ -550,7 +550,7 @@
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                         </div>
-                        <form action="{{ route('admin.pembayaran.store', $calonSiswa->id) }}" method="POST"
+                        <form action="{{ route('pembayaran.store', $calonSiswa->id) }}" method="POST"
                             enctype="multipart/form-data">
                             @csrf
                             <div class="modal-body p-4">
@@ -643,7 +643,7 @@
                             </div>
                         </div>
 
-                        <form action="{{ route('admin.calon-siswa.update-status', $calonSiswa->id) }}" method="POST">
+                        <form action="{{ route('calon-siswa.update-status', $calonSiswa->id) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <div class="row g-3">

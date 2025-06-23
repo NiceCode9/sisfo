@@ -98,7 +98,7 @@
             let table = $('#mapel-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.mata-pelajaran.datatable') }}",
+                ajax: "{{ route('mata-pelajaran.datatable') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',

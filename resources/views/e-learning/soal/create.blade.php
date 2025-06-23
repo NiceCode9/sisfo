@@ -22,7 +22,7 @@
                         <h3 class="card-title">Tambah Soal untuk Tugas: {{ $tugas->judul }}</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.soal.store') }}" method="POST" id="formSoal">
+                        <form action="{{ route('soal.store') }}" method="POST" id="formSoal">
                             @csrf
                             <input type="hidden" name="tugas_id" value="{{ $tugas->id }}">
 
@@ -87,7 +87,7 @@
                                 <button type="submit" class="btn btn-info" name="add_more" value="true">
                                     Simpan & Tambah Soal Lain
                                 </button>
-                                <a href="{{ route('admin.tugas.show', $tugas->id) }}" class="btn btn-secondary">
+                                <a href="{{ route('tugas.show', $tugas->id) }}" class="btn btn-secondary">
                                     Selesai
                                 </a>
                             </div>

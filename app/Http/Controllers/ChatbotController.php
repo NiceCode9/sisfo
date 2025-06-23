@@ -59,7 +59,7 @@ class ChatbotController extends Controller
                 'Authorization' => 'Bearer ' . $this->openaiApiKey,
                 'Content-Type' => 'application/json',
             ])->post('https://openrouter.ai/api/v1/chat/completions', [
-                'model' => 'deepseek/deepseek-r1-0528:free',
+                'model' => 'deepseek/deepseek-chat-v3-0324:free',
                 'messages' => [
                     [
                         'role' => 'system',
@@ -79,7 +79,7 @@ class ChatbotController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $botReply
-            ]);
+            ])->setStatusCode(200);
             // } else {
             //     return response()->json([
             //         'success' => false,

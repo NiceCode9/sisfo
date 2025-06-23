@@ -9,7 +9,7 @@
         </div>
         <div class="card-body">
             <form
-                action="{{ isset($permission) ? route('admin.permissions.update', $permission->id) : route('admin.permissions.store') }}"
+                action="{{ isset($permission) ? route('permissions.update', $permission->id) : route('permissions.store') }}"
                 method="POST">
                 @csrf
                 @if (isset($permission))
@@ -52,7 +52,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Simpan
                 </button>
-                <a href="{{ route('admin.permissions.index') }}" class="btn btn-secondary">
+                <a href="{{ route('permissions.index') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
             </form>

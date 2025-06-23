@@ -59,10 +59,10 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             @if (auth()->user()->hasRole('guru'))
-                                                <td>{{ $p->siswa->nama }}</td>
+                                                <td>{{ $p->siswa->user->name }}</td>
                                             @endif
                                             <td>{{ $p->tugas->judul }}</td>
-                                            <td>{{ $p->tugas->guruMataPelajaran->mataPelajaran->nama }}</td>
+                                            <td>{{ $p->tugas->guruKelas->guruMataPelajaran->mataPelajaran->nama }}</td>
                                             <td>
                                                 {{ $p->waktu_pengumpulan->format('d M Y H:i') }}
                                                 @if ($p->waktu_pengumpulan > $p->tugas->batas_waktu)
@@ -85,7 +85,7 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <a href="{{ route('admin.pengumpulan-tugas.show', $p->id) }}"
+                                                    <a href="{{ route('pengumpulan-tugas.show', $p->id) }}"
                                                         class="btn btn-sm btn-info" title="Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
@@ -99,7 +99,7 @@
 
                                                 @if (auth()->user()->hasRole('siswa') && !$p->nilai)
                                                     <form id="delete-form-{{ $p->id }}"
-                                                        action="{{ route('admin.pengumpulan-tugas.destroy', $p->id) }}"
+                                                        action="{{ route('pengumpulan-tugas.destroy', $p->id) }}"
                                                         method="POST" class="d-none">
                                                         @csrf
                                                         @method('DELETE')

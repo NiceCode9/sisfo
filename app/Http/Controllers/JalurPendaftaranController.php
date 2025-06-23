@@ -37,7 +37,7 @@ class JalurPendaftaranController extends Controller
 
         JalurPendaftaran::create($request->all());
 
-        return redirect()->route('admin.jalur-pendaftaran.index')
+        return redirect()->route('jalur-pendaftaran.index')
             ->with('success', 'Jalur Pendaftaran berhasil ditambahkan');
     }
 
@@ -70,7 +70,7 @@ class JalurPendaftaranController extends Controller
 
         $jalurPendaftaran->update($request->all());
 
-        return redirect()->route('admin.jalur-pendaftaran.index')
+        return redirect()->route('jalur-pendaftaran.index')
             ->with('success', 'Jalur Pendaftaran berhasil diperbarui');
     }
 
@@ -81,7 +81,7 @@ class JalurPendaftaranController extends Controller
     {
         $jalurPendaftaran->delete();
 
-        return redirect()->route('admin.jalur-pendaftaran.index')
+        return redirect()->route('jalur-pendaftaran.index')
             ->with('success', 'Jalur Pendaftaran berhasil dihapus');
     }
 }

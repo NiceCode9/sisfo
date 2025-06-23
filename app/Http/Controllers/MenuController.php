@@ -46,7 +46,7 @@ class MenuController extends Controller
 
         Menu::create($validated);
 
-        return redirect()->route('admin.menus.index')
+        return redirect()->route('menus.index')
             ->with('success', 'Menu berhasil ditambahkan');
     }
 
@@ -95,7 +95,7 @@ class MenuController extends Controller
 
         $menu->update($validated);
 
-        return redirect()->route('admin.menus.index')
+        return redirect()->route('menus.index')
             ->with('success', 'Menu berhasil diperbarui');
     }
 
@@ -103,13 +103,13 @@ class MenuController extends Controller
     {
         // Check if menu has children
         if ($menu->children()->count() > 0) {
-            return redirect()->route('admin.menus.index')
+            return redirect()->route('menus.index')
                 ->with('error', 'Menu tidak bisa dihapus karena memiliki submenu');
         }
 
         $menu->delete();
 
-        return redirect()->route('admin.menus.index')
+        return redirect()->route('menus.index')
             ->with('success', 'Menu berhasil dihapus');
     }
 

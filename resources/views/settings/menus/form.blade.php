@@ -8,8 +8,7 @@
             </h6>
         </div>
         <div class="card-body">
-            <form action="{{ isset($menu) ? route('admin.menus.update', $menu->id) : route('admin.menus.store') }}"
-                method="POST">
+            <form action="{{ isset($menu) ? route('menus.update', $menu->id) : route('menus.store') }}" method="POST">
                 @csrf
                 @if (isset($menu))
                     @method('PUT')
@@ -174,7 +173,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Simpan
                 </button>
-                <a href="{{ route('admin.menus.index') }}" class="btn btn-secondary">
+                <a href="{{ route('menus.index') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
             </form>

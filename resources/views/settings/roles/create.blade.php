@@ -15,7 +15,7 @@
                             </svg>
                         </a>
                     </li>
-                    <li class="breadcrumb-item" aria-current="page"><a href="{{ route('admin.roles.index') }}">Roles</a>
+                    <li class="breadcrumb-item" aria-current="page"><a href="{{ route('roles.index') }}">Roles</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">Create Roles</li>
                 </ol>
@@ -24,7 +24,7 @@
             {{-- <p class="mb-0">Your web analytics dashboard template.</p> --}}
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('admin.roles.index') }}" class="btn btn-sm btn-gray-500 d-inline-flex align-items-center">
+            <a href="{{ route('roles.index') }}" class="btn btn-sm btn-gray-500 d-inline-flex align-items-center">
 
                 Kembali
             </a>
@@ -38,8 +38,7 @@
             </h6>
         </div>
         <div class="card-body">
-            <form action="{{ isset($role) ? route('admin.roles.update', $role->id) : route('admin.roles.store') }}"
-                method="POST">
+            <form action="{{ isset($role) ? route('roles.update', $role->id) : route('roles.store') }}" method="POST">
                 @csrf
                 @if (isset($role))
                     @method('PUT')

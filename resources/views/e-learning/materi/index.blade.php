@@ -193,7 +193,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('admin.materi.datatable') }}",
+                    url: "{{ route('materi.datatable') }}",
                     error: function(xhr, error, thrown) {
                         if (xhr.status === 419) { // CSRF token mismatch
                             Swal.fire({
@@ -272,7 +272,7 @@
                 var formData = new FormData(this);
 
                 $.ajax({
-                    url: "{{ route('admin.materi.store') }}",
+                    url: "{{ route('materi.store') }}",
                     method: 'POST',
                     data: formData,
                     processData: false,

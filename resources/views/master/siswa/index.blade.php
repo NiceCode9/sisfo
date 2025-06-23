@@ -66,7 +66,7 @@
             $('#tblsiswa').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.siswa.datatable') }}",
+                ajax: "{{ route('siswa.datatable') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',

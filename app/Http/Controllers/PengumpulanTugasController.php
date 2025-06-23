@@ -17,8 +17,10 @@ class PengumpulanTugasController extends Controller
         $user = Auth::user();
 
         if ($user->hasRole('guru')) {
-            $pengumpulan = PengumpulanTugas::whereHas('tugas.guruMataPelajaran.guru', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
+            $pengumpulan = PengumpulanTugas::whereHas('tugas.guruKelas.guruMataPelajaran.guru', function ($query) use ($user) {
+                $query->whereHas('user', function ($q) use ($user) {
+                    $q->where('id', $user->id);
+                });
             })->with(['tugas', 'siswa'])->paginate(10);
         } else {
             $pengumpulan = PengumpulanTugas::where('siswa_id', $user->siswa->id)
@@ -83,6 +85,8 @@ class PengumpulanTugasController extends Controller
             'teks_pengumpulan' => $request->teks_pengumpulan
         ]);
 
+        // $pengumpulan->hitungNilaiPilihanGanda();
+
         if ($tugas->metode_pengerjaan === 'upload_file') {
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
@@ -101,7 +105,7 @@ class PengumpulanTugasController extends Controller
             }
         }
 
-        return redirect()->route('admin.pengumpulan-tugas.index')
+        return redirect()->route('pengumpulan-tugas.index')
             ->with('success', 'Tugas berhasil dikumpulkan');
     }
 
@@ -126,7 +130,7 @@ class PengumpulanTugasController extends Controller
 
         $pengumpulanTuga->update($request->only(['nilai', 'umpan_balik']));
 
-        return redirect()->route('admin.pengumpulan-tugas.show', $pengumpulanTuga->id)
+        return redirect()->route('pengumpulan-tugas.show', $pengumpulanTuga->id)
             ->with('success', 'Nilai dan umpan balik berhasil disimpan');
     }
 
@@ -138,7 +142,7 @@ class PengumpulanTugasController extends Controller
 
         $pengumpulanTuga->delete();
 
-        return redirect()->route('admin.pengumpulan-tugas.index')
+        return redirect()->route('pengumpulan-tugas.index')
             ->with('success', 'Pengumpulan tugas berhasil dihapus');
     }
 }

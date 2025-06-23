@@ -43,7 +43,7 @@ class RoleController extends Controller
             $role->syncPermissions($permissions);
         }
 
-        return redirect()->route('admin.roles.index')
+        return redirect()->route('roles.index')
             ->with('success', 'Role berhasil dibuat');
     }
 
@@ -85,7 +85,7 @@ class RoleController extends Controller
             $role->syncPermissions([]);
         }
 
-        return redirect()->route('admin.roles.index')
+        return redirect()->route('roles.index')
             ->with('success', 'Role berhasil diperbarui');
     }
 
@@ -96,12 +96,12 @@ class RoleController extends Controller
         }
 
         if ($role->users()->count() > 0) {
-            return redirect()->route('admin.roles.index')
+            return redirect()->route('roles.index')
                 ->with('error', 'Role tidak bisa dihapus karena masih memiliki user');
         }
 
         $role->delete();
-        return redirect()->route('admin.roles.index')
+        return redirect()->route('roles.index')
             ->with('success', 'Role berhasil dihapus');
     }
 }

@@ -22,7 +22,7 @@
             {{-- <p class="mb-0">Your web analytics dashboard template.</p> --}}
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('admin.users.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
+            <a href="{{ route('users.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
@@ -56,7 +56,7 @@
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">Daftar User</h6>
             {{-- @can('setting.user.manage')
-                <a href="{{ route('admin.users.create') }}" class="btn btn-sm btn-primary">
+                <a href="{{ route('users.create') }}" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus"></i> Tambah User
                 </a>
             @endcan --}}
@@ -87,7 +87,7 @@
                                 </td>
                                 <td>
                                     @if ($user->siswa)
-                                        {{-- <a href="{{ route('admin.siswa.show', $user->siswa->id) }}">
+                                        {{-- <a href="{{ route('siswa.show', $user->siswa->id) }}">
                                             {{ $user->siswa->nis }} - {{ $user->siswa->calonSiswa->nama_lengkap }}
                                         </a> --}}
                                     @else
@@ -97,8 +97,7 @@
                                 <td>
                                     <div class="d-flex me-auto">
                                         @can('setting.user.manage')
-                                            <a href="{{ route('admin.users.edit', $user->id) }}"
-                                                class="btn btn-sm btn-warning mr-2">
+                                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-warning mr-2">
                                                 <i class="fas fa-edit"></i>
                                             </a>
 
@@ -107,7 +106,7 @@
                                                 <i class="fas fa-key"></i>
                                             </button>
 
-                                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
+                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger"
@@ -128,7 +127,7 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
-                                                <form action="{{ route('admin.users.update-password', $user->id) }}"
+                                                <form action="{{ route('users.update-password', $user->id) }}"
                                                     method="POST">
                                                     @csrf
                                                     @method('PUT')

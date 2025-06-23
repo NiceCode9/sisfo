@@ -28,7 +28,7 @@
 
     <div class="table-settings mb-4">
         <div class="row align-items-center justify-content-between">
-            <form action="{{ route('admin.calon-siswa.index') }}" method="GET" class="row">
+            <form action="{{ route('calon-siswa.index') }}" method="GET" class="row">
                 <div class="col-md-4">
                     <div class="input-group me-2 me-lg-3">
                         <span class="input-group-text">
@@ -116,13 +116,13 @@
                                         <span class="badge bg-danger">Ditolak</span>
                                     @endif
                                 </td>
-                                <td><a href="{{ route('admin.calon-siswa.show', $casis->id) }}"
+                                <td><a href="{{ route('calon-siswa.show', $casis->id) }}"
                                         class="btn btn-primary btn-sm">Detail</a></td>
                                 {{-- <td>
                                     <div class="btn-group" role="group">
-                                        <a href="{{ route('admin.calon-siswa.edit', $casis->id) }}"
+                                        <a href="{{ route('calon-siswa.edit', $casis->id) }}"
                                             class="btn btn-warning btn-sm">Edit</a>
-                                        <form action="{{ route('admin.calon-siswa.destroy', $casis->id) }}" method="POST"
+                                        <form action="{{ route('calon-siswa.destroy', $casis->id) }}" method="POST"
                                             style="display:inline;">
                                             @csrf
                                             @method('DELETE')

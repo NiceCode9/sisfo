@@ -175,7 +175,7 @@
                 const formData = new FormData(this);
 
                 $.ajax({
-                    url: "{{ route('admin.kuota-pendaftaran.store') }}",
+                    url: "{{ route('kuota-pendaftaran.store') }}",
                     type: "POST",
                     data: formData,
                     processData: false,

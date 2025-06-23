@@ -18,8 +18,8 @@
                             </svg>
                         </a>
                     </li>
-                    <li class="breadcrumb-item" aria-current="page"><a
-                            href="{{ route('admin.biaya-pendaftaran.index') }}">Biaya Pendaftaran</a>
+                    <li class="breadcrumb-item" aria-current="page"><a href="{{ route('biaya-pendaftaran.index') }}">Biaya
+                            Pendaftaran</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">Tambah Data</li>
                 </ol>
@@ -28,7 +28,7 @@
             {{-- <p class="mb-0">Your web analytics dashboard template.</p> --}}
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('admin.biaya-pendaftaran.index') }}"
+            <a href="{{ route('biaya-pendaftaran.index') }}"
                 class="btn btn-sm btn-gray-500 d-inline-flex align-items-center">
                 Kembali
             </a>
@@ -55,7 +55,7 @@
         </div>
         <div class="card-body">
             <form
-                action="{{ isset($biaya) ? route('admin.biaya-pendaftaran.update', $biaya->id) : route('admin.biaya-pendaftaran.store') }}"
+                action="{{ isset($biaya) ? route('biaya-pendaftaran.update', $biaya->id) : route('biaya-pendaftaran.store') }}"
                 method="POST">
                 @csrf
                 @if (isset($biaya))

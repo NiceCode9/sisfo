@@ -93,11 +93,11 @@ class SoalController extends Controller
             DB::commit();
 
             if ($request->has('add_more')) {
-                return redirect()->route('admin.soal.create', ['tugas' => $request->tugas_id])
+                return redirect()->route('soal.create', ['tugas' => $request->tugas_id])
                     ->with('success', 'Soal berhasil ditambahkan. Silahkan tambah soal lainnya.');
             }
 
-            return redirect()->route('admin.tugas.show', $request->tugas_id)
+            return redirect()->route('tugas.show', $request->tugas_id)
                 ->with('success', 'Soal berhasil ditambahkan');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -112,7 +112,7 @@ class SoalController extends Controller
      */
     public function show(Soal $soal)
     {
-        $soal->load(['tugas', 'jawaban']);
+        $soal->load(['jawaban', 'jawabanSiswa.pengumpulanTugas.siswa', 'tugas.guruKelas.guruMataPelajaran.mataPelajaran']);
         return view('e-learning.soal.show', compact('soal'));
     }
 
@@ -190,7 +190,7 @@ class SoalController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.soal.show', $soal->id)
+            return redirect()->route('soal.show', $soal->id)
                 ->with('success', 'Soal berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -223,7 +223,7 @@ class SoalController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.tugas.show', $tugasId)
+            return redirect()->route('tugas.show', $tugasId)
                 ->with('success', 'Soal berhasil dihapus');
         } catch (\Exception $e) {
             DB::rollBack();

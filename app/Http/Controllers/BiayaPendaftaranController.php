@@ -42,7 +42,7 @@ class BiayaPendaftaranController extends Controller
 
         BiayaPendaftaran::create($request->all());
 
-        return redirect()->route('admin.biaya-pendaftaran.index')
+        return redirect()->route('biaya-pendaftaran.index')
             ->with('success', 'Biaya Pendaftaran berhasil ditambahkan');
     }
 
@@ -80,7 +80,7 @@ class BiayaPendaftaranController extends Controller
 
         $biayaPendaftaran->update($request->all());
 
-        return redirect()->route('admin.biaya-pendaftaran.index')
+        return redirect()->route('biaya-pendaftaran.index')
             ->with('success', 'Biaya Pendaftaran berhasil diperbarui');
     }
 
@@ -91,7 +91,7 @@ class BiayaPendaftaranController extends Controller
     {
         $biayaPendaftaran->delete();
 
-        return redirect()->route('admin.biaya-pendaftaran.index')
+        return redirect()->route('biaya-pendaftaran.index')
             ->with('success', 'Biaya Pendaftaran berhasil dihapus');
     }
 }

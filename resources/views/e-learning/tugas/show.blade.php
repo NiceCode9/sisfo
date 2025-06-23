@@ -9,18 +9,21 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Detail Tugas</h3>
-                        <div class="card-tools">
+                        <div class="card-tools d-flex justify-content-end">
                             @if (auth()->user()->hasRole('guru') && $tuga->guruKelas->guruMataPelajaran->guru->user->id === auth()->id())
-                                <a href="{{ route('admin.tugas.edit', $tuga->id) }}" class="btn btn-warning btn-sm">
+                                <a href="{{ route('tugas.edit', $tuga->id) }}" class="btn btn-warning btn-sm me-2">
                                     <i class="fas fa-edit"></i> Edit Tugas
                                 </a>
                                 @if ($tuga->metode_pengerjaan === 'online')
-                                    <a href="{{ route('admin.soal.create', ['tugas' => $tuga->id]) }}"
-                                        class="btn btn-primary btn-sm">
+                                    <a href="{{ route('soal.create', ['tugas' => $tuga->id]) }}"
+                                        class="btn btn-primary btn-sm me-2">
                                         <i class="fas fa-plus"></i> Tambah Soal
                                     </a>
                                 @endif
                             @endif
+                            <a href="{{ route('tugas.index') }}" class="btn btn-gray-200 btn-sm me-2">
+                                <i class="fas fa-arrow-left"></i> Kembali ke Daftar Tugas
+                            </a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -84,7 +87,7 @@
                         </div>
 
                         @if ($tuga->metode_pengerjaan === 'upload_file' && $tuga->file_tugas)
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <h5>File Tugas</h5>
                                 <a href="{{ Storage::url($tuga->file_tugas) }}" class="btn btn-info" target="_blank">
                                     <i class="fas fa-download"></i> Download File Tugas
@@ -126,11 +129,11 @@
                                                     @if (auth()->user()->hasRole('guru'))
                                                         <td>
                                                             <div class="btn-group">
-                                                                <a href="{{ route('admin.soal.show', $soal->id) }}"
+                                                                <a href="{{ route('soal.show', $soal->id) }}"
                                                                     class="btn btn-sm btn-info" title="Detail">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
-                                                                <a href="{{ route('admin.soal.edit', $soal->id) }}"
+                                                                <a href="{{ route('soal.edit', $soal->id) }}"
                                                                     class="btn btn-sm btn-warning" title="Edit">
                                                                     <i class="fas fa-edit"></i>
                                                                 </a>
@@ -155,11 +158,11 @@
                         @endif
 
                         @if (auth()->user()->hasRole('siswa'))
-                            <div class="mt-4">
+                            <div class="mt-3">
                                 @if (!$tuga->pengumpulanTugas()->where('siswa_id', auth()->user()->siswa->id)->exists())
                                     @if (!$tuga->batas_waktu->isPast())
-                                        <a href="{{ route('admin.pengumpulan-tugas.create', ['tugas' => $tuga->id]) }}"
-                                            class="btn btn-success">
+                                        <a href="{{ route('pengumpulan-tugas.create', ['tugas' => $tuga->id]) }}"
+                                            class="btn btn-success text-white">
                                             <i class="fas fa-upload"></i> Kumpulkan Tugas
                                         </a>
                                     @else

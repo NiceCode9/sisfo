@@ -8,6 +8,7 @@ use App\Models\GuruMataPelajaran;
 use App\Models\TahunAjaran;
 use App\Models\Kelas;
 use App\Models\MataPelajaran;
+use App\Models\PengumpulanTugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -110,6 +111,13 @@ class TugasController extends Controller
                     }
                     return $html;
                 })
+                ->addColumn('progres_pengumpulan', function ($tugas) {
+                    // Hitung jumlah siswa di kelas
+                    $jumlahSiswa = $tugas->guruKelas->kelas->siswa()->count();
+                    // Hitung jumlah yang sudah mengumpulkan
+                    $jumlahMengumpulkan = $tugas->pengumpulanTugas->count();
+                    return "<span class=\"badge bg-secondary\">$jumlahMengumpulkan / $jumlahSiswa</span>";
+                })
                 ->addColumn('status', function ($tugas) use ($user) {
                     $status = 'Belum Dikumpulkan';
                     $statusClass = 'bg-warning';
@@ -134,21 +142,27 @@ class TugasController extends Controller
                 })
                 ->addColumn('action', function ($tugas) use ($user) {
                     $html = '<div class="btn-group">';
-                    $html .= '<a href="' . route('admin.tugas.show', ['tuga' => $tugas->id]) . '" class="btn btn-sm btn-info" title="Detail"><i class="fas fa-eye"></i></a>';
+                    $html .= '<a href="' . route('tugas.show', ['tuga' => $tugas->id]) . '" class="btn btn-sm btn-info" title="Detail"><i class="fas fa-eye"></i></a>';
 
                     if ($user->hasRole('guru') && $tugas->guruKelas->guruMataPelajaran->guru->user->id === $user->id) {
-                        $html .= '<a href="' . route('admin.tugas.edit', $tugas->id) . '" class="btn btn-sm btn-warning" title="Edit"><i class="fas fa-edit"></i></a>';
+                        $html .= '<a href="' . route('tugas.edit', $tugas->id) . '" class="btn btn-sm btn-warning" title="Edit"><i class="fas fa-edit"></i></a>';
                         $html .= '<button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(\'' . $tugas->id . '\')" title="Hapus"><i class="fas fa-trash"></i></button>';
                     } elseif ($user->hasRole('siswa') && !$tugas->batas_waktu->isPast()) {
                         if (!$tugas->pengumpulanTugas()->where('siswa_id', $user->siswa->id)->exists()) {
-                            $html .= '<a href="' . route('admin.pengumpulan-tugas.create', ['tugas' => $tugas->id]) . '" class="btn btn-sm btn-success" title="Kumpulkan"><i class="fas fa-upload"></i> Kumpulkan</a>';
+                            $html .= '<a href="' . route('pengumpulan-tugas.create', ['tugas' => $tugas->id]) . '" class="btn btn-sm btn-success" title="Kumpulkan"><i class="fas fa-upload"></i> Kumpulkan</a>';
                         }
                     }
 
                     $html .= '</div>';
                     return $html;
                 })
-                ->rawColumns(['jenis', 'metode_pengerjaan', 'batas_waktu', 'status', 'action'])
+                ->addColumn('lihat_pengumpulan', function ($tugas) use ($user) {
+                    if ($user->hasRole('guru') && $tugas->guruKelas->guruMataPelajaran->guru->user->id === $user->id) {
+                        return '<a href="' . route('tugas.submissions', ['tugas' => $tugas->id]) . '" class="btn btn-sm btn-info" title="Lihat Pengumpulan">Pengumpulan</a>';
+                    }
+                    return '';
+                })
+                ->rawColumns(['jenis', 'metode_pengerjaan', 'batas_waktu', 'progres_pengumpulan', 'status', 'action', 'lihat_pengumpulan'])
                 ->make(true);
         }
 
@@ -210,11 +224,11 @@ class TugasController extends Controller
         $tugas->save();
 
         if ($tugas->metode_pengerjaan === 'online') {
-            return redirect()->route('admin.soal.create', ['tugas' => $tugas->id])
+            return redirect()->route('soal.create', ['tugas' => $tugas->id])
                 ->with('success', 'Tugas berhasil dibuat, silahkan tambahkan soal.');
         }
 
-        return redirect()->route('admin.tugas.index')
+        return redirect()->route('tugas.index')
             ->with('success', 'Tugas berhasil dibuat.');
     }
 
@@ -223,7 +237,7 @@ class TugasController extends Controller
      */
     public function show(Tugas $tuga)
     {
-        $tuga->load(['soal.jawaban', 'pengumpulanTugas']);
+        $tuga->load(['soal.jawaban', 'pengumpulanTugas.siswa', 'guruKelas.guruMataPelajaran.mataPelajaran']);
         return view('e-learning.tugas.show', compact('tuga'));
     }
 
@@ -305,7 +319,7 @@ class TugasController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.tugas.show', $tuga->id)
+            return redirect()->route('tugas.show', $tuga->id)
                 ->with('success', 'Tugas berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -328,5 +342,158 @@ class TugasController extends Controller
 
         return redirect()->route('tugas.index')
             ->with('success', 'Tugas berhasil dihapus.');
+    }
+
+    /**
+     * Show submitted assignments and grading page
+     */
+    public function submissions(Tugas $tugas, Request $request)
+    {
+        $tugas->load([
+            'guruKelas.kelas',
+            'guruKelas.guruMataPelajaran.mataPelajaran',
+            'pengumpulanTugas.siswa.user'
+        ]);
+
+        if ($request->ajax()) {
+            $query = $tugas->pengumpulanTugas()
+                ->with(['siswa.user'])
+                ->select('pengumpulan_tugas.*');
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('nama_siswa', function ($pengumpulan) {
+                    return $pengumpulan->siswa->user->name;
+                })
+                ->addColumn('waktu_pengumpulan', function ($pengumpulan) {
+                    return $pengumpulan->created_at->format('d M Y H:i');
+                })
+                ->addColumn('file_pengumpulan', function ($pengumpulan) {
+                    if ($pengumpulan->file_pengumpulan) {
+                        return '<a href="' . Storage::url($pengumpulan->file_pengumpulan) . '" class="btn btn-sm btn-primary" target="_blank" title="Lihat File"><i class="fas fa-file"></i> Lihat</a>';
+                    }
+                    return '<span class="badge bg-primary">Tidak Ada File</span>';
+                })
+                ->addColumn('status', function ($pengumpulan) {
+                    if ($pengumpulan->nilai !== null) {
+                        return '<span class="badge bg-success">Sudah Dinilai</span>';
+                    }
+                    return '<span class="badge bg-warning">Belum Dinilai</span>';
+                })
+                ->addColumn('nilai', function ($pengumpulan) {
+                    if ($pengumpulan->nilai !== null) {
+                        return $pengumpulan->nilai;
+                    }
+                    return '-';
+                })
+                ->addColumn('action', function ($pengumpulan) {
+                    $html = '<div class="btn-group">';
+                    // View submission details
+                    $html .= '<button type="button" class="btn btn-sm btn-info" onclick="viewSubmission(' . $pengumpulan->id . ')" title="Lihat"><i class="fas fa-eye"></i></button>';
+
+                    // Grade button if not graded yet
+                    if ($pengumpulan->nilai === null) {
+                        $html .= '<button type="button" class="btn btn-sm btn-primary" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Nilai"><i class="fas fa-star"></i></button>';
+                    } else {
+                        // Edit grade if already graded
+                        $html .= '<button type="button" class="btn btn-sm btn-warning" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Edit Nilai"><i class="fas fa-edit"></i></button>';
+                    }
+                    $html .= '</div>';
+                    return $html;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
+
+        return view('e-learning.tugas.submissions', compact('tugas'));
+    }
+
+    /**
+     * Save grade for a submission
+     */
+    public function grade(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'pengumpulan_id' => 'required|exists:pengumpulan_tugas,id',
+            'nilai' => 'required|numeric|min:0|max:100',
+            'komentar' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $pengumpulan = PengumpulanTugas::findOrFail($request->pengumpulan_id);
+
+        // Check if user has permission to grade
+        $user = Auth::user();
+        if (!$user->hasRole('guru') || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $pengumpulan->nilai = $request->nilai;
+        $pengumpulan->umpan_balik = $request->komentar;
+        $pengumpulan->save();
+
+        return response()->json([
+            'message' => 'Nilai berhasil disimpan',
+            'pengumpulan' => $pengumpulan
+        ]);
+    }
+
+    /**
+     * Get submission details
+     */
+    public function submissionDetail($id)
+    {
+        $pengumpulan = \App\Models\PengumpulanTugas::with([
+            'siswa.user',
+            'tugas.soal',
+            'jawabanSiswa.soal',
+        ])->findOrFail($id);
+
+        $user = Auth::user();
+        if (!$user->hasRole(['guru', 'admin']) && ($user->hasRole('siswa') && $pengumpulan->siswa_id !== $user->siswa->id)) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Siapkan data jawaban per soal
+        $soalList = $pengumpulan->tugas->soal;
+        $jawabanSiswa = $pengumpulan->jawabanSiswa->keyBy('soal_id');
+        $soalJawaban = $soalList->map(function ($soal) use ($jawabanSiswa) {
+            $jawaban = $jawabanSiswa->get($soal->id);
+            return [
+                'soal_id' => $soal->id,
+                'pertanyaan' => $soal->pertanyaan,
+                'tipe' => $soal->tipe,
+                'jawaban_siswa' => $jawaban ? $jawaban->jawaban : null,
+                'nilai' => $jawaban ? $jawaban->nilai : null,
+            ];
+        });
+
+        $result = $pengumpulan->toArray();
+        $result['soal_jawaban'] = $soalJawaban;
+
+        return response()->json($result);
+    }
+
+    public function destroySubmission($id)
+    {
+        $pengumpulan = PengumpulanTugas::findOrFail($id);
+
+        // Check permission
+        $user = Auth::user();
+        if (!$user->hasRole('guru') || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Delete file if exists
+        if ($pengumpulan->file_pengumpulan) {
+            Storage::disk('public')->delete($pengumpulan->file_pengumpulan);
+        }
+
+        $pengumpulan->delete();
+
+        return response()->json(['message' => 'Pengumpulan tugas berhasil dihapus']);
     }
 }

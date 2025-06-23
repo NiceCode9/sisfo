@@ -11,7 +11,7 @@
                         <h3 class="card-title mb-0">Daftar Tugas</h3>
                         @if (auth()->user()->hasRole('guru'))
                             <div>
-                                <a href="{{ route('admin.tugas.create') }}" class="btn btn-primary">
+                                <a href="{{ route('tugas.create') }}" class="btn btn-primary">
                                     <i class="fas fa-plus"></i> Buat Tugas Baru
                                 </a>
                             </div>
@@ -72,6 +72,7 @@
                                         <th>Metode Pengerjaan</th>
                                         <th>Batas Waktu</th>
                                         <th>Status</th>
+                                        <th>Pengumpulan</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -84,7 +85,7 @@
     </div>
 
     @foreach ($tugas ?? [] as $t)
-        <form id="delete-form-{{ $t->id }}" action="{{ route('admin.tugas.destroy', $t->id) }}" method="POST"
+        <form id="delete-form-{{ $t->id }}" action="{{ route('tugas.destroy', $t->id) }}" method="POST"
             class="d-none">
             @csrf
             @method('DELETE')
@@ -100,7 +101,7 @@
                 serverSide: true,
                 responsive: true,
                 ajax: {
-                    url: "{{ route('admin.tugas.index') }}",
+                    url: "{{ route('tugas.index') }}",
                     data: function(d) {
                         d.tahun_ajaran_id = $('#tahun_ajaran_id').val();
                         d.kelas_id = $('#kelas_id').val();
@@ -143,8 +144,20 @@
                         name: 'batas_waktu'
                     },
                     {
+                        data: 'progres_pengumpulan',
+                        name: 'progres_pengumpulan',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
                         data: 'status',
                         name: 'status',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'lihat_pengumpulan',
+                        name: 'lihat_pengumpulan',
                         orderable: false,
                         searchable: false
                     },

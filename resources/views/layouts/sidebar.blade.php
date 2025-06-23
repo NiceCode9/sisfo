@@ -74,9 +74,8 @@
             @foreach ($sidebarMenu as $menu)
                 @if (
                     !$menu->permission ||
-                        ($menu->permission &&
-                            ($user->hasPermissionTo($menu->permission) ||
-                                $user->hasRole(config('permission.super_admin_role', 'Super Admin')))))
+                        ($menu->permission && $user->hasPermissionTo($menu->permission)) ||
+                        $user->hasRole('super-admin'))
                     @if ($menu->group !== $currentGroup)
                         <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
                         <li class="nav-item">
@@ -113,9 +112,7 @@
                                     @foreach ($menu->children as $child)
                                         @if (
                                             !$child->permission ||
-                                                ($child->permission &&
-                                                    ($user->hasPermissionTo($child->permission) ||
-                                                        $user->hasRole(config('permission.super_admin_role', 'Super Admin')))))
+                                                ($child->permission && ($user->hasPermissionTo($child->permission) || $user->hasRole('super-admin'))))
                                             <li class="nav-item @if ($child->isActive()) active @endif">
                                                 <a class="nav-link" href="{{ $child->full_url }}">
                                                     <span class="sidebar-text">{{ $child->name }}</span>

@@ -69,7 +69,7 @@ class UserController extends Controller
         $roles = Role::whereIn('id', $request->roles)->get();
         $user->syncRoles($roles);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('users.index')
             ->with('success', 'User berhasil dibuat');
     }
 
@@ -141,7 +141,7 @@ class UserController extends Controller
         $roles = Role::whereIn('id', $request->roles)->get();
         $user->syncRoles($roles);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('users.index')
             ->with('success', 'User berhasil diperbarui');
     }
 
@@ -157,7 +157,7 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('users.index')
             ->with('success', 'User berhasil dihapus');
     }
 
@@ -171,7 +171,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('users.index')
             ->with('success', 'Password user berhasil diperbarui');
     }
 }

@@ -23,6 +23,7 @@
     <!-- Primary Meta Tags -->
     <title>Volt Free Bootstrap Dashboard - Transactions</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="title" content="Volt Free Bootstrap Dashboard - Transactions">
     <meta name="author" content="Themesberg">
     <meta name="description" content="Ini adalah Sistem Informasi Sekolah yang dibangun menggunakan framework Laravel.">

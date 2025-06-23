@@ -21,14 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('super-admin') ? true : null;
+        });
         view()->composer(
             ['layouts.sidebar'], // Sesuaikan dengan template Anda
             \App\View\Composers\MenuComposer::class
         );
-
-        Gate::before(function ($user, $ability) {
-            return $user->hasRole('admin') ? true : null;
-        });
 
         Paginator::useBootstrapFive();
     }

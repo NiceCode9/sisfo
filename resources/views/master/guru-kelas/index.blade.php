@@ -133,7 +133,7 @@
             let table = $('#guruKelasTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.guru-kelas.datatable') }}",
+                ajax: "{{ route('guru-kelas.datatable') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',

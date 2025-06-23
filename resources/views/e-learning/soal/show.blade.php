@@ -11,7 +11,7 @@
                         <h3 class="card-title">Detail Soal</h3>
                         @if (auth()->user()->hasRole('guru'))
                             <div class="card-tools">
-                                <a href="{{ route('admin.soal.edit', $soal->id) }}" class="btn btn-warning btn-sm">
+                                <a href="{{ route('soal.edit', $soal->id) }}" class="btn btn-warning btn-sm">
                                     <i class="fas fa-edit"></i> Edit Soal
                                 </a>
                             </div>
@@ -25,8 +25,10 @@
                                     <p class="mb-0">
                                         <strong>Judul Tugas:</strong> {{ $soal->tugas->judul }} <br>
                                         <strong>Mata Pelajaran:</strong>
-                                        {{ $soal->tugas->guruMataPelajaran->mataPelajaran->nama_pelajaran }} <br>
-                                        <strong>Guru:</strong> {{ $soal->tugas->guruMataPelajaran->guru->user->name }}
+                                        {{ $soal->tugas->guruKelas->guruMataPelajaran->mataPelajaran->nama_pelajaran }}
+                                        <br>
+                                        <strong>Guru:</strong>
+                                        {{ $soal->tugas->guruKelas->guruMataPelajaran->guru->user->name }}
                                     </p>
                                 </div>
                             </div>
@@ -109,7 +111,7 @@
                         @endif
 
                         <div class="mt-4">
-                            <a href="{{ route('admin.tugas.show', $soal->tugas_id) }}" class="btn btn-secondary">
+                            <a href="{{ route('tugas.show', $soal->tugas_id) }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Kembali ke Detail Tugas
                             </a>
                         </div>

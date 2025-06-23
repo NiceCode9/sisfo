@@ -16,14 +16,15 @@
                                 <h5>Informasi Tugas</h5>
                                 <p><strong>Judul:</strong> {{ $pengumpulanTuga->tugas->judul }}</p>
                                 <p><strong>Mata Pelajaran:</strong>
-                                    {{ $pengumpulanTuga->tugas->guruMataPelajaran->mataPelajaran->nama }}</p>
+                                    {{ $pengumpulanTuga->tugas->guruKelas->guruMataPelajaran->mataPelajaran->nama_pelajaran }}
+                                </p>
                                 <p><strong>Batas Waktu:</strong>
                                     {{ $pengumpulanTuga->tugas->batas_waktu->format('d M Y H:i') }}</p>
                                 <p><strong>Total Nilai:</strong> {{ $pengumpulanTuga->tugas->total_nilai }}</p>
                             </div>
                             <div class="col-md-6">
                                 <h5>Informasi Pengumpulan</h5>
-                                <p><strong>Siswa:</strong> {{ $pengumpulanTuga->siswa->nama }}</p>
+                                <p><strong>Siswa:</strong> {{ $pengumpulanTuga->siswa->user->name }}</p>
                                 <p><strong>Waktu Pengumpulan:</strong>
                                     {{ $pengumpulanTuga->waktu_pengumpulan->format('d M Y H:i') }}</p>
                                 <p><strong>Status:</strong>
@@ -82,7 +83,7 @@
                         @if (auth()->user()->hasRole('guru'))
                             <div class="penilaian-section">
                                 <h5>Penilaian</h5>
-                                <form action="{{ route('admin.pengumpulan-tugas.update', $pengumpulanTuga->id) }}"
+                                <form action="{{ route('pengumpulan-tugas.update', $pengumpulanTuga->id) }}"
                                     method="POST">
                                     @csrf
                                     @method('PUT')

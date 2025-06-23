@@ -15,7 +15,7 @@
                             </svg>
                         </a>
                     </li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">Users</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Create Users</li>
                 </ol>
             </nav>
@@ -31,8 +31,7 @@
             </h6>
         </div>
         <div class="card-body">
-            <form action="{{ isset($user) ? route('admin.users.update', $user->id) : route('admin.users.store') }}"
-                method="POST">
+            <form action="{{ isset($user) ? route('users.update', $user->id) : route('users.store') }}" method="POST">
                 @csrf
                 @if (isset($user))
                     @method('PUT')
@@ -140,7 +139,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Simpan
                 </button>
-                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
+                <a href="{{ route('users.index') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
             </form>

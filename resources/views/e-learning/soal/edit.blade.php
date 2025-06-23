@@ -22,7 +22,7 @@
                         <h3 class="card-title">Edit Soal untuk Tugas: {{ $soal->tugas->judul }}</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.soal.update', $soal->id) }}" method="POST" id="formSoal">
+                        <form action="{{ route('soal.update', $soal->id) }}" method="POST" id="formSoal">
                             @csrf
                             @method('PUT')
 
@@ -100,7 +100,7 @@
 
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                                <a href="{{ route('admin.tugas.show', $soal->tugas_id) }}" class="btn btn-secondary">
+                                <a href="{{ route('tugas.show', $soal->tugas_id) }}" class="btn btn-secondary">
                                     Batal
                                 </a>
                             </div>

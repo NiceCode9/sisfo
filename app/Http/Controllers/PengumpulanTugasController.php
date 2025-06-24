@@ -7,6 +7,7 @@ use App\Models\PengumpulanTugas;
 use App\Models\JawabanSiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -53,6 +54,7 @@ class PengumpulanTugasController extends Controller
 
     public function store(Request $request)
     {
+        dd($request->all());
         $tugas = Tugas::findOrFail($request->tugas_id);
 
         if ($tugas->metode_pengerjaan === 'upload_file') {
@@ -77,36 +79,44 @@ class PengumpulanTugasController extends Controller
                 ->withInput();
         }
 
-        // Buat pengumpulan tugas
-        $pengumpulan = PengumpulanTugas::create([
-            'tugas_id' => $request->tugas_id,
-            'siswa_id' => Auth::user()->siswa->id,
-            'waktu_pengumpulan' => now(),
-            'teks_pengumpulan' => $request->teks_pengumpulan
-        ]);
+        DB::beginTransaction();
+        try {
+            // Buat pengumpulan tugas
+            $pengumpulan = PengumpulanTugas::create([
+                'tugas_id' => $request->tugas_id,
+                'siswa_id' => Auth::user()->siswa->id,
+                'waktu_pengumpulan' => now(),
+                'teks_pengumpulan' => $request->teks_pengumpulan
+            ]);
 
-        // $pengumpulan->hitungNilaiPilihanGanda();
+            if ($tugas->metode_pengerjaan === 'upload_file') {
+                if ($request->hasFile('file')) {
+                    $file = $request->file('file');
+                    $path = $file->store('pengumpulan-tugas', 'public');
+                    $pengumpulan->update(['path_file' => $path]);
+                }
+            } else {
+                // Simpan jawaban siswa
+                foreach ($request->jawaban as $jawaban) {
+                    $soal = $tugas->soal->find($jawaban['soal_id']);
+                    JawabanSiswa::create([
+                        'pengumpulan_id' => $pengumpulan->id,
+                        'soal_id' => $jawaban['soal_id'],
+                        'jawaban_teks' => $jawaban['jawaban_teks'] ?? null,
+                        'id_jawaban' => $jawaban['id_jawaban'] ?? null
+                    ]);
+                }
+            }
 
-        if ($tugas->metode_pengerjaan === 'upload_file') {
-            if ($request->hasFile('file')) {
-                $file = $request->file('file');
-                $path = $file->store('pengumpulan-tugas', 'public');
-                $pengumpulan->update(['path_file' => $path]);
-            }
-        } else {
-            // Simpan jawaban siswa
-            foreach ($request->jawaban as $jawaban) {
-                JawabanSiswa::create([
-                    'pengumpulan_id' => $pengumpulan->id,
-                    'soal_id' => $jawaban['soal_id'],
-                    'jawaban_teks' => $jawaban['jawaban_teks'] ?? null,
-                    'id_jawaban' => $jawaban['id_jawaban'] ?? null
-                ]);
-            }
+            DB::commit();
+            return redirect()->route('pengumpulan-tugas.index')
+                ->with('success', 'Tugas berhasil dikumpulkan');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat mengumpulkan tugas: ' . $e->getMessage())
+                ->withInput();
         }
-
-        return redirect()->route('pengumpulan-tugas.index')
-            ->with('success', 'Tugas berhasil dikumpulkan');
     }
 
     public function show(PengumpulanTugas $pengumpulanTuga)

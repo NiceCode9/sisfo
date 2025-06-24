@@ -46,6 +46,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('soal', \App\Http\Controllers\SoalController::class);
     Route::resource('jawaban', \App\Http\Controllers\JawabanController::class);
     Route::resource('pengumpulan-tugas', \App\Http\Controllers\PengumpulanTugasController::class);
+    Route::resource('siswa', \App\Http\Controllers\SiswaController::class);
     Route::resource('jawaban-siswa', \App\Http\Controllers\JawabanSiswaController::class);
     Route::resource('guru-kelas', \App\Http\Controllers\GuruKelasController::class);
 

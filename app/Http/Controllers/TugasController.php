@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\GuruKelas;
 use App\Models\Tugas;
 use App\Models\GuruMataPelajaran;
+use App\Models\JawabanSiswa;
 use App\Models\TahunAjaran;
 use App\Models\Kelas;
 use App\Models\MataPelajaran;
@@ -390,13 +391,12 @@ class TugasController extends Controller
                     $html = '<div class="btn-group">';
                     // View submission details
                     $html .= '<button type="button" class="btn btn-sm btn-info" onclick="viewSubmission(' . $pengumpulan->id . ')" title="Lihat"><i class="fas fa-eye"></i></button>';
-
-                    // Grade button if not graded yet
-                    if ($pengumpulan->nilai === null) {
-                        $html .= '<button type="button" class="btn btn-sm btn-primary" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Nilai"><i class="fas fa-star"></i></button>';
-                    } else {
-                        // Edit grade if already graded
-                        $html .= '<button type="button" class="btn btn-sm btn-warning" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Edit Nilai"><i class="fas fa-edit"></i></button>';
+                    if ($pengumpulan->tugas->metode_pengerjaan === 'upload_file') {
+                        if ($pengumpulan->nilai === null) {
+                            $html .= '<button type="button" class="btn btn-sm btn-primary" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Nilai"><i class="fas fa-star"></i></button>';
+                        } else {
+                            $html .= '<button type="button" class="btn btn-sm btn-warning" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Edit Nilai"><i class="fas fa-edit"></i></button>';
+                        }
                     }
                     $html .= '</div>';
                     return $html;
@@ -413,11 +413,76 @@ class TugasController extends Controller
      */
     public function grade(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'pengumpulan_id' => 'required|exists:pengumpulan_tugas,id',
-            'nilai' => 'required|numeric|min:0|max:100',
-            'komentar' => 'nullable|string|max:1000',
+        $pengumpulan = PengumpulanTugas::with('tugas')->findOrFail($request->pengumpulan_id);
+        $tugas = $pengumpulan->tugas;
+
+        if ($tugas->jenis === 'pilihan_ganda' || $tugas->jenis === 'campuran') {
+            // Penilaian otomatis untuk pilihan ganda/campuran
+            $pengumpulan->loadMissing('jawabanSiswa', 'tugas.soal');
+            $pengumpulan->hitungNilaiPilihanGanda();
+            return response()->json([
+                'message' => 'Nilai otomatis berhasil dihitung',
+                'pengumpulan' => $pengumpulan
+            ]);
+        } elseif ($tugas->jenis === 'uraian') {
+            // Penilaian manual per soal (gunakan gradeUraian)
+            // Data: pengumpulan_id, id_jawaban, poin
+            if ($request->has('id_jawaban') && $request->has('poin')) {
+                return $this->gradeUraian($request->id_jawaban, $request->poin);
+            } else {
+                return response()->json(['message' => 'Data penilaian uraian tidak lengkap'], 422);
+            }
+        } elseif ($tugas->metode_pengerjaan === 'upload_file') {
+            // Penilaian manual file upload
+            return $this->gradeFileUpload($request);
+        }
+        return response()->json(['message' => 'Tipe tugas tidak dikenali'], 422);
+    }
+
+    /**
+     * Penilaian uraian per soal
+     */
+    private function gradeUraian($id_jawaban, $poin)
+    {
+        $jawabanSiswa = \App\Models\JawabanSiswa::with('pengumpulanTugas')->findOrFail($id_jawaban);
+        $pengumpulan = $jawabanSiswa->pengumpulanTugas;
+
+        // Check if user has permission to grade
+        $user = Auth::user();
+        if (!$user->hasRole('guru') || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Validasi nilai
+        if (!is_numeric($poin) || $poin < 0 || $poin > 100) {
+            return response()->json(['errors' => ['poin' => ['Nilai harus antara 0-100']]], 422);
+        }
+
+        $jawabanSiswa->poin_diperoleh = $poin;
+        $jawabanSiswa->save();
+
+        // Update pengumpulan tugas jika semua jawaban sudah dinilai
+        $pengumpulan->load('jawabanSiswa');
+        $totalPoin = $pengumpulan->jawabanSiswa->sum('poin_diperoleh');
+        // $jumlahSoal = $pengumpulan->jawabanSiswa->count();
+        // $nilaiAkhir = $jumlahSoal > 0 ? round(($totalPoin / ($jumlahSoal * 100)) * $pengumpulan->tugas->total_nilai) : 0;
+        $pengumpulan->nilai = $totalPoin;
+        $pengumpulan->save();
+
+        return response()->json([
+            'message' => 'Nilai uraian berhasil disimpan',
+            'nilai' => $jawabanSiswa->poin_diperoleh,
+            'pengumpulan' => $pengumpulan
         ]);
+    }
+
+    private function gradeFileUpload(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+                    'pengumpulan_id' => 'required|exists:pengumpulan_tugas,id',
+                    'nilai' => 'required|numeric|min:0|max:100',
+                    'komentar' => 'nullable|string|max:1000',
+                ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -449,7 +514,7 @@ class TugasController extends Controller
         $pengumpulan = \App\Models\PengumpulanTugas::with([
             'siswa.user',
             'tugas.soal',
-            'jawabanSiswa.soal',
+            'jawabanSiswa.soal.jawaban',
         ])->findOrFail($id);
 
         $user = Auth::user();
@@ -457,7 +522,6 @@ class TugasController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // Siapkan data jawaban per soal
         $soalList = $pengumpulan->tugas->soal;
         $jawabanSiswa = $pengumpulan->jawabanSiswa->keyBy('soal_id');
         $soalJawaban = $soalList->map(function ($soal) use ($jawabanSiswa) {
@@ -465,9 +529,19 @@ class TugasController extends Controller
             return [
                 'soal_id' => $soal->id,
                 'pertanyaan' => $soal->pertanyaan,
-                'tipe' => $soal->tipe,
-                'jawaban_siswa' => $jawaban ? $jawaban->jawaban : null,
-                'nilai' => $jawaban ? $jawaban->nilai : null,
+                'jenis_soal' => $soal->jenis_soal,
+                'jawaban_siswa' => $jawaban ? (
+                    $soal->jenis_soal === 'pilihan_ganda'
+                        ? (
+                            isset($jawaban->jawaban)
+                                ? $jawaban->jawaban->teks_jawaban . ' (' . ($jawaban->jawaban->jawaban_benar ? 'Benar' : 'Salah') . ')'
+                                : null
+                        )
+                        : $jawaban->jawaban_teks
+                ) : null,
+                'poin_diperoleh' => $jawaban ? $jawaban->poin_diperoleh : null,
+                'nilai' => $jawaban ? $jawaban->poin_diperoleh : null,
+                'id_jawaban' => $jawaban->id ?? null,
             ];
         });
 

@@ -107,6 +107,8 @@ class PengumpulanTugasController extends Controller
                         } else {
                             $poinDiperoleh = 0;
                         }
+                    } elseif ($soal && $soal->jenis_soal === 'uraian') {
+                        $poinDiperoleh = null;
                     }
                     JawabanSiswa::create([
                         'pengumpulan_id' => $pengumpulan->id,
@@ -116,7 +118,13 @@ class PengumpulanTugasController extends Controller
                         'poin_diperoleh' => $poinDiperoleh
                     ]);
                 }
-                $nilaiAkhir = 0;
+
+                if ($tugas->jenis === 'uraian') {
+                    $nilaiAkhir = null;
+                } else {
+                    $nilaiAkhir = 0;
+                }
+
                 if ($jumlahSoal > 0) {
                     $nilaiAkhir = round(($jumlahBenar / $jumlahSoal) * $tugas->total_nilai);
                 }

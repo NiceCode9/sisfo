@@ -94,7 +94,7 @@
 
     <!-- Modal Detail Pengumpulan -->
     <div class="modal fade" id="submissionModal" tabindex="-1" aria-labelledby="submissionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="submissionModalLabel">Detail Pengumpulan</h5>
@@ -117,9 +117,10 @@
 
 @push('scripts')
     <script>
+        let table;
         $(document).ready(function() {
             // Initialize DataTable
-            const table = $('#submissions-table').DataTable({
+            table = $('#submissions-table').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('tugas.submissions', $tugas->id) }}",
@@ -215,6 +216,43 @@
             $('#gradeModal').modal('show');
         }
 
+        // Nilai jenis uraian
+        function gradeUraian(id_jawaban) {
+            const input = $(`input[onchange*='gradeUraian(${id_jawaban})']`);
+            const poin = input.val();
+            let pengumpulanId = input.data('pengumpulan_id');
+            if (poin === '' || isNaN(poin)) return;
+            $.ajax({
+                url: "{{ route('tugas.grade') }}",
+                type: 'POST',
+                data: {
+                    pengumpulan_id: pengumpulanId,
+                    id_jawaban: id_jawaban,
+                    poin: poin,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    notyf.open({ type: 'success', message: response.message });
+                    // Update nilai total di modal
+                    if (response.pengumpulan && typeof response.pengumpulan.nilai !== 'undefined') {
+                        $("#submissionDetail tr:contains('Nilai') td:last").text(response.pengumpulan.nilai);
+                    }
+                    table.ajax.reload(null, false); // Reload without resetting pagination
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseJSON.message);
+                    if (xhr.status === 422) {
+                        const errors = xhr.responseJSON.errors;
+                        Object.keys(errors).forEach(key => {
+                            notyf.open({ type: 'error', message: errors[key][0] });
+                        });
+                    } else {
+                        notyf.open({ type: 'error', message: 'Gagal menyimpan nilai' });
+                    }
+                }
+            });
+        }
+
         // View submission details
         function viewSubmission(id) {
             $.ajax({
@@ -266,14 +304,27 @@
                                 </tr>
                             </thead>
                             <tbody>`;
-                        response.soal_jawaban.forEach(function(item, idx) {
-                            html += `<tr>
-                            <td>${idx + 1}</td>
-                            <td>${item.pertanyaan}</td>
-                            <td>${item.jawaban_siswa !== null ? item.jawaban_siswa : '-'}</td>
-                            <td>${item.nilai !== null ? item.nilai : '-'}</td>
-                        </tr>`;
-                        });
+                        if (response.tugas.jenis == 'pilihan_ganda') {
+                            response.soal_jawaban.forEach(function(item, idx) {
+                                html += `<tr>
+                                    <td>${idx + 1}</td>
+                                    <td>${item.pertanyaan}</td>
+                                    <td>${item.jawaban_siswa !== null ? item.jawaban_siswa : '-'}</td>
+                                    <td>${item.nilai !== null ? item.nilai : '-'}</td>
+                                </tr>`;
+                            });
+                        } else {
+                            response.soal_jawaban.forEach(function(item, idx) {
+                                html += `<tr>
+                                    <td>${idx + 1}</td>
+                                    <td>${item.pertanyaan}</td>
+                                    <td>${item.jawaban_siswa !== null ? item.jawaban_siswa : '-'}</td>
+                                    <td>
+                                        <input type="number" data-pengumpulan_id="${id}" class="form-control" value="${item.poin_diperoleh !== null ? item.poin_diperoleh : 0}" onchange="gradeUraian(${item.id_jawaban})" ${item.id_jawaban == null ? 'readonly' : ''} />
+                                    </td>
+                                </tr>`;
+                            });
+                        }
                         html += `</tbody></table></div>`;
                     }
 

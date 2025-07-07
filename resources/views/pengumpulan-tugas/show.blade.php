@@ -20,7 +20,7 @@
                                 </p>
                                 <p><strong>Batas Waktu:</strong>
                                     {{ $pengumpulanTuga->tugas->batas_waktu->format('d M Y H:i') }}</p>
-                                <p><strong>Total Nilai:</strong> {{ $pengumpulanTuga->tugas->total_nilai }}</p>
+                                {{-- <p><strong>Total Nilai:</strong> {{ $pengumpulanTuga->tugas->total_nilai }}</p> --}}
                             </div>
                             <div class="col-md-6">
                                 <h5>Informasi Pengumpulan</h5>
@@ -113,7 +113,7 @@
                                 </form>
                             </div>
                         @elseif(auth()->user()->hasRole('siswa'))
-                            @if ($pengumpulanTuga->nilai)
+                            @if ($pengumpulanTuga->nilai !== null)
                                 <div class="nilai-section">
                                     <h5>Hasil Penilaian</h5>
                                     <p><strong>Nilai:</strong> {{ $pengumpulanTuga->nilai }} /

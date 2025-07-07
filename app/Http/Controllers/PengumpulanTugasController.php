@@ -54,7 +54,6 @@ class PengumpulanTugasController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
         $tugas = Tugas::findOrFail($request->tugas_id);
 
         if ($tugas->metode_pengerjaan === 'upload_file') {
@@ -81,7 +80,6 @@ class PengumpulanTugasController extends Controller
 
         DB::beginTransaction();
         try {
-            // Buat pengumpulan tugas
             $pengumpulan = PengumpulanTugas::create([
                 'tugas_id' => $request->tugas_id,
                 'siswa_id' => Auth::user()->siswa->id,
@@ -96,16 +94,33 @@ class PengumpulanTugasController extends Controller
                     $pengumpulan->update(['path_file' => $path]);
                 }
             } else {
-                // Simpan jawaban siswa
+                $jumlahBenar = 0;
+                $jumlahSoal = $tugas->soal->where('jenis_soal', 'pilihan_ganda')->count();
                 foreach ($request->jawaban as $jawaban) {
-                    $soal = $tugas->soal->find($jawaban['soal_id']);
+                    $soal = $tugas->soal->where('id', $jawaban['soal_id'])->first();
+                    $poinDiperoleh = null;
+                    if ($soal && $soal->jenis_soal === 'pilihan_ganda') {
+                        $jawabanModel = $soal->jawaban->where('id', $jawaban['id_jawaban'] ?? null)->first();
+                        if ($jawabanModel && $jawabanModel->jawaban_benar) {
+                            $poinDiperoleh = $soal->poin;
+                            $jumlahBenar++;
+                        } else {
+                            $poinDiperoleh = 0;
+                        }
+                    }
                     JawabanSiswa::create([
                         'pengumpulan_id' => $pengumpulan->id,
                         'soal_id' => $jawaban['soal_id'],
                         'jawaban_teks' => $jawaban['jawaban_teks'] ?? null,
-                        'id_jawaban' => $jawaban['id_jawaban'] ?? null
+                        'id_jawaban' => $jawaban['id_jawaban'] ?? null,
+                        'poin_diperoleh' => $poinDiperoleh
                     ]);
                 }
+                $nilaiAkhir = 0;
+                if ($jumlahSoal > 0) {
+                    $nilaiAkhir = round(($jumlahBenar / $jumlahSoal) * $tugas->total_nilai);
+                }
+                $pengumpulan->update(['nilai' => $nilaiAkhir]);
             }
 
             DB::commit();
@@ -122,6 +137,7 @@ class PengumpulanTugasController extends Controller
     public function show(PengumpulanTugas $pengumpulanTuga)
     {
         $pengumpulanTuga->load(['tugas.soal.jawaban', 'jawabanSiswa', 'siswa']);
+        // dd($pengumpulanTuga);
         return view('pengumpulan-tugas.show', compact('pengumpulanTuga'));
     }
 

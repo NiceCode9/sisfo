@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             BerkasCalonSeeder::class,
             RiwayatKelasSeeder::class,
             UserSeeder::class,
+            TugasSeeder::class,
         ]);
     }
 }

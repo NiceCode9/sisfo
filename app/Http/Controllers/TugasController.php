@@ -351,62 +351,151 @@ class TugasController extends Controller
     public function submissions(Tugas $tugas, Request $request)
     {
         $tugas->load([
-            'guruKelas.kelas',
+            'guruKelas.kelas.siswa',
             'guruKelas.guruMataPelajaran.mataPelajaran',
             'pengumpulanTugas.siswa.user'
         ]);
 
+        // $query = $tugas->guruKelas->kelas->siswa()
+        //     ->with(['user', 'pengumpulanTugas' => function ($q) use ($tugas) {
+        //         $q->where('tugas_id', $tugas->id);
+        //     }])
+        //     ->select('siswa.*');
+
+        // dd($query->get());
+
         if ($request->ajax()) {
-            $query = $tugas->pengumpulanTugas()
-                ->with(['siswa.user'])
-                ->select('pengumpulan_tugas.*');
+            // Query semua siswa di kelas beserta pengumpulan tugas mereka untuk tugas ini
+            $query = $tugas->guruKelas->kelas->siswa()
+                ->with(['user', 'riwayatKelas', 'pengumpulanTugas' => function ($q) use ($tugas) {
+                    $q->where('tugas_id', $tugas->id);
+                }])
+                ->select('siswa.*');
 
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->addColumn('nama_siswa', function ($pengumpulan) {
-                    return $pengumpulan->siswa->user->name;
+                ->addColumn('nama_siswa', function ($siswa) {
+                    return $siswa->user->name;
                 })
-                ->addColumn('waktu_pengumpulan', function ($pengumpulan) {
-                    return $pengumpulan->created_at->format('d M Y H:i');
+                ->addColumn('kelas', function ($siswa) {
+                    return $siswa->riwayatKelas()
+                        ->where('tahun_ajaran_id', TahunAjaran::aktif()->first()->id)
+                        ->first()
+                        ?->kelas->nama_kelas ?? '-';
                 })
-                ->addColumn('file_pengumpulan', function ($pengumpulan) {
-                    if ($pengumpulan->file_pengumpulan) {
-                        return '<a href="' . Storage::url($pengumpulan->file_pengumpulan) . '" class="btn btn-sm btn-primary" target="_blank" title="Lihat File"><i class="fas fa-file"></i> Lihat</a>';
+                ->addColumn('waktu_pengumpulan', function ($siswa) use ($tugas) {
+                    $pengumpulan = $siswa->pengumpulanTugas->first();
+                    return $pengumpulan ? $pengumpulan->created_at->format('d M Y H:i') : '-';
+                })
+                ->addColumn('file_pengumpulan', function ($siswa) {
+                    $pengumpulan = $siswa->pengumpulanTugas->first();
+                    if ($pengumpulan && $pengumpulan->path_file) {
+                        return '<a href="' . Storage::url($pengumpulan->path_file) . '" class="btn btn-sm btn-primary" target="_blank" title="Lihat File"><i class="fas fa-file"></i> Lihat</a>';
                     }
-                    return '<span class="badge bg-primary">Tidak Ada File</span>';
+                    return '<span class="badge bg-secondary">Tidak Ada File</span>';
                 })
-                ->addColumn('status', function ($pengumpulan) {
-                    if ($pengumpulan->nilai !== null) {
-                        return '<span class="badge bg-success">Sudah Dinilai</span>';
+                ->addColumn('status', function ($siswa) {
+                    $pengumpulan = $siswa->pengumpulanTugas->first();
+                    if ($pengumpulan) {
+                        return $pengumpulan->nilai !== null
+                            ? '<span class="badge bg-success">Sudah Dinilai</span>'
+                            : '<span class="badge bg-warning">Belum Dinilai</span>';
                     }
-                    return '<span class="badge bg-warning">Belum Dinilai</span>';
+                    return '<span class="badge bg-secondary">Belum Mengumpulkan</span>';
                 })
-                ->addColumn('nilai', function ($pengumpulan) {
-                    if ($pengumpulan->nilai !== null) {
-                        return $pengumpulan->nilai;
-                    }
-                    return '-';
+                ->addColumn('nilai', function ($siswa) {
+                    $pengumpulan = $siswa->pengumpulanTugas->first();
+                    return $pengumpulan && $pengumpulan->nilai !== null ? $pengumpulan->nilai : '-';
                 })
-                ->addColumn('action', function ($pengumpulan) {
+                ->addColumn('action', function ($siswa) use ($tugas) {
+                    $pengumpulan = $siswa->pengumpulanTugas->first();
                     $html = '<div class="btn-group">';
-                    // View submission details
-                    $html .= '<button type="button" class="btn btn-sm btn-info" onclick="viewSubmission(' . $pengumpulan->id . ')" title="Lihat"><i class="fas fa-eye"></i></button>';
-                    if ($pengumpulan->tugas->metode_pengerjaan === 'upload_file') {
-                        if ($pengumpulan->nilai === null) {
-                            $html .= '<button type="button" class="btn btn-sm btn-primary" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Nilai"><i class="fas fa-star"></i></button>';
-                        } else {
-                            $html .= '<button type="button" class="btn btn-sm btn-warning" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Edit Nilai"><i class="fas fa-edit"></i></button>';
+                    if ($pengumpulan) {
+                        $html .= '<button type="button" class="btn btn-sm btn-info" onclick="viewSubmission(' . $pengumpulan->id . ')" title="Lihat"><i class="fas fa-eye"></i></button>';
+                        if ($tugas->metode_pengerjaan === 'upload_file') {
+                            if ($pengumpulan->nilai === null) {
+                                $html .= '<button type="button" class="btn btn-sm btn-primary" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Nilai"><i class="fas fa-star"></i></button>';
+                            } else {
+                                $html .= '<button type="button" class="btn btn-sm btn-warning" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Edit Nilai"><i class="fas fa-edit"></i></button>';
+                            }
+                        } elseif ($tugas->metode_pengerjaan === 'online' && $tugas->jenis === 'pilihan_ganda') {
+                            if ($pengumpulan->nilai === null) {
+                                $html .= '<button type="button" class="btn btn-sm btn-success" onclick="autoGrade(' . $pengumpulan->id . ')" title="Auto Nilai"><i class="fas fa-magic"></i></button>';
+                            }
                         }
+                        $html .= '<button type="button" class="btn btn-sm btn-danger" onclick="deleteSubmission(' . $pengumpulan->id . ')" title="Hapus"><i class="fas fa-trash"></i></button>';
+                    } else {
+                        $html .= '<span class="text-muted">Belum mengumpulkan</span>';
                     }
                     $html .= '</div>';
                     return $html;
                 })
-                ->rawColumns(['status', 'action'])
+                ->rawColumns(['file_pengumpulan', 'status', 'action'])
                 ->make(true);
         }
 
         return view('e-learning.tugas.submissions', compact('tugas'));
     }
+
+    // public function submissions(Tugas $tugas, Request $request)
+    // {
+    //     $tugas->load([
+    //         'guruKelas.kelas',
+    //         'guruKelas.guruMataPelajaran.mataPelajaran',
+    //         'pengumpulanTugas.siswa.user'
+    //     ]);
+
+    //     if ($request->ajax()) {
+    //         $query = $tugas->pengumpulanTugas()
+    //             ->with(['siswa.user'])
+    //             ->select('pengumpulan_tugas.*');
+
+    //         return DataTables::of($query)
+    //             ->addIndexColumn()
+    //             ->addColumn('nama_siswa', function ($pengumpulan) {
+    //                 return $pengumpulan->siswa->user->name;
+    //             })
+    //             ->addColumn('waktu_pengumpulan', function ($pengumpulan) {
+    //                 return $pengumpulan->created_at->format('d M Y H:i');
+    //             })
+    //             ->addColumn('file_pengumpulan', function ($pengumpulan) {
+    //                 if ($pengumpulan->file_pengumpulan) {
+    //                     return '<a href="' . Storage::url($pengumpulan->file_pengumpulan) . '" class="btn btn-sm btn-primary" target="_blank" title="Lihat File"><i class="fas fa-file"></i> Lihat</a>';
+    //                 }
+    //                 return '<span class="badge bg-primary">Tidak Ada File</span>';
+    //             })
+    //             ->addColumn('status', function ($pengumpulan) {
+    //                 if ($pengumpulan->nilai !== null) {
+    //                     return '<span class="badge bg-success">Sudah Dinilai</span>';
+    //                 }
+    //                 return '<span class="badge bg-warning">Belum Dinilai</span>';
+    //             })
+    //             ->addColumn('nilai', function ($pengumpulan) {
+    //                 if ($pengumpulan->nilai !== null) {
+    //                     return $pengumpulan->nilai;
+    //                 }
+    //                 return '-';
+    //             })
+    //             ->addColumn('action', function ($pengumpulan) {
+    //                 $html = '<div class="btn-group">';
+    //                 // View submission details
+    //                 $html .= '<button type="button" class="btn btn-sm btn-info" onclick="viewSubmission(' . $pengumpulan->id . ')" title="Lihat"><i class="fas fa-eye"></i></button>';
+    //                 if ($pengumpulan->tugas->metode_pengerjaan === 'upload_file') {
+    //                     if ($pengumpulan->nilai === null) {
+    //                         $html .= '<button type="button" class="btn btn-sm btn-primary" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Nilai"><i class="fas fa-star"></i></button>';
+    //                     } else {
+    //                         $html .= '<button type="button" class="btn btn-sm btn-warning" onclick="showGradeModal(' . $pengumpulan->id . ')" title="Edit Nilai"><i class="fas fa-edit"></i></button>';
+    //                     }
+    //                 }
+    //                 $html .= '</div>';
+    //                 return $html;
+    //             })
+    //             ->rawColumns(['status', 'action'])
+    //             ->make(true);
+    //     }
+
+    //     return view('e-learning.tugas.submissions', compact('tugas'));
+    // }
 
     /**
      * Save grade for a submission
@@ -479,10 +568,10 @@ class TugasController extends Controller
     private function gradeFileUpload(Request $request)
     {
         $validator = Validator::make($request->all(), [
-                    'pengumpulan_id' => 'required|exists:pengumpulan_tugas,id',
-                    'nilai' => 'required|numeric|min:0|max:100',
-                    'komentar' => 'nullable|string|max:1000',
-                ]);
+            'pengumpulan_id' => 'required|exists:pengumpulan_tugas,id',
+            'nilai' => 'required|numeric|min:0|max:100',
+            'komentar' => 'nullable|string|max:1000',
+        ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -532,12 +621,12 @@ class TugasController extends Controller
                 'jenis_soal' => $soal->jenis_soal,
                 'jawaban_siswa' => $jawaban ? (
                     $soal->jenis_soal === 'pilihan_ganda'
-                        ? (
-                            isset($jawaban->jawaban)
-                                ? $jawaban->jawaban->teks_jawaban . ' (' . ($jawaban->jawaban->jawaban_benar ? 'Benar' : 'Salah') . ')'
-                                : null
-                        )
-                        : $jawaban->jawaban_teks
+                    ? (
+                        isset($jawaban->jawaban)
+                        ? $jawaban->jawaban->teks_jawaban . ' (' . ($jawaban->jawaban->jawaban_benar ? 'Benar' : 'Salah') . ')'
+                        : null
+                    )
+                    : $jawaban->jawaban_teks
                 ) : null,
                 'poin_diperoleh' => $jawaban ? $jawaban->poin_diperoleh : null,
                 'nilai' => $jawaban ? $jawaban->poin_diperoleh : null,

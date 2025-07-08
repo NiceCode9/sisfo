@@ -50,4 +50,9 @@ class Siswa extends Model
 
         return $query->first();
     }
+
+    public function pengumpulanTugas()
+    {
+        return $this->hasMany(PengumpulanTugas::class, 'siswa_id');
+    }
 }

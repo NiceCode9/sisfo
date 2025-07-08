@@ -62,7 +62,8 @@
                                                 <td>{{ $p->siswa->user->name }}</td>
                                             @endif
                                             <td>{{ $p->tugas->judul }}</td>
-                                            <td>{{ $p->tugas->guruKelas->guruMataPelajaran->mataPelajaran->nama }}</td>
+                                            <td>{{ $p->tugas->guruKelas->guruMataPelajaran->mataPelajaran->nama_pelajaran }}
+                                            </td>
                                             <td>
                                                 {{ $p->waktu_pengumpulan->format('d M Y H:i') }}
                                                 @if ($p->waktu_pengumpulan > $p->tugas->batas_waktu)

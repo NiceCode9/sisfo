@@ -16,9 +16,13 @@ Route::group(['middleware' => ['guest']], function () {
     Route::post('/chatbot', [App\Http\Controllers\ChatbotController::class, 'chat']);
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -98,6 +102,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::get('materi/{materi}/download', [\App\Http\Controllers\MateriController::class, 'download'])->name('materi.download');
     Route::get('tugas/{tugas}/download', [\App\Http\Controllers\TugasController::class, 'download'])->name('tugas.download');
+
+    Route::get('riwayat-kelas', [\App\Http\Controllers\RiwayatKelasController::class, 'index'])->name('riwayat-kelas.index');
 });
 
 

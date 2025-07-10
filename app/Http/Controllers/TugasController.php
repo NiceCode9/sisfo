@@ -66,6 +66,15 @@ class TugasController extends Controller
                 });
             }
 
+            // Filter berdasarkan siswa
+            if ($user->hasRole('siswa')) {
+                $query->whereHas('guruKelas', function ($q) use ($user) {
+                    $q->whereHas('kelas.siswa', function ($qq) use ($user) {
+                        $qq->where('siswa_id', $user->siswa->id);
+                    });
+                });
+            }
+
             // Filter tahun ajaran
             if ($request->filled('tahun_ajaran_id')) {
                 $query->whereHas('guruKelas', function ($q) use ($request) {
@@ -114,9 +123,12 @@ class TugasController extends Controller
                 })
                 ->addColumn('progres_pengumpulan', function ($tugas) {
                     // Hitung jumlah siswa di kelas
-                    $jumlahSiswa = $tugas->guruKelas->kelas->siswa()->count();
+                    $jumlahSiswa = $tugas->guruKelas->kelas->siswaAktif()->count();
                     // Hitung jumlah yang sudah mengumpulkan
-                    $jumlahMengumpulkan = $tugas->pengumpulanTugas->count();
+                    // $jumlahMengumpulkan = $tugas->guruKelas->kelas->siswa->pengumpulanTugas->count();
+                    $jumlahMengumpulkan = $tugas->guruKelas->kelas->siswaAktif()->with('pengumpulanTugas')->whereHas('pengumpulanTugas', function ($query) use ($tugas) {
+                        $query->where('tugas_id', $tugas->id);
+                    })->count();
                     return "<span class=\"badge bg-secondary\">$jumlahMengumpulkan / $jumlahSiswa</span>";
                 })
                 ->addColumn('status', function ($tugas) use ($user) {
@@ -356,18 +368,23 @@ class TugasController extends Controller
             'pengumpulanTugas.siswa.user'
         ]);
 
-        // $query = $tugas->guruKelas->kelas->siswa()
+        $jumlahSiswa = $tugas->guruKelas->kelas->siswaAktif()->count();
+        $jumlahPengumpulan = $tugas->guruKelas->kelas->siswaAktif()->with('pengumpulanTugas')->whereHas('pengumpulanTugas', function ($query) use ($tugas) {
+            $query->where('tugas_id', $tugas->id);
+        })->count();
+
+        // $query = $tugas->guruKelas->kelas->siswaAktif()
         //     ->with(['user', 'pengumpulanTugas' => function ($q) use ($tugas) {
         //         $q->where('tugas_id', $tugas->id);
         //     }])
         //     ->select('siswa.*');
 
-        // dd($query->get());
+        // dd($jumlahSiswa, $jumlahPengumpulan);
 
         if ($request->ajax()) {
             // Query semua siswa di kelas beserta pengumpulan tugas mereka untuk tugas ini
-            $query = $tugas->guruKelas->kelas->siswa()
-                ->with(['user', 'riwayatKelas', 'pengumpulanTugas' => function ($q) use ($tugas) {
+            $query = $tugas->guruKelas->kelas->siswaAktif()
+                ->with(['user', 'pengumpulanTugas' => function ($q) use ($tugas) {
                     $q->where('tugas_id', $tugas->id);
                 }])
                 ->select('siswa.*');
@@ -434,7 +451,7 @@ class TugasController extends Controller
                 ->make(true);
         }
 
-        return view('e-learning.tugas.submissions', compact('tugas'));
+        return view('e-learning.tugas.submissions', compact('tugas', 'jumlahSiswa', 'jumlahPengumpulan'));
     }
 
     // public function submissions(Tugas $tugas, Request $request)
@@ -505,6 +522,10 @@ class TugasController extends Controller
         $pengumpulan = PengumpulanTugas::with('tugas')->findOrFail($request->pengumpulan_id);
         $tugas = $pengumpulan->tugas;
 
+        if ($tugas->metode_pengerjaan === 'upload_file') {
+            return $this->gradeFileUpload($request);
+        }
+
         if ($tugas->jenis === 'pilihan_ganda' || $tugas->jenis === 'campuran') {
             // Penilaian otomatis untuk pilihan ganda/campuran
             $pengumpulan->loadMissing('jawabanSiswa', 'tugas.soal');
@@ -521,9 +542,6 @@ class TugasController extends Controller
             } else {
                 return response()->json(['message' => 'Data penilaian uraian tidak lengkap'], 422);
             }
-        } elseif ($tugas->metode_pengerjaan === 'upload_file') {
-            // Penilaian manual file upload
-            return $this->gradeFileUpload($request);
         }
         return response()->json(['message' => 'Tipe tugas tidak dikenali'], 422);
     }
@@ -569,7 +587,7 @@ class TugasController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'pengumpulan_id' => 'required|exists:pengumpulan_tugas,id',
-            'nilai' => 'required|numeric|min:0|max:100',
+            'nilai' => 'required|min:0|max:100',
             'komentar' => 'nullable|string|max:1000',
         ]);
 

@@ -37,6 +37,47 @@
 
     <div class="card shadow border-0 mb-4">
         <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="tahun_ajaran_id">Tahun Ajaran</label>
+                        <select class="form-control select2" id="tahun_ajaran_id" name="tahun_ajaran_id">
+                            <option value="">Semua Tahun Ajaran</option>
+                            @foreach ($tahunAjaran as $ta)
+                                <option value="{{ $ta->id }}">
+                                    {{ \Carbon\Carbon::parse($ta->tanggal_mulai)->translatedFormat('d F Y') }} /
+                                    {{ \Carbon\Carbon::parse($ta->tanggal_selesai)->translatedFormat('d F Y') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                @if (!auth()->user()->hasRole('siswa'))
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="kelas_id">Kelas</label>
+                            <select class="form-control select2" id="kelas_id" name="kelas_id">
+                                <option value="">Semua Kelas</option>
+                                @foreach ($kelas as $k)
+                                    <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                @endif
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="mata_pelajaran_id">Mata Pelajaran</label>
+                        <select class="form-control select2" id="mata_pelajaran_id" name="mata_pelajaran_id">
+                            <option value="">Semua Mata Pelajaran</option>
+                            @foreach ($mataPelajaran as $mp)
+                                <option value="{{ $mp->id }}">{{ $mp->nama_pelajaran }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-centered table-nowrap mb-0 rounded" id="materiTable">
                     <thead class="thead-light">
@@ -112,7 +153,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-link text-gray ms-auto"
+                            data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
@@ -194,6 +236,11 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ route('materi.datatable') }}",
+                    data: function(d) {
+                        d.tahun_ajaran_id = $('#tahun_ajaran_id').val();
+                        d.kelas_id = $('#kelas_id').val();
+                        d.mata_pelajaran_id = $('#mata_pelajaran_id').val();
+                    },
                     error: function(xhr, error, thrown) {
                         if (xhr.status === 419) { // CSRF token mismatch
                             Swal.fire({
@@ -422,6 +469,10 @@
                 form.find('.is-invalid').removeClass('is-invalid');
                 form.find('.invalid-feedback').empty();
                 $('#current_file').empty();
+            });
+
+            $('#tahun_ajaran_id, #kelas_id, #mata_pelajaran_id').change(function() {
+                table.draw();
             });
         });
     </script>

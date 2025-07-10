@@ -287,7 +287,7 @@
 
         .expand-btn {
             background: var(--primary-gradient);
-            color: white;
+            color: white !important;
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 25px;
@@ -299,11 +299,20 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            text-decoration: none;
+            z-index: 1;
+            position: relative;
         }
 
         .expand-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white !important;
+            text-decoration: none;
+        }
+
+        .expand-btn i {
+            color: white !important;
         }
 
         .grading-section {
@@ -356,10 +365,10 @@
         }
 
         .btn-modern {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white !important;
             padding: 0.75rem 2rem;
             border-radius: 50px;
             font-weight: 600;
@@ -367,6 +376,8 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            text-decoration: none;
+            z-index: 1;
         }
 
         .btn-modern::before {
@@ -376,8 +387,9 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             transition: left 0.5s ease;
+            z-index: -1;
         }
 
         .btn-modern:hover::before {
@@ -385,11 +397,43 @@
         }
 
         .btn-modern:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.6);
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            color: white;
+            color: white !important;
+            text-decoration: none;
+        }
+
+        .btn-modern:active {
+            transform: translateY(-1px);
+            color: white !important;
+        }
+
+        .btn-modern:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            color: white !important;
+        }
+
+        .btn-modern i {
+            color: inherit;
+            opacity: 1;
+        }
+
+        /* Untuk button di card body dengan background yang berbeda */
+        .card-body-modern .btn-modern {
+            background: var(--primary-gradient);
+            border: 2px solid transparent;
+            color: white !important;
+        }
+
+        .card-body-modern .btn-modern:hover {
+            background: var(--secondary-gradient);
+            border-color: transparent;
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
         .result-section {
@@ -446,7 +490,7 @@
 
         .file-download-btn {
             background: var(--primary-gradient);
-            color: white;
+            color: white !important;
             border: none;
             border-radius: 15px;
             padding: 1rem 2rem;
@@ -458,6 +502,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            z-index: 1;
         }
 
         .file-download-btn::before {
@@ -469,6 +514,7 @@
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s ease;
+            z-index: -1;
         }
 
         .file-download-btn:hover::before {
@@ -478,8 +524,12 @@
         .file-download-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-            color: white;
+            color: white !important;
             text-decoration: none;
+        }
+
+        .file-download-btn i {
+            color: white !important;
         }
 
         .word-count {
@@ -793,11 +843,13 @@
                                                     <div class="answer-text">
                                                         <div class="d-flex align-items-center p-3 rounded-3"
                                                             style="background: rgba(59, 130, 246, 0.1);">
-                                                            <div class="me-3">
+                                                            <div class="me-1">
                                                                 <i class="fas fa-arrow-right text-primary"></i>
                                                             </div>
                                                             <div>
-                                                                <strong>{{ $jawaban->jawaban->teks_jawaban . '(' . $jawaban->jawaban->jawaban_benar ? 'Benar' : 'Salah' . ')' }}</strong>
+                                                                <strong>
+                                                                    {{ $jawaban->jawaban->teks_jawaban }} ({{ $jawaban->jawaban->jawaban_benar ? 'Benar' : 'Salah' }})
+                                                                </strong>
                                                             </div>
                                                         </div>
                                                     </div>

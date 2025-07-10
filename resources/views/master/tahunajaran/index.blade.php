@@ -239,7 +239,7 @@
                 const status = $(this).data('status');
 
                 // Set form action
-                $('#editForm').attr('action', `/admin/tahun-ajaran/${id}`);
+                $('#editForm').attr('action', `/tahun-ajaran/${id}`);
 
                 // Fill form fields
                 $('#edit_nama_tahun_ajaran').val(nama);

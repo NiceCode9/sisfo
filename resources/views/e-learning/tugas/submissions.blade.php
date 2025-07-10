@@ -62,22 +62,21 @@
                                     <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Total Siswa</span>
-                                        <span class="info-box-number">{{ $tugas->guruKelas->kelas->siswa->count() }}</span>
+                                        <span class="info-box-number">{{ $jumlahSiswa }}</span>
                                     </div>
                                 </div>
                                 <div class="info-box">
                                     <span class="info-box-icon bg-success"><i class="fas fa-check"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Sudah Mengumpulkan</span>
-                                        <span class="info-box-number">{{ $tugas->pengumpulanTugas->count() }}</span>
+                                        <span class="info-box-number">{{ $jumlahPengumpulan }}</span>
                                     </div>
                                 </div>
                                 <div class="info-box">
                                     <span class="info-box-icon bg-warning"><i class="fas fa-clock"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Belum Mengumpulkan</span>
-                                        <span
-                                            class="info-box-number">{{ $tugas->guruKelas->kelas->siswa->count() - $tugas->pengumpulanTugas->count() }}</span>
+                                        <span class="info-box-number">{{ $jumlahSiswa - $jumlahPengumpulan }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -265,6 +264,7 @@
             $('#gradeForm').on('submit', function(e) {
                 e.preventDefault();
                 const formData = $(this).serialize();
+                console.log(formData);
 
                 $.ajax({
                     url: "{{ route('tugas.grade') }}",
@@ -288,6 +288,8 @@
                     error: function(xhr) {
                         if (xhr.status === 422) {
                             const errors = xhr.responseJSON.errors;
+                            console.log(xhr.responseJSON);
+
                             Object.keys(errors).forEach(key => {
                                 if (typeof notyf !== 'undefined') {
                                     notyf.open({

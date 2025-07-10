@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\GuruKelas;
 use App\Models\Materi;
 use App\Models\GuruMataPelajaran;
+use App\Models\Kelas;
+use App\Models\MataPelajaran;
+use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,13 +20,8 @@ class MateriController extends Controller
      */
     public function index()
     {
-        // $guruMataPelajaran = GuruMataPelajaran::with(['guru.user', 'mataPelajaran'])
-        //     ->when(!Auth::user()->hasRole('superadmin'), function ($query) {
-        //         return $query->whereHas('guru.user', function ($q) {
-        //             $q->where('id', Auth::id());
-        //         });
-        //     })
-        //     ->get();
+        $user = Auth::user();
+        $tahunAjaran = TahunAjaran::latest()->get();
         $guruKelas = GuruKelas::with(['guruMataPelajaran.mataPelajaran', 'guruMataPelajaran.guru.user'])
             ->when(!Auth::user()->hasRole('superadmin'), function ($query) {
                 return $query->whereHas('guruMataPelajaran.guru.user', function ($q) {
@@ -32,13 +30,34 @@ class MateriController extends Controller
             })
             ->get();
 
-        return view('e-learning.materi.index', compact('guruKelas'));
+        if ($user->hasRole('guru')) {
+            $guru = $user->guru;
+            $tahunAjaranAktif = TahunAjaran::aktif()->first();
+
+            // Ambil kelas yang diajar oleh guru
+            $kelas = Kelas::whereHas('guruKelas.guruMataPelajaran', function ($query) use ($guru, $tahunAjaranAktif) {
+                $query->where('guru_id', $guru->id)
+                    ->where('tahun_ajaran_id', $tahunAjaranAktif->id)
+                    ->where('aktif', true);
+            })->orderBy('nama_kelas')->get();
+
+            // Ambil mata pelajaran yang diajar oleh guru
+            $mataPelajaran = MataPelajaran::whereHas('guruMataPelajaran', function ($query) use ($guru) {
+                $query->where('guru_id', $guru->id);
+            })->orderBy('nama_pelajaran')->get();
+        } else {
+            // Jika superadmin, tampilkan semua
+            $kelas = Kelas::orderBy('nama_kelas')->get();
+            $mataPelajaran = MataPelajaran::orderBy('nama_pelajaran')->get();
+        }
+
+        return view('e-learning.materi.index', compact('guruKelas', 'kelas', 'mataPelajaran', 'tahunAjaran'));
     }
 
     /**
      * Get data for DataTables
      */
-    public function datatable()
+    public function datatable(Request $request)
     {
         $materi = Materi::with(['guruKelas.guruMataPelajaran.guru.user', 'guruKelas.guruMataPelajaran.mataPelajaran'])
             ->when(Auth::user()->hasRole('guru'), function ($query) {
@@ -50,9 +69,30 @@ class MateriController extends Controller
                 return $query->whereHas('guruKelas', function ($q) {
                     $q->where('kelas_id', Auth::user()->siswa->kelasAktif()->kelas_id);
                 });
-            })
-            ->get();
-        return DataTables::of($materi)
+            });
+
+        // Filter tahun ajaran
+        if ($request->filled('tahun_ajaran_id')) {
+            $materi->whereHas('guruKelas', function ($q) use ($request) {
+                $q->where('tahun_ajaran_id', $request->tahun_ajaran_id);
+            });
+        }
+
+        // Filter kelas
+        if ($request->filled('kelas_id')) {
+            $materi->whereHas('guruKelas', function ($q) use ($request) {
+                $q->where('kelas_id', $request->kelas_id);
+            });
+        }
+
+        // Filter mata pelajaran
+        if ($request->filled('mata_pelajaran_id')) {
+            $materi->whereHas('guruKelas.guruMataPelajaran', function ($q) use ($request) {
+                $q->where('mata_pelajaran_id', $request->mata_pelajaran_id);
+            });
+        }
+
+        return DataTables::of($materi->get())
             ->addIndexColumn()
             ->addColumn('guru', function ($row) {
                 return $row->guruKelas->guruMataPelajaran->guru->user->name;

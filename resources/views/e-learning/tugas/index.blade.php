@@ -33,17 +33,19 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="kelas_id">Kelas</label>
-                                    <select class="form-control select2" id="kelas_id" name="kelas_id">
-                                        <option value="">Semua Kelas</option>
-                                        @foreach ($kelas as $k)
-                                            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
-                                        @endforeach
-                                    </select>
+                            @if (!auth()->user()->hasRole('siswa'))
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="kelas_id">Kelas</label>
+                                        <select class="form-control select2" id="kelas_id" name="kelas_id">
+                                            <option value="">Semua Kelas</option>
+                                            @foreach ($kelas as $k)
+                                                <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="mata_pelajaran_id">Mata Pelajaran</label>
@@ -168,9 +170,6 @@
                         searchable: false
                     }
                 ],
-                order: [
-                    [7, 'desc']
-                ]
             });
 
             $('#tahun_ajaran_id, #kelas_id, #mata_pelajaran_id').change(function() {

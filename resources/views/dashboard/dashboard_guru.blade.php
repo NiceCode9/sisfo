@@ -67,26 +67,34 @@
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-            <div class="quick-action-card">
-                <i class="bi bi-plus-circle quick-action-icon"></i>
-                <h6>Buat Materi</h6>
-                <p class="text-muted small">Tambah materi pembelajaran baru</p>
-            </div>
-            <div class="quick-action-card">
-                <i class="bi bi-clipboard-plus quick-action-icon"></i>
-                <h6>Buat Tugas</h6>
-                <p class="text-muted small">Berikan tugas kepada siswa</p>
-            </div>
-            <div class="quick-action-card">
-                <i class="bi bi-calendar-plus quick-action-icon"></i>
-                <h6>Atur Jadwal</h6>
-                <p class="text-muted small">Kelola jadwal mengajar</p>
-            </div>
-            <div class="quick-action-card">
-                <i class="bi bi-bar-chart-line quick-action-icon"></i>
-                <h6>Lihat Nilai</h6>
-                <p class="text-muted small">Pantau progress siswa</p>
-            </div>
+            <a href="{{ route('materi.index') }}">
+                <div class="quick-action-card">
+                    <i class="bi bi-plus-circle quick-action-icon"></i>
+                    <h6>Buat Materi</h6>
+                    <p class="text-muted small">Tambah materi pembelajaran baru</p>
+                </div>
+            </a>
+            <a href="{{ route('tugas.index') }}">
+                <div class="quick-action-card">
+                    <i class="bi bi-clipboard-plus quick-action-icon"></i>
+                    <h6>Buat Tugas</h6>
+                    <p class="text-muted small">Berikan tugas kepada siswa</p>
+                </div>
+            </a>
+            <a href="">
+                <div class="quick-action-card">
+                    <i class="bi bi-calendar-plus quick-action-icon"></i>
+                    <h6>Atur Jadwal</h6>
+                    <p class="text-muted small">Kelola jadwal mengajar</p>
+                </div>
+            </a>
+            <a href="{{ route('tugas.index') }}">
+                <div class="quick-action-card">
+                    <i class="bi bi-bar-chart-line quick-action-icon"></i>
+                    <h6>Lihat Nilai</h6>
+                    <p class="text-muted small">Pantau progress siswa</p>
+                </div>
+            </a>
         </div>
 
         <div class="row">
@@ -646,12 +654,12 @@
                                 </thead>
                                 <tbody>
                                     ${data.siswa.map((siswa, index) => `
-                                                                <tr>
-                                                                    <td>${index + 1}</td>
-                                                                    <td>${siswa.nama_lengkap}</td>
-                                                                    <td>${siswa.email}</td>
-                                                                </tr>
-                                                            `).join('')}
+                                                                                            <tr>
+                                                                                                <td>${index + 1}</td>
+                                                                                                <td>${siswa.nama_lengkap}</td>
+                                                                                                <td>${siswa.email}</td>
+                                                                                            </tr>
+                                                                                        `).join('')}
                                 </tbody>
                             </table>
                         </div>

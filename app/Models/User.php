@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -25,6 +26,13 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'slug',
+        'bio',
+        'fb',
+        'ig',
+        'x',
+        'li',
+        'is_active',
     ];
 
     /**
@@ -64,4 +72,27 @@ class User extends Authenticatable
     {
         return $this->hasMany(LogStatusPendaftaran::class);
     }
+
+    // Relationships
+    public function articles(): HasMany
+    {
+        return $this->hasMany(Artikel::class);
+    }
+
+    public function publishedArticles(): HasMany
+    {
+        return $this->hasMany(Artikel::class)->where('status', 'published');
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    // Methods
+    // public function getUrlAttribute()
+    // {
+    //     return route('author.show', $this->slug);
+    // }
 }

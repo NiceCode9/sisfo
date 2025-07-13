@@ -144,7 +144,7 @@
             $('#kelasForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#kelas_id').val();
-                let url = id ? `/admin/kelas/${id}` : '/admin/kelas';
+                let url = id ? `/kelas/${id}` : '/kelas';
                 let method = id ? 'PUT' : 'POST';
 
                 $.ajax({
@@ -175,7 +175,7 @@
                 let id = $(this).data('id');
                 $('#modalTitle').text('Edit Data Kelas');
 
-                $.get(`/admin/kelas/${id}`, function(data) {
+                $.get(`/kelas/${id}`, function(data) {
                     $('#kelas_id').val(data.id);
                     $('#nama_kelas').val(data.nama_kelas);
                     $('#tingkat').val(data.tingkat);
@@ -199,7 +199,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/kelas/${id}`,
+                            url: `/kelas/${id}`,
                             method: 'DELETE',
                             data: {
                                 _token: '{{ csrf_token() }}'

@@ -115,6 +115,121 @@ class DashboardController extends Controller
                     'aktivitasTerbaru'
                 ));
             case 'siswa':
+                $tahunAjaranAktif = TahunAjaran::aktif()->first();
+                $siswa = $user->siswa;
+
+                if (!$siswa || !$tahunAjaranAktif) {
+                    return redirect()->back()->with('error', 'Data siswa atau tahun ajaran tidak ditemukan');
+                }
+
+                // Ambil kelas aktif siswa
+                $kelasAktif = $siswa->kelasAktif($tahunAjaranAktif->id);
+                // dd($kelasAktif);
+
+                if (!$kelasAktif) {
+                    return view('dashboard.dashboard_siswa', [
+                        'siswa' => $siswa,
+                        'tahunAjaran' => $tahunAjaranAktif,
+                        'kelasAktif' => null,
+                        'jadwalHariIni' => collect(),
+                        'tugasTerbaru' => collect(),
+                        'materiTerbaru' => collect(),
+                        'pengumuman' => collect(),
+                        'statistik' => [
+                            'total_tugas' => 0,
+                            'tugas_selesai' => 0,
+                            'tugas_pending' => 0,
+                            'rata_nilai' => 0
+                        ]
+                    ]);
+                }
+
+                // Ambil jadwal hari ini
+                $hariIni = Carbon::now()->locale('id')->dayName;
+                $jadwalHariIni = Jadwal::whereHas('guruKelas', function ($query) use ($kelasAktif, $tahunAjaranAktif) {
+                    $query->where('kelas_id', $kelasAktif->kelas_id)
+                        ->where('tahun_ajaran_id', $tahunAjaranAktif->id)
+                        ->where('aktif', true);
+                })
+                    ->where('hari', $hariIni)
+                    ->with(['guruKelas.guruMataPelajaran.guru', 'guruKelas.guruMataPelajaran.mataPelajaran'])
+                    ->orderBy('jam_mulai')
+                    ->get();
+
+                // Ambil tugas terbaru dan belum dikerjakan
+                $tugasTerbaru = Tugas::whereHas('guruKelas', function ($query) use ($kelasAktif, $tahunAjaranAktif) {
+                    $query->where('kelas_id', $kelasAktif->kelas_id)
+                        ->where('tahun_ajaran_id', $tahunAjaranAktif->id)
+                        ->where('aktif', true);
+                })
+                    ->aktif()
+                    ->with(['guruKelas.guruMataPelajaran.guru', 'guruKelas.guruMataPelajaran.mataPelajaran'])
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get();
+
+                // Ambil materi terbaru
+                $materiTerbaru = Materi::whereHas('guruKelas', function ($query) use ($kelasAktif, $tahunAjaranAktif) {
+                    $query->where('kelas_id', $kelasAktif->kelas_id)
+                        ->where('tahun_ajaran_id', $tahunAjaranAktif->id)
+                        ->where('aktif', true);
+                })
+                    ->published()
+                    ->with(['guruKelas.guruMataPelajaran.guru', 'guruKelas.guruMataPelajaran.mataPelajaran'])
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get();
+
+                // Ambil pengumuman terbaru
+                $pengumuman = Pengumuman::where('tahun_ajaran_id', $tahunAjaranAktif->id)
+                    ->where('status_aktif', true)
+                    ->orderBy('tanggal_pengumuman', 'desc')
+                    ->limit(3)
+                    ->get();
+
+                // Statistik tugas
+                $totalTugas = Tugas::whereHas('guruKelas', function ($query) use ($kelasAktif, $tahunAjaranAktif) {
+                    $query->where('kelas_id', $kelasAktif->kelas_id)
+                        ->where('tahun_ajaran_id', $tahunAjaranAktif->id)
+                        ->where('aktif', true);
+                })->aktif()->count();
+
+                $tugasSelesai = PengumpulanTugas::where('siswa_id', $siswa->id)
+                    ->whereHas('tugas.guruKelas', function ($query) use ($kelasAktif, $tahunAjaranAktif) {
+                        $query->where('kelas_id', $kelasAktif->kelas_id)
+                            ->where('tahun_ajaran_id', $tahunAjaranAktif->id)
+                            ->where('aktif', true);
+                    })->count();
+
+                $tugasPending = $totalTugas - $tugasSelesai;
+
+                // Rata-rata nilai
+                $rataNilai = PengumpulanTugas::where('siswa_id', $siswa->id)
+                    ->whereHas('tugas.guruKelas', function ($query) use ($kelasAktif, $tahunAjaranAktif) {
+                        $query->where('kelas_id', $kelasAktif->kelas_id)
+                            ->where('tahun_ajaran_id', $tahunAjaranAktif->id)
+                            ->where('aktif', true);
+                    })
+                    ->whereNotNull('nilai')
+                    ->avg('nilai') ?? 0;
+
+                $statistik = [
+                    'total_tugas' => $totalTugas,
+                    'tugas_selesai' => $tugasSelesai,
+                    'tugas_pending' => $tugasPending,
+                    'rata_nilai' => round($rataNilai, 2)
+                ];
+
+                return view('dashboard.dashboard_siswa', compact(
+                    'siswa',
+                    'tahunAjaranAktif',
+                    'kelasAktif',
+                    'jadwalHariIni',
+                    'tugasTerbaru',
+                    'materiTerbaru',
+                    'pengumuman',
+                    'statistik'
+                ));
             default:
                 $siswa = $user->siswa;
                 $jadwalHariIni = [];

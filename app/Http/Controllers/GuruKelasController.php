@@ -6,6 +6,8 @@ use App\Models\GuruKelas;
 use App\Models\GuruMataPelajaran;
 use App\Models\Kelas;
 use App\Models\TahunAjaran;
+use App\Models\Guru;
+use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -21,13 +23,55 @@ class GuruKelasController extends Controller
         $kelas = Kelas::all();
         $tahunAjaran = TahunAjaran::aktif()->first();
 
-        return view('master.guru-kelas.index', compact('guruMataPelajaran', 'kelas', 'tahunAjaran'));
+        // Data untuk filter
+        $allTahunAjaran = TahunAjaran::all();
+        $guru = Guru::with('user')->get();
+        $mataPelajaran = MataPelajaran::all();
+
+        return view('master.guru-kelas.index', compact(
+            'guruMataPelajaran',
+            'kelas',
+            'tahunAjaran',
+            'allTahunAjaran',
+            'guru',
+            'mataPelajaran'
+        ));
     }
 
-    public function datatable()
+    public function datatable(Request $request)
     {
-        $data = GuruKelas::with(['guruMataPelajaran.guru.user', 'guruMataPelajaran.mataPelajaran', 'kelas', 'tahunAjaran'])
-            ->get();
+        $query = GuruKelas::with(['guruMataPelajaran.guru.user', 'guruMataPelajaran.mataPelajaran', 'kelas', 'tahunAjaran']);
+
+        // Filter berdasarkan guru
+        if ($request->has('guru_id') && $request->guru_id != '') {
+            $query->whereHas('guruMataPelajaran', function ($q) use ($request) {
+                $q->where('guru_id', $request->guru_id);
+            });
+        }
+
+        // Filter berdasarkan kelas
+        if ($request->has('kelas_id') && $request->kelas_id != '') {
+            $query->where('kelas_id', $request->kelas_id);
+        }
+
+        // Filter berdasarkan tahun ajaran
+        if ($request->has('tahun_ajaran_id') && $request->tahun_ajaran_id != '') {
+            $query->where('tahun_ajaran_id', $request->tahun_ajaran_id);
+        }
+
+        // Filter berdasarkan mata pelajaran
+        if ($request->has('mata_pelajaran_id') && $request->mata_pelajaran_id != '') {
+            $query->whereHas('guruMataPelajaran', function ($q) use ($request) {
+                $q->where('mata_pelajaran_id', $request->mata_pelajaran_id);
+            });
+        }
+
+        // Filter berdasarkan status
+        if ($request->has('status') && $request->status != '') {
+            $query->where('aktif', $request->status);
+        }
+
+        $data = $query->get();
 
         return DataTables::of($data)
             ->addIndexColumn()
@@ -44,14 +88,14 @@ class GuruKelasController extends Controller
                 return $row->tahunAjaran->nama_tahun_ajaran;
             })
             ->addColumn('status', function ($row) {
-                return $row->aktif ? 'Aktif' : 'Tidak Aktif';
+                return $row->aktif ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>';
             })
             ->addColumn('action', function ($row) {
                 $btn = '<button type="button" class="btn btn-sm btn-warning me-1 btn-edit" data-id="' . $row->id . '">Edit</button>';
                 $btn .= '<button type="button" class="btn btn-sm btn-danger btn-delete" data-id="' . $row->id . '">Hapus</button>';
                 return $btn;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'status'])
             ->make(true);
     }
 
@@ -77,6 +121,19 @@ class GuruKelasController extends Controller
         }
 
         try {
+            // Cek duplikasi
+            $exists = GuruKelas::where('guru_mata_pelajaran_id', $request->guru_mata_pelajaran_id)
+                ->where('kelas_id', $request->kelas_id)
+                ->where('tahun_ajaran_id', $request->tahun_ajaran_id)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Guru sudah mengajar di kelas ini pada tahun ajaran yang sama'
+                ], 422);
+            }
+
             GuruKelas::create($request->all());
 
             return response()->json([
@@ -123,6 +180,21 @@ class GuruKelasController extends Controller
 
         try {
             $guruKelas = GuruKelas::findOrFail($id);
+
+            // Cek duplikasi kecuali untuk data yang sedang diupdate
+            $exists = GuruKelas::where('guru_mata_pelajaran_id', $request->guru_mata_pelajaran_id)
+                ->where('kelas_id', $request->kelas_id)
+                ->where('tahun_ajaran_id', $request->tahun_ajaran_id)
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Guru sudah mengajar di kelas ini pada tahun ajaran yang sama'
+                ], 422);
+            }
+
             $guruKelas->update($request->all());
 
             return response()->json([

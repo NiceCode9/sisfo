@@ -4,6 +4,21 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <style>
+        .filter-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -39,6 +54,81 @@
         </div>
     </div>
 
+    <!-- Filter Card -->
+    <div class="filter-card">
+        <div class="filter-title">
+            <i class="fas fa-filter me-2"></i>Filter Data
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label for="filter_guru" class="form-label">Guru</label>
+                    <select class="form-select" id="filter_guru">
+                        <option value="">Semua Guru</option>
+                        @foreach ($guru as $g)
+                            <option value="{{ $g->id }}">{{ $g->user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label for="filter_mata_pelajaran" class="form-label">Mata Pelajaran</label>
+                    <select class="form-select" id="filter_mata_pelajaran">
+                        <option value="">Semua Mata Pelajaran</option>
+                        @foreach ($mataPelajaran as $mp)
+                            <option value="{{ $mp->id }}">{{ $mp->nama_pelajaran }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="mb-3">
+                    <label for="filter_kelas" class="form-label">Kelas</label>
+                    <select class="form-select" id="filter_kelas">
+                        <option value="">Semua Kelas</option>
+                        @foreach ($kelas as $k)
+                            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="mb-3">
+                    <label for="filter_tahun_ajaran" class="form-label">Tahun Ajaran</label>
+                    <select class="form-select" id="filter_tahun_ajaran">
+                        <option value="">Semua Tahun</option>
+                        @foreach ($allTahunAjaran as $ta)
+                            <option value="{{ $ta->id }}" {{ $ta->status_aktif ? 'selected' : '' }}>
+                                {{ $ta->nama_tahun_ajaran }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="mb-3">
+                    <label for="filter_status" class="form-label">Status</label>
+                    <select class="form-select" id="filter_status">
+                        <option value="">Semua Status</option>
+                        <option value="1">Aktif</option>
+                        <option value="0">Tidak Aktif</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary me-2" id="btnFilter">
+                    <i class="fas fa-search me-1"></i> Filter
+                </button>
+                <button type="button" class="btn btn-secondary" id="btnReset">
+                    <i class="fas fa-undo me-1"></i> Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="card shadow border-0 mb-4">
         <div class="card-body">
             <div class="table-responsive">
@@ -70,11 +160,11 @@
                 <form id="guruKelasForm">
                     @csrf
                     <input type="hidden" name="id" id="guru_kelas_id">
-                    <input type="hidden" name="tahun_ajaran_id" value="{{ $tahunAjaran->id }}">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="guru_mata_pelajaran_id">Guru & Mata Pelajaran</label>
-                            <select class="form-select" id="guru_mata_pelajaran_id" name="guru_mata_pelajaran_id" required>
+                            <select class="form-select" id="guru_mata_pelajaran_id" name="guru_mata_pelajaran_id"
+                                required>
                                 <option value="">Pilih Guru & Mata Pelajaran</option>
                                 @foreach ($guruMataPelajaran as $gmp)
                                     <option value="{{ $gmp->id }}">
@@ -90,6 +180,18 @@
                                 <option value="">Pilih Kelas</option>
                                 @foreach ($kelas as $k)
                                     <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tahun_ajaran_id">Tahun Ajaran</label>
+                            <select class="form-select" id="tahun_ajaran_id" name="tahun_ajaran_id" required>
+                                <option value="">Pilih Tahun Ajaran</option>
+                                @foreach ($allTahunAjaran as $ta)
+                                    <option value="{{ $ta->id }}" {{ $ta->status_aktif ? 'selected' : '' }}>
+                                        {{ $ta->nama_tahun_ajaran }}
+                                    </option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback"></div>
@@ -133,7 +235,16 @@
             let table = $('#guruKelasTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('guru-kelas.datatable') }}",
+                ajax: {
+                    url: "{{ route('guru-kelas.datatable') }}",
+                    data: function(d) {
+                        d.guru_id = $('#filter_guru').val();
+                        d.mata_pelajaran_id = $('#filter_mata_pelajaran').val();
+                        d.kelas_id = $('#filter_kelas').val();
+                        d.tahun_ajaran_id = $('#filter_tahun_ajaran').val();
+                        d.status = $('#filter_status').val();
+                    }
+                },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -168,6 +279,28 @@
                     }
                 ]
             });
+
+            // Event listener untuk filter
+            $('#btnFilter').on('click', function() {
+                table.ajax.reload();
+            });
+
+            // Event listener untuk reset filter
+            $('#btnReset').on('click', function() {
+                $('#filter_guru').val('');
+                $('#filter_mata_pelajaran').val('');
+                $('#filter_kelas').val('');
+                $('#filter_tahun_ajaran').val('');
+                $('#filter_status').val('');
+                table.ajax.reload();
+            });
+
+            // Auto filter ketika dropdown berubah
+            $('#filter_guru, #filter_mata_pelajaran, #filter_kelas, #filter_tahun_ajaran, #filter_status').on(
+                'change',
+                function() {
+                    table.ajax.reload();
+                });
 
             // Handle form submission
             $('#guruKelasForm').on('submit', function(e) {
@@ -217,6 +350,7 @@
                     $('#guru_kelas_id').val(data.id);
                     $('#guru_mata_pelajaran_id').val(data.guru_mata_pelajaran_id);
                     $('#kelas_id').val(data.kelas_id);
+                    $('#tahun_ajaran_id').val(data.tahun_ajaran_id);
                     $('#status').val(data.aktif ? '1' : '0');
                     $('#keterangan').val(data.keterangan);
                     $('#createGuruKelasModal').modal('show');

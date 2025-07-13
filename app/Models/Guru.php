@@ -14,6 +14,10 @@ class Guru extends Model
         'nip',
         'biografi',
         'bidang_keahlian',
+        'alamat',
+        'gelar',
+        'telp',
+        'foto_path',
     ];
 
     /**

@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['guest']], function () {
@@ -104,6 +106,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('tugas/{tugas}/download', [\App\Http\Controllers\TugasController::class, 'download'])->name('tugas.download');
 
     Route::get('riwayat-kelas', [\App\Http\Controllers\RiwayatKelasController::class, 'index'])->name('riwayat-kelas.index');
+
+    Route::prefix('artikel')->as('artikel.')->group(function () {
+        Route::resource('kategori', KategoriController::class);
+        Route::resource('tags', TagController::class);
+    });
 });
 
 

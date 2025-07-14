@@ -2,208 +2,612 @@
 
 @section('title', 'Tambah Artikel')
 
+@push('styles')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+            padding: 1rem 1.5rem;
+            border-bottom: none;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 0.5rem;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 1rem 1rem;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .tag-checkbox {
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .tag-checkbox:hover {
+            background: #e9ecef;
+        }
+
+        .image-preview-container {
+            position: relative;
+            border: 2px dashed #dee2e6;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .image-preview-container:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .character-counter {
+            position: absolute;
+            right: 0.75rem;
+            bottom: 0.75rem;
+            font-size: 0.75rem;
+            color: #6c757d;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-draft {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-published {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-archived {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .feature-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .feature-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(102, 126, 234, 0.3);
+        }
+
+        .seo-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .seo-excellent {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .seo-good {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .seo-poor {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .floating-save {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 0.5rem 1rem rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .floating-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 1rem 2rem rgba(102, 126, 234, 0.6);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            margin: 2rem 0;
+            border-radius: 1px;
+        }
+
+        .tooltip-custom {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-custom .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip-custom:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+@endpush
+
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1>Tambah Artikel</h1>
-                    <a href="{{ route('artikel.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Kembali
+    <div class="page-header animate-fade-in">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Tambah Artikel Baru
+                    </h1>
+                    <p class="mb-0 opacity-75">Buat artikel yang menarik dan SEO-friendly</p>
+                </div>
+                <div>
+                    <a href="{{ route('artikel.artikel.index') }}" class="btn btn-light">
+                        <i class="fas fa-arrow-left me-2"></i>Kembali
                     </a>
                 </div>
-
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form action="{{ route('artikel.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <!-- Basic Information -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Informasi Dasar</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="title" class="form-label">Judul Artikel *</label>
-                                        <input type="text" class="form-control" id="title" name="title"
-                                            value="{{ old('title') }}" required>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="excerpt" class="form-label">Ringkasan *</label>
-                                        <textarea class="form-control" id="excerpt" name="excerpt" rows="3" required>{{ old('excerpt') }}</textarea>
-                                        <small class="form-text text-muted">Maksimal 500 karakter</small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="content" class="form-label">Konten *</label>
-                                        <textarea class="form-control" id="content" name="content" rows="15" required>{{ old('content') }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- SEO Settings -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Pengaturan SEO</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="meta_title" class="form-label">Meta Title</label>
-                                        <input type="text" class="form-control" id="meta_title" name="meta_title"
-                                            value="{{ old('meta_title') }}">
-                                        <small class="form-text text-muted">Optimal: 50-60 karakter</small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="meta_description" class="form-label">Meta Description</label>
-                                        <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ old('meta_description') }}</textarea>
-                                        <small class="form-text text-muted">Optimal: 150-160 karakter</small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="canonical_url" class="form-label">Canonical URL</label>
-                                        <input type="url" class="form-control" id="canonical_url" name="canonical_url"
-                                            value="{{ old('canonical_url') }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4">
-                            <!-- Publish Settings -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Pengaturan Publikasi</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="status" class="form-label">Status *</label>
-                                        <select class="form-select" id="status" name="status" required>
-                                            <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft
-                                            </option>
-                                            <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>
-                                                Published</option>
-                                            <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>
-                                                Archived</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="category_id" class="form-label">Kategori *</label>
-                                        <select class="form-select" id="category_id" name="category_id" required>
-                                            <option value="">Pilih Kategori</option>
-                                            @foreach ($categories as $category)
-                                                <option value="{{ $category->id }}"
-                                                    {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                                    {{ $category->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Tags</label>
-                                        <div class="row">
-                                            @foreach ($tags as $tag)
-                                                <div class="col-6 mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="tags[]"
-                                                            value="{{ $tag->id }}" id="tag_{{ $tag->id }}"
-                                                            {{ in_array($tag->id, old('tags', [])) ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="tag_{{ $tag->id }}">
-                                                            {{ $tag->name }}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" name="is_featured"
-                                            value="1" id="is_featured" {{ old('is_featured') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_featured">
-                                            Artikel Unggulan
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" name="is_breaking"
-                                            value="1" id="is_breaking" {{ old('is_breaking') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_breaking">
-                                            Berita Terkini
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Featured Image -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Gambar Unggulan</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="featured_image" class="form-label">Upload Gambar</label>
-                                        <input type="file" class="form-control" id="featured_image"
-                                            name="featured_image" accept="image/*" onchange="previewImage(event)">
-                                        <small class="form-text text-muted">Format: JPEG, PNG, JPG, GIF. Maksimal
-                                            2MB</small>
-                                    </div>
-
-                                    <div id="image-preview" class="mb-3" style="display: none;">
-                                        <img id="preview-img" src="" class="img-fluid rounded"
-                                            style="max-height: 200px;">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="featured_image_alt" class="form-label">Alt Text</label>
-                                        <input type="text" class="form-control" id="featured_image_alt"
-                                            name="featured_image_alt" value="{{ old('featured_image_alt') }}">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="featured_image_caption" class="form-label">Caption</label>
-                                        <textarea class="form-control" id="featured_image_caption" name="featured_image_caption" rows="2">{{ old('featured_image_caption') }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Submit Buttons -->
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-save"></i> Simpan Artikel
-                                        </button>
-                                        <a href="{{ route('artikel.index') }}" class="btn btn-secondary">
-                                            <i class="fas fa-times"></i> Batal
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
+    </div>
+
+    <div class="container-fluid">
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show animate-fade-in" role="alert">
+                <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Terdapat kesalahan:
+                </h5>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <form action="{{ route('artikel.artikel.store') }}" method="POST" enctype="multipart/form-data" id="articleForm">
+            @csrf
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Basic Information -->
+                    <div class="card mb-4 animate-fade-in">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                Informasi Dasar
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="title" class="form-label">
+                                    Judul Artikel *
+                                    <span class="tooltip-custom">
+                                        <i class="fas fa-info-circle text-muted ms-1"></i>
+                                        <span class="tooltip-text">Judul yang menarik akan meningkatkan engagement</span>
+                                    </span>
+                                </label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" id="title" name="title"
+                                        value="{{ old('title') }}" required
+                                        placeholder="Masukkan judul artikel yang menarik...">
+                                    <span class="character-counter" id="title-counter">0/255</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="excerpt" class="form-label">
+                                    Ringkasan *
+                                    <span class="tooltip-custom">
+                                        <i class="fas fa-info-circle text-muted ms-1"></i>
+                                        <span class="tooltip-text">Ringkasan yang baik akan muncul di hasil pencarian</span>
+                                    </span>
+                                </label>
+                                <div class="position-relative">
+                                    <textarea class="form-control" id="excerpt" name="excerpt" rows="4" required
+                                        placeholder="Tulis ringkasan artikel yang akan menarik pembaca...">{{ old('excerpt') }}</textarea>
+                                    <span class="character-counter" id="excerpt-counter">0/500</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="content" class="form-label">
+                                    Konten Artikel *
+                                    <span class="tooltip-custom">
+                                        <i class="fas fa-info-circle text-muted ms-1"></i>
+                                        <span class="tooltip-text">Gunakan editor untuk memformat konten dengan baik</span>
+                                    </span>
+                                </label>
+                                <div id="editor-container">
+                                    <textarea class="form-control" id="content" name="content" rows="20" required
+                                        placeholder="Mulai menulis konten artikel Anda di sini...">{{ old('content') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEO Settings -->
+                    <div class="card mb-4 animate-fade-in">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-search me-2"></i>
+                                Pengaturan SEO
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="meta_title" class="form-label">
+                                    Meta Title
+                                    <span class="tooltip-custom">
+                                        <i class="fas fa-info-circle text-muted ms-1"></i>
+                                        <span class="tooltip-text">Judul yang muncul di hasil pencarian Google</span>
+                                    </span>
+                                </label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" id="meta_title" name="meta_title"
+                                        value="{{ old('meta_title') }}" placeholder="Otomatis diisi dari judul artikel">
+                                    <span class="character-counter" id="meta-title-counter">0/60</span>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-lightbulb text-warning me-1"></i>
+                                    Optimal: 50-60 karakter
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="meta_description" class="form-label">
+                                    Meta Description
+                                    <span class="tooltip-custom">
+                                        <i class="fas fa-info-circle text-muted ms-1"></i>
+                                        <span class="tooltip-text">Deskripsi yang muncul di hasil pencarian Google</span>
+                                    </span>
+                                </label>
+                                <div class="position-relative">
+                                    <textarea class="form-control" id="meta_description" name="meta_description" rows="3"
+                                        placeholder="Otomatis diisi dari ringkasan artikel">{{ old('meta_description') }}</textarea>
+                                    <span class="character-counter" id="meta-desc-counter">0/160</span>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-lightbulb text-warning me-1"></i>
+                                    Optimal: 150-160 karakter
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="canonical_url" class="form-label">
+                                    Canonical URL
+                                    <span class="tooltip-custom">
+                                        <i class="fas fa-info-circle text-muted ms-1"></i>
+                                        <span class="tooltip-text">URL canonical untuk mencegah duplicate content</span>
+                                    </span>
+                                </label>
+                                <input type="url" class="form-control" id="canonical_url" name="canonical_url"
+                                    value="{{ old('canonical_url') }}" placeholder="https://example.com/artikel-saya">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Publish Settings -->
+                    <div class="card mb-4 animate-fade-in">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cog me-2"></i>
+                                Pengaturan Publikasi
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status Publikasi *</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>
+                                        <i class="fas fa-edit"></i> Draft
+                                    </option>
+                                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>
+                                        <i class="fas fa-globe"></i> Published
+                                    </option>
+                                    <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>
+                                        <i class="fas fa-archive"></i> Archived
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="category_id" class="form-label">Kategori *</label>
+                                <select class="form-select" id="category_id" name="category_id" required>
+                                    <option value="">Pilih Kategori</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}"
+                                            {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Tags</label>
+                                <div class="row">
+                                    @foreach ($tags as $tag)
+                                        <div class="col-12 mb-2">
+                                            <div class="tag-checkbox">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="tags[]"
+                                                        value="{{ $tag->id }}" id="tag_{{ $tag->id }}"
+                                                        {{ in_array($tag->id, old('tags', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="tag_{{ $tag->id }}">
+                                                        <span class="badge bg-secondary">{{ $tag->name }}</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <hr class="section-divider">
+
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_featured" value="1"
+                                        id="is_featured" {{ old('is_featured') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_featured">
+                                        <i class="fas fa-star text-warning me-1"></i>
+                                        Artikel Unggulan
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_breaking" value="1"
+                                        id="is_breaking" {{ old('is_breaking') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_breaking">
+                                        <i class="fas fa-bolt text-danger me-1"></i>
+                                        Berita Terkini
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Featured Image -->
+                    <div class="card mb-4 animate-fade-in">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-image me-2"></i>
+                                Gambar Unggulan
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="image-preview-container" id="image-drop-zone">
+                                <div id="image-preview" style="display: none;">
+                                    <img id="preview-img" src="" class="img-fluid rounded mb-3"
+                                        style="max-height: 200px;">
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeImage()">
+                                            <i class="fas fa-trash me-1"></i>Hapus
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted mb-3">Drag & drop gambar di sini atau klik untuk memilih</p>
+                                    <input type="file" class="form-control" id="featured_image" name="featured_image"
+                                        accept="image/*" onchange="previewImage(event)" style="display: none;">
+                                    <button type="button" class="btn btn-outline-primary"
+                                        onclick="document.getElementById('featured_image').click()">
+                                        <i class="fas fa-upload me-1"></i>Pilih Gambar
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Format: JPEG, PNG, JPG, GIF. Maksimal 2MB
+                            </small>
+
+                            <div class="mt-3">
+                                <label for="featured_image_alt" class="form-label">Alt Text</label>
+                                <input type="text" class="form-control" id="featured_image_alt"
+                                    name="featured_image_alt" value="{{ old('featured_image_alt') }}"
+                                    placeholder="Deskripsi gambar untuk SEO">
+                            </div>
+
+                            <div class="mt-3">
+                                <label for="featured_image_caption" class="form-label">Caption</label>
+                                <textarea class="form-control" id="featured_image_caption" name="featured_image_caption" rows="2"
+                                    placeholder="Caption gambar (opsional)">{{ old('featured_image_caption') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card animate-fade-in">
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>Simpan Artikel
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="saveDraft()">
+                                    <i class="fas fa-edit me-2"></i>Simpan sebagai Draft
+                                </button>
+                                <a href="{{ route('artikel.artikel.index') }}" class="btn btn-outline-danger">
+                                    <i class="fas fa-times me-2"></i>Batal
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Floating Save Button -->
+        <button type="button" class="floating-save" onclick="document.getElementById('articleForm').submit()">
+            <i class="fas fa-save me-2"></i>Simpan
+        </button>
     </div>
 @endsection
 
 @push('scripts')
+    <!-- TinyMCE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
     <script>
+        // Initialize TinyMCE
+        tinymce.init({
+            selector: '#content',
+            height: 400,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px }',
+            menubar: 'file edit view insert format tools table help',
+            branding: false,
+            setup: function(editor) {
+                editor.on('change', function() {
+                    editor.save();
+                });
+            }
+        });
+
+        // Image preview and drag & drop
         function previewImage(event) {
             const file = event.target.files[0];
             if (file) {
@@ -211,10 +615,48 @@
                 reader.onload = function(e) {
                     document.getElementById('preview-img').src = e.target.result;
                     document.getElementById('image-preview').style.display = 'block';
+                    document.getElementById('upload-placeholder').style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             }
         }
+
+        function removeImage() {
+            document.getElementById('featured_image').value = '';
+            document.getElementById('image-preview').style.display = 'none';
+            document.getElementById('upload-placeholder').style.display = 'block';
+        }
+
+        // Drag & Drop functionality
+        const dropZone = document.getElementById('image-drop-zone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#667eea';
+            dropZone.style.background = 'rgba(102, 126, 234, 0.1)';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#dee2e6';
+            dropZone.style.background = '#f8f9fa';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#dee2e6';
+            dropZone.style.background = '#f8f9fa';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('featured_image').files = files;
+                previewImage({
+                    target: {
+                        files: files
+                    }
+                });
+            }
+        });
 
         // Auto-generate meta title from title
         document.getElementById('title').addEventListener('input', function() {
@@ -222,6 +664,7 @@
             if (!metaTitle.value) {
                 metaTitle.value = this.value;
             }
+            updateCharacterCounter('title', this.value.length, 255);
         });
 
         // Auto-generate meta description from excerpt
@@ -230,37 +673,420 @@
             if (!metaDescription.value) {
                 metaDescription.value = this.value;
             }
+            updateCharacterCounter('excerpt', this.value.length, 500);
         });
 
         // Character counters
-        function addCharacterCounter(inputId, maxLength) {
-            const input = document.getElementById(inputId);
-            const counterDiv = document.createElement('div');
-            counterDiv.className = 'form-text text-muted';
-            counterDiv.style.textAlign = 'right';
-            input.parentNode.appendChild(counterDiv);
+        function updateCharacterCounter(fieldId, currentLength, maxLength) {
+            const counter = document.getElementById(fieldId + '-counter');
+            if (counter) {
+                counter.textContent = `${currentLength}/${maxLength}`;
 
-            function updateCounter() {
-                const length = input.value.length;
-                counterDiv.textContent = `${length}/${maxLength} karakter`;
-
-                if (length > maxLength) {
-                    counterDiv.className = 'form-text text-danger';
-                } else if (length > maxLength * 0.9) {
-                    counterDiv.className = 'form-text text-warning';
+                if (currentLength > maxLength) {
+                    counter.className = 'character-counter text-danger';
+                } else if (currentLength > maxLength * 0.9) {
+                    counter.className = 'character-counter text-warning';
                 } else {
-                    counterDiv.className = 'form-text text-muted';
+                    counter.className = 'character-counter text-muted';
                 }
             }
-
-            input.addEventListener('input', updateCounter);
-            updateCounter();
         }
 
-        // Add character counters
-        addCharacterCounter('title', 255);
-        addCharacterCounter('excerpt', 500);
-        addCharacterCounter('meta_title', 60);
-        addCharacterCounter('meta_description', 160);
+        // Add character counters to all relevant fields
+        document.getElementById('meta_title').addEventListener('input', function() {
+            updateCharacterCounter('meta-title', this.value.length, 60);
+        });
+
+        document.getElementById('meta_description').addEventListener('input', function() {
+            updateCharacterCounter('meta-desc', this.value.length, 160);
+        });
+
+        // Save as draft function
+        function saveDraft() {
+            document.getElementById('status').value = 'draft';
+            document.getElementById('articleForm').submit();
+        }
+
+        // Initialize character counters on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCharacterCounter('title', document.getElementById('title').value.length, 255);
+            updateCharacterCounter('excerpt', document.getElementById('excerpt').value.length, 500);
+            updateCharacterCounter('meta-title', document.getElementById('meta_title').value.length, 60);
+            updateCharacterCounter('meta-desc', document.getElementById('meta_description').value.length, 160);
+        });
+
+        // Show success message animation
+        function showSuccessMessage(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show animate-fade-in';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Auto-save functionality (optional)
+        let autoSaveInterval;
+
+        function startAutoSave() {
+            autoSaveInterval = setInterval(() => {
+                // Save draft logic here
+                console.log('Auto-saving draft...');
+            }, 30000); // Auto-save every 30 seconds
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                document.getElementById('articleForm').submit();
+            }
+        });
+
+        // Form validation
+        // Form validation
+        document.getElementById('articleForm').addEventListener('submit', function(e) {
+            const title = document.getElementById('title').value.trim();
+            const excerpt = document.getElementById('excerpt').value.trim();
+            const content = tinymce.get('content').getContent();
+            const categoryId = document.getElementById('category_id').value;
+
+            let errors = [];
+
+            // Validate required fields
+            if (!title) {
+                errors.push('Judul artikel wajib diisi');
+            }
+
+            if (!excerpt) {
+                errors.push('Ringkasan artikel wajib diisi');
+            }
+
+            if (!content || content.trim() === '') {
+                errors.push('Konten artikel wajib diisi');
+            }
+
+            if (!categoryId) {
+                errors.push('Kategori wajib dipilih');
+            }
+
+            // Validate field lengths
+            if (title.length > 255) {
+                errors.push('Judul artikel maksimal 255 karakter');
+            }
+
+            if (excerpt.length > 500) {
+                errors.push('Ringkasan artikel maksimal 500 karakter');
+            }
+
+            const metaTitle = document.getElementById('meta_title').value;
+            if (metaTitle.length > 60) {
+                errors.push('Meta title maksimal 60 karakter');
+            }
+
+            const metaDescription = document.getElementById('meta_description').value;
+            if (metaDescription.length > 160) {
+                errors.push('Meta description maksimal 160 karakter');
+            }
+
+            // Show errors if any
+            if (errors.length > 0) {
+                e.preventDefault();
+                showErrorMessage(errors);
+                return false;
+            }
+
+            // Show loading state
+            showLoadingState();
+        });
+
+        function showErrorMessage(errors) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show animate-fade-in';
+            alertDiv.innerHTML = `
+                <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Terdapat kesalahan:
+                </h5>
+                <ul class="mb-0">
+                    ${errors.map(error => `<li>${error}</li>`).join('')}
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const container = document.querySelector('.container-fluid');
+            const existingAlert = container.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            container.insertBefore(alertDiv, container.firstChild);
+
+            // Scroll to top to show error
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function showLoadingState() {
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const floatingBtn = document.querySelector('.floating-save');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Menyimpan...';
+
+            floatingBtn.disabled = true;
+            floatingBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Menyimpan...';
+        }
+
+        // Slug generator
+        function generateSlug(text) {
+            return text
+                .toLowerCase()
+                .trim()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/[\s_-]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        // Preview slug as user types title
+        document.getElementById('title').addEventListener('input', function() {
+            const slug = generateSlug(this.value);
+            const slugPreview = document.getElementById('slug-preview');
+            if (slugPreview) {
+                slugPreview.textContent = slug || 'slug-akan-dibuat-otomatis';
+            }
+        });
+
+        // Word count for content
+        function updateWordCount() {
+            const content = tinymce.get('content').getContent({
+                format: 'text'
+            });
+            const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
+            const wordCountEl = document.getElementById('word-count');
+            if (wordCountEl) {
+                wordCountEl.textContent = `${wordCount} kata`;
+            }
+        }
+
+        // SEO Score Calculator
+        function calculateSeoScore() {
+            const title = document.getElementById('title').value.trim();
+            const excerpt = document.getElementById('excerpt').value.trim();
+            const content = tinymce.get('content').getContent({
+                format: 'text'
+            });
+            const metaTitle = document.getElementById('meta_title').value.trim();
+            const metaDescription = document.getElementById('meta_description').value.trim();
+
+            let score = 0;
+            let maxScore = 100;
+            let suggestions = [];
+
+            // Title evaluation (20 points)
+            if (title.length >= 30 && title.length <= 60) {
+                score += 20;
+            } else if (title.length > 0) {
+                score += 10;
+                suggestions.push('Judul sebaiknya 30-60 karakter');
+            }
+
+            // Excerpt evaluation (15 points)
+            if (excerpt.length >= 120 && excerpt.length <= 160) {
+                score += 15;
+            } else if (excerpt.length > 0) {
+                score += 8;
+                suggestions.push('Ringkasan sebaiknya 120-160 karakter');
+            }
+
+            // Content length evaluation (20 points)
+            const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
+            if (wordCount >= 300) {
+                score += 20;
+            } else if (wordCount >= 150) {
+                score += 15;
+            } else if (wordCount > 0) {
+                score += 5;
+                suggestions.push('Konten sebaiknya minimal 300 kata');
+            }
+
+            // Meta title evaluation (15 points)
+            if (metaTitle.length >= 30 && metaTitle.length <= 60) {
+                score += 15;
+            } else if (metaTitle.length > 0) {
+                score += 8;
+                suggestions.push('Meta title sebaiknya 30-60 karakter');
+            }
+
+            // Meta description evaluation (15 points)
+            if (metaDescription.length >= 120 && metaDescription.length <= 160) {
+                score += 15;
+            } else if (metaDescription.length > 0) {
+                score += 8;
+                suggestions.push('Meta description sebaiknya 120-160 karakter');
+            }
+
+            // Featured image evaluation (10 points)
+            const featuredImage = document.getElementById('featured_image').files[0];
+            if (featuredImage) {
+                score += 10;
+            } else {
+                suggestions.push('Tambahkan gambar unggulan');
+            }
+
+            // Category evaluation (5 points)
+            const categoryId = document.getElementById('category_id').value;
+            if (categoryId) {
+                score += 5;
+            } else {
+                suggestions.push('Pilih kategori artikel');
+            }
+
+            updateSeoScoreDisplay(score, suggestions);
+        }
+
+        function updateSeoScoreDisplay(score, suggestions) {
+            const seoScoreEl = document.getElementById('seo-score');
+            const seoSuggestionsEl = document.getElementById('seo-suggestions');
+
+            if (seoScoreEl) {
+                let className = 'seo-poor';
+                let icon = 'fas fa-times-circle';
+
+                if (score >= 80) {
+                    className = 'seo-excellent';
+                    icon = 'fas fa-check-circle';
+                } else if (score >= 60) {
+                    className = 'seo-good';
+                    icon = 'fas fa-exclamation-circle';
+                }
+
+                seoScoreEl.className = `seo-score ${className}`;
+                seoScoreEl.innerHTML = `
+                    <i class="${icon}"></i>
+                    SEO Score: ${score}/100
+                `;
+            }
+
+            if (seoSuggestionsEl) {
+                if (suggestions.length > 0) {
+                    seoSuggestionsEl.innerHTML = `
+                        <div class="mt-2">
+                            <strong>Saran Perbaikan:</strong>
+                            <ul class="mb-0 mt-1">
+                                ${suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    seoSuggestionsEl.innerHTML = `
+                        <div class="mt-2 text-success">
+                            <i class="fas fa-check me-1"></i>
+                            SEO sudah optimal!
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Real-time SEO score calculation
+        function bindSeoCalculation() {
+            const fieldsToWatch = ['title', 'excerpt', 'meta_title', 'meta_description', 'category_id'];
+
+            fieldsToWatch.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', calculateSeoScore);
+                }
+            });
+
+            // Watch for TinyMCE content changes
+            tinymce.get('content').on('keyup', calculateSeoScore);
+
+            // Watch for featured image changes
+            document.getElementById('featured_image').addEventListener('change', calculateSeoScore);
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize SEO calculation
+            setTimeout(() => {
+                bindSeoCalculation();
+                calculateSeoScore();
+            }, 1000); // Wait for TinyMCE to load
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Initialize auto-save
+            startAutoSave();
+        });
+
+        // Confirm before leaving page if there are unsaved changes
+        let hasUnsavedChanges = false;
+
+        document.getElementById('articleForm').addEventListener('input', function() {
+            hasUnsavedChanges = true;
+        });
+
+        document.getElementById('articleForm').addEventListener('submit', function() {
+            hasUnsavedChanges = false;
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = 'Anda memiliki perubahan yang belum disimpan. Yakin ingin meninggalkan halaman?';
+            }
+        });
+
+        // Add progress indicator
+        function updateProgressIndicator() {
+            const requiredFields = ['title', 'excerpt', 'content', 'category_id'];
+            let completedFields = 0;
+
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                let hasValue = false;
+
+                if (fieldId === 'content') {
+                    hasValue = tinymce.get('content').getContent().trim() !== '';
+                } else {
+                    hasValue = field && field.value.trim() !== '';
+                }
+
+                if (hasValue) {
+                    completedFields++;
+                }
+            });
+
+            const progress = (completedFields / requiredFields.length) * 100;
+            const progressBar = document.getElementById('form-progress');
+
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+                progressBar.setAttribute('aria-valuenow', progress);
+            }
+        }
+
+        // Bind progress indicator to form changes
+        document.getElementById('articleForm').addEventListener('input', updateProgressIndicator);
+
+        // Initialize progress indicator
+        setTimeout(() => {
+            updateProgressIndicator();
+        }, 1000);
     </script>
 @endpush

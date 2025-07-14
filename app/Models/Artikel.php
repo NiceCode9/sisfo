@@ -92,7 +92,7 @@ class Artikel extends Model
 
     public function comments(): HasMany
     {
-        return $this->hasMany(Komentar::class);
+        return $this->hasMany(Komentar::class, 'article_id');
     }
 
     public function approvedComments(): HasMany
@@ -107,7 +107,7 @@ class Artikel extends Model
 
     public function relatedArticles(): BelongsToMany
     {
-        return $this->belongsToMany(Artikel::class, 'article_related', 'article_id', 'related_article_id')
+        return $this->belongsToMany(Artikel::class, 'artikel_related', 'article_id', 'related_article_id')
             ->withPivot('relevance_score')
             ->orderByPivot('relevance_score', 'desc');
     }

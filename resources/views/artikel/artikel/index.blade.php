@@ -8,7 +8,7 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1>Kelola Artikel</h1>
-                    <a href="{{ route('artikel.create') }}" class="btn btn-primary">
+                    <a href="{{ route('artikel.artikel.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Tambah Artikel
                     </a>
                 </div>
@@ -23,7 +23,7 @@
                 <!-- Filter Form -->
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form method="GET" action="{{ route('artikel.index') }}">
+                        <form method="GET" action="{{ route('artikel.artikel.index') }}">
                             <div class="row">
                                 <div class="col-md-3">
                                     <label for="search" class="form-label">Cari Artikel</label>
@@ -60,7 +60,7 @@
                                         <button type="submit" class="btn btn-outline-primary">
                                             <i class="fas fa-search"></i> Filter
                                         </button>
-                                        <a href="{{ route('artikel.index') }}" class="btn btn-outline-secondary">
+                                        <a href="{{ route('artikel.artikel.index') }}" class="btn btn-outline-secondary">
                                             <i class="fas fa-times"></i> Reset
                                         </a>
                                     </div>
@@ -151,11 +151,11 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="{{ route('artikel.show', $article) }}"
+                                                    <a href="{{ route('artikel.artikel.show', $article) }}"
                                                         class="btn btn-sm btn-outline-info">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a href="{{ route('artikel.edit', $article) }}"
+                                                    <a href="{{ route('artikel.artikel.edit', $article) }}"
                                                         class="btn btn-sm btn-outline-primary">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
@@ -172,7 +172,8 @@
                                                 <div class="text-muted">
                                                     <i class="fas fa-newspaper fa-3x mb-3"></i>
                                                     <p>Tidak ada artikel yang ditemukan.</p>
-                                                    <a href="{{ route('artikel.create') }}" class="btn btn-primary">
+                                                    <a href="{{ route('artikel.artikel.create') }}"
+                                                        class="btn btn-primary">
                                                         Buat Artikel Pertama
                                                     </a>
                                                 </div>
@@ -225,7 +226,7 @@
     <script>
         function confirmDelete(articleId) {
             const form = document.getElementById('deleteForm');
-            form.action = `/artikel/${articleId}`;
+            form.action = `/artikel/artikel/${articleId}`;
 
             const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             modal.show();
@@ -237,7 +238,7 @@
                 const articleId = this.dataset.id;
                 const currentStatus = this.dataset.status;
 
-                fetch(`/artikel/${articleId}/toggle-status`, {
+                fetch(`/artikel/artikel/${articleId}/toggle-status`, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')

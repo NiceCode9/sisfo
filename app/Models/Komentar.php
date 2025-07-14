@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Komentar extends Model
 {
+    protected $table = 'komentar';
     protected $fillable = [
         'article_id',
         'parent_id',
@@ -22,7 +23,7 @@ class Komentar extends Model
 
     public function article(): BelongsTo
     {
-        return $this->belongsTo(Artikel::class);
+        return $this->belongsTo(Artikel::class, 'article_id');
     }
 
     public function parent(): BelongsTo

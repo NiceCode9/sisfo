@@ -112,6 +112,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::resource('kategori', KategoriController::class);
         Route::resource('tags', TagController::class);
         Route::resource('artikel', ArtikelController::class);
+        Route::get('/artikel/{id}/toogle-status', [ArtikelController::class, 'toogleStatus'])->name('artikel.toggle-status');
     });
 });
 

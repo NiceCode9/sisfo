@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
@@ -110,6 +111,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::prefix('artikel')->as('artikel.')->group(function () {
         Route::resource('kategori', KategoriController::class);
         Route::resource('tags', TagController::class);
+        Route::resource('artikel', ArtikelController::class);
     });
 });
 

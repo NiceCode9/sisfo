@@ -60,11 +60,16 @@ class Artikel extends Model
         'seo_score' => 'decimal:1'
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function sluggable(): array
     {
         return [
             'slug' => [
-                'source' => 'title'
+                'source' => ['title', 'category.name']
             ]
         ];
     }
@@ -97,12 +102,12 @@ class Artikel extends Model
 
     public function approvedComments(): HasMany
     {
-        return $this->hasMany(Komentar::class)->where('status', 'approved');
+        return $this->hasMany(Komentar::class, 'article_id')->where('status', 'approved');
     }
 
     public function analytics(): HasMany
     {
-        return $this->hasMany(ArtikelAnalis::class);
+        return $this->hasMany(ArtikelAnalis::class, 'article_id');
     }
 
     public function relatedArticles(): BelongsToMany
@@ -168,10 +173,7 @@ class Artikel extends Model
     // Accessors & Mutators
     public function getUrlAttribute(): string
     {
-        return route('article.show', [
-            'category' => $this->category->slug,
-            'slug' => $this->slug
-        ]);
+        return route('artikel.artikel.show', $this->slug);
     }
 
     public function getMetaTitleAttribute($value): string
@@ -272,53 +274,193 @@ class Artikel extends Model
         $analytics->increment('views');
     }
 
+    // public function updateSeoScore(): void
+    // {
+    //     $score = 0;
+
+    //     // Title length (ideal: 50-60 characters)
+    //     $titleLength = strlen($this->title);
+    //     if ($titleLength >= 50 && $titleLength <= 60) {
+    //         $score += 2;
+    //     } elseif ($titleLength >= 30 && $titleLength <= 70) {
+    //         $score += 1;
+    //     }
+
+    //     // Meta description length (ideal: 150-160 characters)
+    //     $descLength = strlen($this->meta_description);
+    //     if ($descLength >= 150 && $descLength <= 160) {
+    //         $score += 2;
+    //     } elseif ($descLength >= 120 && $descLength <= 170) {
+    //         $score += 1;
+    //     }
+
+    //     // Has featured image
+    //     if ($this->featured_image) {
+    //         $score += 1;
+    //     }
+
+    //     // Has alt text for featured image
+    //     if ($this->featured_image_alt) {
+    //         $score += 1;
+    //     }
+
+    //     // Content length (ideal: 1000+ words)
+    //     if ($this->word_count >= 1000) {
+    //         $score += 2;
+    //     } elseif ($this->word_count >= 500) {
+    //         $score += 1;
+    //     }
+
+    //     // Has tags
+    //     if ($this->tags->count() > 0) {
+    //         $score += 1;
+    //     }
+
+    //     // Has canonical URL
+    //     if ($this->canonical_url) {
+    //         $score += 1;
+    //     }
+
+    //     $this->update(['seo_score' => $score]);
+    // }
+
     public function updateSeoScore(): void
     {
         $score = 0;
+        $maxScore = 10; // Total 10 poin untuk kemudahan perhitungan
 
-        // Title length (ideal: 50-60 characters)
+        // 1. Title length (ideal: 30-60 characters) - 2 points
         $titleLength = strlen($this->title);
-        if ($titleLength >= 50 && $titleLength <= 60) {
+        if ($titleLength >= 30 && $titleLength <= 60) {
             $score += 2;
-        } elseif ($titleLength >= 30 && $titleLength <= 70) {
+        } elseif ($titleLength >= 20 && $titleLength <= 80) {
             $score += 1;
         }
 
-        // Meta description length (ideal: 150-160 characters)
-        $descLength = strlen($this->meta_description);
-        if ($descLength >= 150 && $descLength <= 160) {
+        // 2. Meta description length (ideal: 120-160 characters) - 2 points
+        $metaDesc = $this->meta_description ?: $this->excerpt;
+        $descLength = strlen($metaDesc);
+        if ($descLength >= 120 && $descLength <= 160) {
             $score += 2;
-        } elseif ($descLength >= 120 && $descLength <= 170) {
+        } elseif ($descLength >= 100 && $descLength <= 180) {
             $score += 1;
         }
 
-        // Has featured image
+        // 3. Has featured image - 1 point
         if ($this->featured_image) {
             $score += 1;
         }
 
-        // Has alt text for featured image
-        if ($this->featured_image_alt) {
+        // 4. Has alt text for featured image - 1 point
+        if ($this->featured_image && $this->featured_image_alt) {
             $score += 1;
         }
 
-        // Content length (ideal: 1000+ words)
-        if ($this->word_count >= 1000) {
+        // 5. Content length (ideal: 300+ words) - 2 points
+        if ($this->word_count >= 300) {
             $score += 2;
-        } elseif ($this->word_count >= 500) {
+        } elseif ($this->word_count >= 150) {
             $score += 1;
         }
 
-        // Has tags
-        if ($this->tags->count() > 0) {
+        // 6. Has tags - 1 point
+        if ($this->tags()->count() > 0) {
             $score += 1;
         }
 
-        // Has canonical URL
+        // 7. Has canonical URL - 1 point
         if ($this->canonical_url) {
             $score += 1;
         }
 
-        $this->update(['seo_score' => $score]);
+        // Convert to percentage (0-100)
+        $scorePercentage = ($score / $maxScore) * 100;
+
+        // Store SEO analysis details
+        $analysis = [
+            'score' => $scorePercentage,
+            'details' => [
+                'title_length' => $titleLength,
+                'title_optimal' => $titleLength >= 30 && $titleLength <= 60,
+                'meta_desc_length' => $descLength,
+                'meta_desc_optimal' => $descLength >= 120 && $descLength <= 160,
+                'has_featured_image' => !empty($this->featured_image),
+                'has_image_alt' => !empty($this->featured_image_alt),
+                'word_count' => $this->word_count,
+                'word_count_optimal' => $this->word_count >= 300,
+                'has_tags' => $this->tags()->count() > 0,
+                'has_canonical' => !empty($this->canonical_url),
+            ],
+            'suggestions' => $this->generateSeoSuggestions($scorePercentage)
+        ];
+
+        $this->update([
+            'seo_score' => $scorePercentage,
+            'seo_analysis' => $analysis
+        ]);
+    }
+
+    private function generateSeoSuggestions(float $score): array
+    {
+        $suggestions = [];
+
+        // Title suggestions
+        $titleLength = strlen($this->title);
+        if ($titleLength < 30) {
+            $suggestions[] = 'Judul terlalu pendek. Ideal: 30-60 karakter';
+        } elseif ($titleLength > 60) {
+            $suggestions[] = 'Judul terlalu panjang. Ideal: 30-60 karakter';
+        }
+
+        // Meta description suggestions
+        $metaDesc = $this->meta_description ?: $this->excerpt;
+        $descLength = strlen($metaDesc);
+        if ($descLength < 120) {
+            $suggestions[] = 'Meta description terlalu pendek. Ideal: 120-160 karakter';
+        } elseif ($descLength > 160) {
+            $suggestions[] = 'Meta description terlalu panjang. Ideal: 120-160 karakter';
+        }
+
+        // Image suggestions
+        if (!$this->featured_image) {
+            $suggestions[] = 'Tambahkan gambar unggulan untuk meningkatkan SEO';
+        } elseif (!$this->featured_image_alt) {
+            $suggestions[] = 'Tambahkan alt text untuk gambar unggulan';
+        }
+
+        // Content suggestions
+        if ($this->word_count < 300) {
+            $suggestions[] = 'Konten terlalu pendek. Minimal 300 kata untuk SEO optimal';
+        }
+
+        // Tags suggestions
+        if ($this->tags()->count() === 0) {
+            $suggestions[] = 'Tambahkan tag untuk meningkatkan kategorisasi';
+        }
+
+        // Canonical URL suggestions
+        if (!$this->canonical_url) {
+            $suggestions[] = 'Tambahkan canonical URL untuk mencegah duplicate content';
+        }
+
+        return $suggestions;
+    }
+
+    // Accessor untuk SEO score status
+    public function getSeoStatusAttribute(): string
+    {
+        if ($this->seo_score >= 80) {
+            return 'excellent';
+        } elseif ($this->seo_score >= 60) {
+            return 'good';
+        } else {
+            return 'poor';
+        }
+    }
+
+    // Accessor untuk SEO suggestions
+    public function getSeoSuggestionsAttribute(): array
+    {
+        return $this->seo_analysis['suggestions'] ?? [];
     }
 }

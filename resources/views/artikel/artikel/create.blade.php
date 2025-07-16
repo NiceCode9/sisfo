@@ -366,6 +366,9 @@
                             <h5 class="mb-0">
                                 <i class="fas fa-search me-2"></i>
                                 Pengaturan SEO
+                                <span class="float-end" id="seo-score">
+
+                                </span>
                             </h5>
                         </div>
                         <div class="card-body">
@@ -416,7 +419,12 @@
                                     </span>
                                 </label>
                                 <input type="url" class="form-control" id="canonical_url" name="canonical_url"
-                                    value="{{ old('canonical_url') }}" placeholder="https://example.com/artikel-saya">
+                                    value="{{ old('canonical_url', base_url()) }}"
+                                    placeholder="https://example.com/artikel-saya">
+                            </div>
+
+                            <div id="seo-suggestions">
+
                             </div>
                         </div>
                     </div>
@@ -586,7 +594,7 @@
 @push('scripts')
     <!-- TinyMCE -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
-    <script>
+    {{-- <script>
         // Initialize TinyMCE
         tinymce.init({
             selector: '#content',
@@ -1088,5 +1096,542 @@
         setTimeout(() => {
             updateProgressIndicator();
         }, 1000);
+    </script> --}}
+    // Replace the entire script section in create.blade.php with this:
+
+    <script>
+        // Initialize TinyMCE
+        tinymce.init({
+            selector: '#content',
+            height: 400,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px }',
+            menubar: 'file edit view insert format tools table help',
+            branding: false,
+            setup: function(editor) {
+                editor.on('change', function() {
+                    editor.save();
+                });
+            }
+        });
+
+        // Image preview and drag & drop
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview-img').src = e.target.result;
+                    document.getElementById('image-preview').style.display = 'block';
+                    document.getElementById('upload-placeholder').style.display = 'none';
+                    document.getElementById('image-drop-zone').classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('featured_image').value = '';
+            document.getElementById('preview-img').src = '';
+            document.getElementById('image-preview').style.display = 'none';
+            document.getElementById('upload-placeholder').style.display = 'block';
+            document.getElementById('image-drop-zone').classList.remove('has-image');
+        }
+
+        // Drag & Drop functionality
+        const dropZone = document.getElementById('image-drop-zone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#667eea';
+            dropZone.style.background = 'rgba(102, 126, 234, 0.1)';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#dee2e6';
+            dropZone.style.background = '#f8f9fa';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#dee2e6';
+            dropZone.style.background = '#f8f9fa';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('featured_image').files = files;
+                previewImage({
+                    target: {
+                        files: files
+                    }
+                });
+            }
+        });
+
+        // Auto-generate meta title from title
+        document.getElementById('title').addEventListener('input', function() {
+            const metaTitle = document.getElementById('meta_title');
+            if (!metaTitle.value) {
+                metaTitle.value = this.value;
+            }
+            updateCharacterCounter('title', this.value.length, 255);
+        });
+
+        // Auto-generate meta description from excerpt
+        document.getElementById('excerpt').addEventListener('input', function() {
+            const metaDescription = document.getElementById('meta_description');
+            if (!metaDescription.value) {
+                metaDescription.value = this.value;
+            }
+            updateCharacterCounter('excerpt', this.value.length, 500);
+        });
+
+        // Character counters
+        function updateCharacterCounter(fieldId, currentLength, maxLength) {
+            const counter = document.getElementById(fieldId + '-counter');
+            if (counter) {
+                counter.textContent = `${currentLength}/${maxLength}`;
+
+                if (currentLength > maxLength) {
+                    counter.className = 'character-counter text-danger';
+                } else if (currentLength > maxLength * 0.9) {
+                    counter.className = 'character-counter text-warning';
+                } else {
+                    counter.className = 'character-counter text-muted';
+                }
+            }
+        }
+
+        // Add character counters to all relevant fields
+        document.getElementById('meta_title').addEventListener('input', function() {
+            updateCharacterCounter('meta-title', this.value.length, 60);
+        });
+
+        document.getElementById('meta_description').addEventListener('input', function() {
+            updateCharacterCounter('meta-desc', this.value.length, 160);
+        });
+
+        // Save as draft function
+        function saveDraft() {
+            document.getElementById('status').value = 'draft';
+            document.getElementById('articleForm').submit();
+        }
+
+        // Initialize character counters on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCharacterCounter('title', document.getElementById('title').value.length, 255);
+            updateCharacterCounter('excerpt', document.getElementById('excerpt').value.length, 500);
+            updateCharacterCounter('meta-title', document.getElementById('meta_title').value.length, 60);
+            updateCharacterCounter('meta-desc', document.getElementById('meta_description').value.length, 160);
+        });
+
+        // SEO Score Calculator - Fixed Version
+        function calculateSeoScore() {
+            const title = document.getElementById('title').value.trim();
+            const excerpt = document.getElementById('excerpt').value.trim();
+            const metaTitle = document.getElementById('meta_title').value.trim();
+            const metaDescription = document.getElementById('meta_description').value.trim();
+            const categoryId = document.getElementById('category_id').value;
+            const canonicalUrl = document.getElementById('canonical_url').value.trim();
+            const featuredImageAlt = document.getElementById('featured_image_alt').value.trim();
+
+            // Get content from TinyMCE
+            let content = '';
+            try {
+                content = tinymce.get('content').getContent({
+                    format: 'text'
+                });
+            } catch (e) {
+                content = document.getElementById('content').value;
+            }
+
+            // Check if featured image exists
+            const featuredImage = document.getElementById('featured_image').files[0];
+            const hasFeaturedImage = featuredImage || false;
+
+            // Check selected tags
+            const selectedTags = document.querySelectorAll('input[name="tags[]"]:checked');
+
+            let score = 0;
+            const maxScore = 10;
+            let suggestions = [];
+
+            // 1. Title length evaluation (2 points)
+            const titleLength = title.length;
+            if (titleLength >= 30 && titleLength <= 60) {
+                score += 2;
+            } else if (titleLength >= 20 && titleLength <= 80) {
+                score += 1;
+            } else if (titleLength > 0) {
+                if (titleLength < 30) {
+                    suggestions.push('Judul terlalu pendek. Ideal: 30-60 karakter');
+                } else {
+                    suggestions.push('Judul terlalu panjang. Ideal: 30-60 karakter');
+                }
+            }
+
+            // 2. Meta description evaluation (2 points)
+            const effectiveMetaDesc = metaDescription || excerpt;
+            const metaDescLength = effectiveMetaDesc.length;
+            if (metaDescLength >= 120 && metaDescLength <= 160) {
+                score += 2;
+            } else if (metaDescLength >= 100 && metaDescLength <= 180) {
+                score += 1;
+            } else if (metaDescLength > 0) {
+                if (metaDescLength < 120) {
+                    suggestions.push('Meta description terlalu pendek. Ideal: 120-160 karakter');
+                } else {
+                    suggestions.push('Meta description terlalu panjang. Ideal: 120-160 karakter');
+                }
+            }
+
+            // 3. Featured image evaluation (1 point)
+            if (hasFeaturedImage) {
+                score += 1;
+            } else {
+                suggestions.push('Tambahkan gambar unggulan untuk meningkatkan SEO');
+            }
+
+            // 4. Image alt text evaluation (1 point)
+            if (hasFeaturedImage && featuredImageAlt) {
+                score += 1;
+            } else if (hasFeaturedImage && !featuredImageAlt) {
+                suggestions.push('Tambahkan alt text untuk gambar unggulan');
+            }
+
+            // 5. Content length evaluation (2 points)
+            const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
+            if (wordCount >= 300) {
+                score += 2;
+            } else if (wordCount >= 150) {
+                score += 1;
+            } else if (wordCount > 0) {
+                suggestions.push(`Konten terlalu pendek (${wordCount} kata). Minimal 300 kata untuk SEO optimal`);
+            }
+
+            // 6. Tags evaluation (1 point)
+            if (selectedTags.length > 0) {
+                score += 1;
+            } else {
+                suggestions.push('Tambahkan tag untuk meningkatkan kategorisasi');
+            }
+
+            // 7. Canonical URL evaluation (1 point)
+            if (canonicalUrl) {
+                score += 1;
+            } else {
+                suggestions.push('Tambahkan canonical URL untuk mencegah duplicate content');
+            }
+
+            // Convert to percentage
+            const scorePercentage = Math.round((score / maxScore) * 100);
+
+            // Additional suggestions based on other factors
+            if (!categoryId) {
+                suggestions.push('Pilih kategori artikel');
+            }
+
+            if (!metaTitle && title) {
+                suggestions.push('Meta title akan otomatis diisi dari judul');
+            }
+
+            if (!metaDescription && excerpt) {
+                suggestions.push('Meta description akan otomatis diisi dari ringkasan');
+            }
+
+            updateSeoScoreDisplay(scorePercentage, suggestions, {
+                titleLength,
+                metaDescLength,
+                wordCount,
+                hasFeaturedImage,
+                hasImageAlt: featuredImageAlt.length > 0,
+                hasTagsSelected: selectedTags.length > 0,
+                hasCanonicalUrl: canonicalUrl.length > 0
+            });
+
+            return scorePercentage;
+        }
+
+        function updateSeoScoreDisplay(score, suggestions, details) {
+            const seoScoreEl = document.getElementById('seo-score');
+            const seoSuggestionsEl = document.getElementById('seo-suggestions');
+
+            if (seoScoreEl) {
+                let className = 'seo-poor';
+                let icon = 'fas fa-times-circle';
+                let statusText = 'Perlu Perbaikan';
+
+                if (score >= 80) {
+                    className = 'seo-excellent';
+                    icon = 'fas fa-check-circle';
+                    statusText = 'Excellent';
+                } else if (score >= 60) {
+                    className = 'seo-good';
+                    icon = 'fas fa-exclamation-circle';
+                    statusText = 'Good';
+                }
+
+                seoScoreEl.innerHTML = `
+                <span class="seo-score ${className}">
+                    <i class="${icon}"></i>
+                    SEO Score: ${score}/100 (${statusText})
+                </span>
+            `;
+            }
+
+            if (seoSuggestionsEl) {
+                if (suggestions.length > 0) {
+                    seoSuggestionsEl.innerHTML = `
+                    <div class="alert alert-info mt-3">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            Saran Perbaikan SEO:
+                        </h6>
+                        <ul class="mb-0">
+                            ${suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                } else {
+                    seoSuggestionsEl.innerHTML = `
+                    <div class="alert alert-success mt-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>SEO sudah optimal!</strong> Artikel Anda siap dipublikasikan.
+                    </div>
+                `;
+                }
+
+                // Add SEO details breakdown
+                const detailsHtml = `
+                <div class="seo-details mt-3">
+                    <h6>Detail SEO:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="${details.titleLength >= 30 && details.titleLength <= 60 ? 'text-success' : 'text-warning'}">
+                                    <i class="fas fa-${details.titleLength >= 30 && details.titleLength <= 60 ? 'check' : 'exclamation-triangle'}"></i>
+                                    Judul: ${details.titleLength} karakter
+                                </li>
+                                <li class="${details.metaDescLength >= 120 && details.metaDescLength <= 160 ? 'text-success' : 'text-warning'}">
+                                    <i class="fas fa-${details.metaDescLength >= 120 && details.metaDescLength <= 160 ? 'check' : 'exclamation-triangle'}"></i>
+                                    Meta Description: ${details.metaDescLength} karakter
+                                </li>
+                                <li class="${details.wordCount >= 300 ? 'text-success' : 'text-warning'}">
+                                    <i class="fas fa-${details.wordCount >= 300 ? 'check' : 'exclamation-triangle'}"></i>
+                                    Konten: ${details.wordCount} kata
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="${details.hasFeaturedImage ? 'text-success' : 'text-warning'}">
+                                    <i class="fas fa-${details.hasFeaturedImage ? 'check' : 'times'}"></i>
+                                    Gambar Unggulan: ${details.hasFeaturedImage ? 'Ada' : 'Tidak Ada'}
+                                </li>
+                                <li class="${details.hasImageAlt ? 'text-success' : 'text-warning'}">
+                                    <i class="fas fa-${details.hasImageAlt ? 'check' : 'times'}"></i>
+                                    Alt Text: ${details.hasImageAlt ? 'Ada' : 'Tidak Ada'}
+                                </li>
+                                <li class="${details.hasTagsSelected ? 'text-success' : 'text-warning'}">
+                                    <i class="fas fa-${details.hasTagsSelected ? 'check' : 'times'}"></i>
+                                    Tags: ${details.hasTagsSelected ? 'Dipilih' : 'Belum Dipilih'}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                seoSuggestionsEl.innerHTML += detailsHtml;
+            }
+        }
+
+        // Improved event binding for real-time calculation
+        function bindSeoCalculation() {
+            const fieldsToWatch = ['title', 'excerpt', 'meta_title', 'meta_description', 'category_id', 'canonical_url',
+                'featured_image_alt'
+            ];
+
+            fieldsToWatch.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', debounce(calculateSeoScore, 300));
+                    field.addEventListener('change', calculateSeoScore);
+                }
+            });
+
+            // Watch for TinyMCE content changes
+            if (typeof tinymce !== 'undefined') {
+                tinymce.get('content').on('keyup', debounce(calculateSeoScore, 500));
+                tinymce.get('content').on('change', calculateSeoScore);
+            }
+
+            // Watch for featured image changes
+            const featuredImageInput = document.getElementById('featured_image');
+            if (featuredImageInput) {
+                featuredImageInput.addEventListener('change', calculateSeoScore);
+            }
+
+            // Watch for tag selection changes
+            const tagCheckboxes = document.querySelectorAll('input[name="tags[]"]');
+            tagCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', calculateSeoScore);
+            });
+        }
+
+        // Debounce function to prevent excessive calculations
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Form validation
+        document.getElementById('articleForm').addEventListener('submit', function(e) {
+            const title = document.getElementById('title').value.trim();
+            const excerpt = document.getElementById('excerpt').value.trim();
+            const content = tinymce.get('content').getContent();
+            const categoryId = document.getElementById('category_id').value;
+
+            let errors = [];
+
+            // Validate required fields
+            if (!title) {
+                errors.push('Judul artikel wajib diisi');
+            }
+
+            if (!excerpt) {
+                errors.push('Ringkasan artikel wajib diisi');
+            }
+
+            if (!content || content.trim() === '') {
+                errors.push('Konten artikel wajib diisi');
+            }
+
+            if (!categoryId) {
+                errors.push('Kategori wajib dipilih');
+            }
+
+            // Validate field lengths
+            if (title.length > 255) {
+                errors.push('Judul artikel maksimal 255 karakter');
+            }
+
+            if (excerpt.length > 500) {
+                errors.push('Ringkasan artikel maksimal 500 karakter');
+            }
+
+            const metaTitle = document.getElementById('meta_title').value;
+            if (metaTitle.length > 60) {
+                errors.push('Meta title maksimal 60 karakter');
+            }
+
+            const metaDescription = document.getElementById('meta_description').value;
+            if (metaDescription.length > 160) {
+                errors.push('Meta description maksimal 160 karakter');
+            }
+
+            // Show errors if any
+            if (errors.length > 0) {
+                e.preventDefault();
+                showErrorMessage(errors);
+                return false;
+            }
+
+            // Show loading state
+            showLoadingState();
+        });
+
+        function showErrorMessage(errors) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show animate-fade-in';
+            alertDiv.innerHTML = `
+            <h5 class="alert-heading">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Terdapat kesalahan:
+            </h5>
+            <ul class="mb-0">
+                ${errors.map(error => `<li>${error}</li>`).join('')}
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+            const container = document.querySelector('.container-fluid');
+            const existingAlert = container.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            container.insertBefore(alertDiv, container.firstChild);
+
+            // Scroll to top to show error
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function showLoadingState() {
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const floatingBtn = document.querySelector('.floating-save');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Menyimpan...';
+
+            floatingBtn.disabled = true;
+            floatingBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Menyimpan...';
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize SEO calculation
+            const initSeo = () => {
+                if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
+                    bindSeoCalculation();
+                    calculateSeoScore();
+                } else {
+                    setTimeout(initSeo, 500);
+                }
+            };
+
+            initSeo();
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Confirm before leaving page if there are unsaved changes
+            let hasUnsavedChanges = false;
+
+            document.getElementById('articleForm').addEventListener('input', function() {
+                hasUnsavedChanges = true;
+            });
+
+            document.getElementById('articleForm').addEventListener('submit', function() {
+                hasUnsavedChanges = false;
+            });
+
+            window.addEventListener('beforeunload', function(e) {
+                if (hasUnsavedChanges) {
+                    e.preventDefault();
+                    e.returnValue =
+                        'Anda memiliki perubahan yang belum disimpan. Yakin ingin meninggalkan halaman?';
+                }
+            });
+        });
     </script>
 @endpush

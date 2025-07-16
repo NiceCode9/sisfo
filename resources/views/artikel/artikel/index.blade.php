@@ -119,7 +119,7 @@
                                                 <span class="badge bg-secondary">{{ $article->category->name }}</span>
                                             </td>
                                             <td>
-                                                <button class="btn btn-sm status-toggle" data-id="{{ $article->id }}"
+                                                <button class="btn btn-sm status-toggle" data-id="{{ $article->slug }}"
                                                     data-status="{{ $article->status }}">
                                                     @if ($article->status === 'published')
                                                         <span class="badge bg-success">Published</span>
@@ -137,10 +137,10 @@
                                                         @if ($article->seo_score >= 8) bg-success
                                                         @elseif($article->seo_score >= 5) bg-warning
                                                         @else bg-danger @endif"
-                                                            style="width: {{ ($article->seo_score / 10) * 100 }}%">
+                                                            style="width: {{ ($article->seo_score / 100) * 100 }}%">
                                                         </div>
                                                     </div>
-                                                    <small class="ms-2">{{ $article->seo_score }}/10</small>
+                                                    <small class="ms-2">{{ $article->seo_score }}/100</small>
                                                 </div>
                                             </td>
                                             <td>
@@ -159,8 +159,8 @@
                                                         class="btn btn-sm btn-outline-primary">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <button class="btn btn-sm btn-outline-danger"
-                                                        onclick="confirmDelete({{ $article->id }})">
+                                                    <button class="btn btn-sm btn-outline-danger btn-delete"
+                                                        data-slug="{{ $article->slug }}">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -224,7 +224,16 @@
 
 @push('scripts')
     <script>
+        $(document).ready(function() {
+            $(document).on('click', '.btn-delete', function() {
+                let slug = $(this).data('slug')
+                confirmDelete(slug)
+            });
+        });
+
         function confirmDelete(articleId) {
+            console.log(articleId);
+
             const form = document.getElementById('deleteForm');
             form.action = `/artikel/artikel/${articleId}`;
 

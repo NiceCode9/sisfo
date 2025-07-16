@@ -30,6 +30,6 @@ class ArtikelAnalis extends Model
 
     public function article(): BelongsTo
     {
-        return $this->belongsTo(Artikel::class);
+        return $this->belongsTo(Artikel::class, 'article_id');
     }
 }

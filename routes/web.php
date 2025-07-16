@@ -13,6 +13,11 @@ Route::group(['middleware' => ['guest']], function () {
 
     Route::controller('App\Http\Controllers\FrontController')->group(function () {
         Route::get('/pendaftaran', 'pendaftaran')->name('pendaftaran');
+
+        Route::prefix('/artikel')->group(function () {
+            Route::get('/', 'artikel')->name('artikel.index');
+            Route::get('/{artikel}', 'showArtikel')->name('artikel.read');
+        });
     });
 
     Route::post('/pendaftaran', [\App\Http\Controllers\CalonSiswaController::class, 'store'])->name('pendaftaran.store');
@@ -112,7 +117,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::resource('kategori', KategoriController::class);
         Route::resource('tags', TagController::class);
         Route::resource('artikel', ArtikelController::class);
-        Route::get('/artikel/{id}/toogle-status', [ArtikelController::class, 'toogleStatus'])->name('artikel.toggle-status');
+        Route::put('/artikel/{artikel}/toogle-status', [ArtikelController::class, 'toggleStatus'])->name('artikel.toggle-status');
     });
 });
 

@@ -7,6 +7,7 @@ use App\Models\Kategori;
 use App\Models\Sitemap;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -77,7 +78,6 @@ class ArtikelController extends Controller
 
         $data = $request->all();
         $data['author_id'] = auth()->id();
-        $data['slug'] = Str::slug($request->title);
 
         // Handle featured image upload
         if ($request->hasFile('featured_image')) {
@@ -105,7 +105,7 @@ class ArtikelController extends Controller
         // Update sitemap
         $this->updateSitemap($artikel);
 
-        return redirect()->route('artikel.index')
+        return redirect()->route('artikel.artikel.index')
             ->with('success', 'Artikel berhasil dibuat.');
     }
 
@@ -149,44 +149,54 @@ class ArtikelController extends Controller
             'canonical_url' => 'nullable|url'
         ]);
 
-        $data = $request->all();
-        $data['slug'] = Str::slug($request->title);
+        DB::beginTransaction();
+        try {
+            $data = $request->all();
+            $data['slug'] = Str::slug($request->title);
 
-        // Handle featured image upload
-        if ($request->hasFile('featured_image')) {
-            // Delete old image
-            if ($artikel->featured_image) {
-                Storage::disk('public')->delete($artikel->featured_image);
+            // Handle featured image upload
+            if ($request->hasFile('featured_image')) {
+                // Delete old image
+                if ($artikel->featured_image) {
+                    Storage::disk('public')->delete($artikel->featured_image);
+                }
+
+                $image = $request->file('featured_image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $imagePath = $image->storeAs('articles', $imageName, 'public');
+                $data['featured_image'] = $imagePath;
             }
 
-            $image = $request->file('featured_image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('articles', $imageName, 'public');
-            $data['featured_image'] = $imagePath;
+            // Set published_at if status is published and not set before
+            if ($request->status === 'published' && !$artikel->published_at) {
+                $data['published_at'] = now();
+            }
+
+            $artikel->slug = null;
+            $artikel->update($data);
+
+            // Sync tags
+            if ($request->has('tags')) {
+                $artikel->tags()->sync($request->tags);
+            } else {
+                $artikel->tags()->detach();
+            }
+
+            // Update SEO score
+            $artikel->updateSeoScore();
+
+            // Update sitemap
+            $this->updateSitemap($artikel);
+
+            DB::commit();
+            return redirect()->route('artikel.artikel.index')
+                ->with('success', 'Artikel berhasil diperbarui.');
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::rollBack();
+            return redirect()->route('artikel.artikel.index')
+                ->with('error', 'Artikel gagal diperbarui.');
         }
-
-        // Set published_at if status is published and not set before
-        if ($request->status === 'published' && !$artikel->published_at) {
-            $data['published_at'] = now();
-        }
-
-        $artikel->update($data);
-
-        // Sync tags
-        if ($request->has('tags')) {
-            $artikel->tags()->sync($request->tags);
-        } else {
-            $artikel->tags()->detach();
-        }
-
-        // Update SEO score
-        $artikel->updateSeoScore();
-
-        // Update sitemap
-        $this->updateSitemap($artikel);
-
-        return redirect()->route('artikel.index')
-            ->with('success', 'Artikel berhasil diperbarui.');
     }
 
     /**
@@ -204,13 +214,13 @@ class ArtikelController extends Controller
 
         $artikel->delete();
 
-        return redirect()->route('artikel.index')
+        return redirect()->route('artikel.artikel.index')
             ->with('success', 'Artikel berhasil dihapus.');
     }
 
     public function toggleStatus(Artikel $artikel)
     {
-        $newStatus = $artikel->status === 'published' ? 'draft' : 'published';
+        $newStatus = $artikel->status == 'published' ? 'draft' : 'published';
 
         $artikel->update([
             'status' => $newStatus,

@@ -417,7 +417,7 @@
             </div>
         @endif
 
-        <form action="{{ route('artikel.artikel.update', $artikel->id) }}" method="POST" enctype="multipart/form-data"
+        <form action="{{ route('artikel.artikel.update', $artikel->slug) }}" method="POST" enctype="multipart/form-data"
             id="articleForm">
             @csrf
             @method('PUT')
@@ -486,16 +486,16 @@
                             <h5 class="mb-0">
                                 <i class="fas fa-search me-2"></i>
                                 Pengaturan SEO
-                                @if ($artikel->seo_score)
-                                    <span class="float-end" id="seo-score">
+                                <span class="float-end" id="seo-score">
+                                    @if ($artikel->seo_score)
                                         <span
                                             class="seo-score {{ $artikel->seo_score >= 80 ? 'seo-excellent' : ($artikel->seo_score >= 60 ? 'seo-good' : 'seo-poor') }}">
                                             <i
                                                 class="fas fa-{{ $artikel->seo_score >= 80 ? 'check-circle' : ($artikel->seo_score >= 60 ? 'exclamation-circle' : 'times-circle') }}"></i>
                                             SEO Score: {{ $artikel->seo_score }}/100
                                         </span>
-                                    </span>
-                                @endif
+                                    @endif
+                                </span>
                             </h5>
                         </div>
                         <div class="card-body">
@@ -515,7 +515,7 @@
                                 </div>
                                 <div class="form-text">
                                     <i class="fas fa-lightbulb text-warning me-1"></i>
-                                    Optimal: 50-60 karakter
+                                    Optimal: 30-60 karakter
                                 </div>
                             </div>
 
@@ -534,7 +534,7 @@
                                 </div>
                                 <div class="form-text">
                                     <i class="fas fa-lightbulb text-warning me-1"></i>
-                                    Optimal: 150-160 karakter
+                                    Optimal: 120-160 karakter
                                 </div>
                             </div>
 
@@ -551,7 +551,22 @@
                                     placeholder="https://example.com/artikel-saya">
                             </div>
 
-                            <div id="seo-suggestions"></div>
+                            <!-- SEO Suggestions Container -->
+                            <div id="seo-suggestions">
+                                @if ($artikel->seo_analysis && isset($artikel->seo_analysis['suggestions']))
+                                    <div class="alert alert-info">
+                                        <h6 class="alert-heading">
+                                            <i class="fas fa-lightbulb me-2"></i>
+                                            Saran Perbaikan SEO:
+                                        </h6>
+                                        <ul class="mb-0">
+                                            @foreach ($artikel->seo_analysis['suggestions'] as $suggestion)
+                                                <li>{{ $suggestion }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -976,150 +991,430 @@
         }
 
         // SEO Score Calculator
+        // function calculateSeoScore() {
+        //     const title = document.getElementById('title').value.trim();
+        //     const excerpt = document.getElementById('excerpt').value.trim();
+        //     const content = tinymce.get('content').getContent({
+        //         format: 'text'
+        //     });
+        //     const metaTitle = document.getElementById('meta_title').value.trim();
+        //     const metaDescription = document.getElementById('meta_description').value.trim();
+
+        //     let score = 0;
+        //     let maxScore = 100;
+        //     let suggestions = [];
+
+        //     // Title evaluation (20 points)
+        //     if (title.length >= 30 && title.length <= 60) {
+        //         score += 20;
+        //     } else if (title.length > 0) {
+        //         score += 10;
+        //         suggestions.push('Judul sebaiknya 30-60 karakter');
+        //     }
+
+        //     // Excerpt evaluation (15 points)
+        //     if (excerpt.length >= 120 && excerpt.length <= 160) {
+        //         score += 15;
+        //     } else if (excerpt.length > 0) {
+        //         score += 8;
+        //         suggestions.push('Ringkasan sebaiknya 120-160 karakter');
+        //     }
+
+        //     // Content length evaluation (20 points)
+        //     const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
+        //     if (wordCount >= 300) {
+        //         score += 20;
+        //     } else if (wordCount >= 150) {
+        //         score += 15;
+        //     } else if (wordCount > 0) {
+        //         score += 5;
+        //         suggestions.push('Konten sebaiknya minimal 300 kata');
+        //     }
+
+        //     // Meta title evaluation (15 points)
+        //     if (metaTitle.length >= 30 && metaTitle.length <= 60) {
+        //         score += 15;
+        //     } else if (metaTitle.length > 0) {
+        //         score += 8;
+        //         suggestions.push('Meta title sebaiknya 30-60 karakter');
+        //     }
+
+        //     // Meta description evaluation (15 points)
+        //     if (metaDescription.length >= 120 && metaDescription.length <= 160) {
+        //         score += 15;
+        //     } else if (metaDescription.length > 0) {
+        //         score += 8;
+        //         suggestions.push('Meta description sebaiknya 120-160 karakter');
+        //     }
+
+        //     // Featured image evaluation (10 points)
+        //     const featuredImage = document.getElementById('featured_image').files[0];
+        //     if (featuredImage || '{{ $artikel->featured_image }}') {
+        //         score += 10;
+        //     } else {
+        //         suggestions.push('Tambahkan gambar unggulan');
+        //     }
+
+        //     // Category evaluation (5 points)
+        //     const categoryId = document.getElementById('category_id').value;
+        //     if (categoryId) {
+        //         score += 5;
+        //     } else {
+        //         suggestions.push('Pilih kategori artikel');
+        //     }
+
+        //     // updateSeoScoreDisplay(score, suggestions);
+        // }
+
+        // function updateSeoScoreDisplay(score, suggestions) {
+        //     const seoScoreEl = document.getElementById('seo-score');
+        //     const seoSuggestionsEl = document.getElementById('seo-suggestions');
+
+        //     if (seoScoreEl) {
+        //         let className = 'seo-poor';
+        //         let icon = 'fas fa-times-circle';
+
+        //         if (score >= 80) {
+        //             className = 'seo-excellent';
+        //             icon = 'fas fa-check-circle';
+        //         } else if (score >= 60) {
+        //             className = 'seo-good';
+        //             icon = 'fas fa-exclamation-circle';
+        //         }
+
+        //         seoScoreEl.className = `seo-score ${className}`;
+        //         seoScoreEl.innerHTML = `
+    //             <i class="${icon}"></i>
+    //             SEO Score: ${score}/100
+    //         `;
+        //     }
+
+        //     if (seoSuggestionsEl) {
+        //         if (suggestions.length > 0) {
+        //             seoSuggestionsEl.innerHTML = `
+    //                 <div class="mt-2">
+    //                     <strong>Saran Perbaikan:</strong>
+    //                     <ul class="mb-0 mt-1">
+    //                         ${suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
+    //                     </ul>
+    //                 </div>
+    //             `;
+        //         } else {
+        //             seoSuggestionsEl.innerHTML = `
+    //                 <div class="mt-2 text-success">
+    //                     <i class="fas fa-check me-1"></i>
+    //                     SEO sudah optimal!
+    //                 </div>
+    //             `;
+        //         }
+        //     }
+        // }
+
+        // Real-time SEO score calculation
+        // function bindSeoCalculation() {
+        //     const fieldsToWatch = ['title', 'excerpt', 'meta_title', 'meta_description', 'category_id'];
+
+        //     fieldsToWatch.forEach(fieldId => {
+        //         const field = document.getElementById(fieldId);
+        //         if (field) {
+        //             field.addEventListener('input', calculateSeoScore);
+        //         }
+        //     });
+
+        //     // Watch for TinyMCE content changes
+        //     tinymce.get('content').on('keyup', calculateSeoScore);
+
+        //     // Watch for featured image changes
+        //     document.getElementById('featured_image').addEventListener('change', calculateSeoScore);
+        // }
+
+        // SEO Score Calculator - Fixed Version
         function calculateSeoScore() {
             const title = document.getElementById('title').value.trim();
             const excerpt = document.getElementById('excerpt').value.trim();
-            const content = tinymce.get('content').getContent({
-                format: 'text'
-            });
             const metaTitle = document.getElementById('meta_title').value.trim();
             const metaDescription = document.getElementById('meta_description').value.trim();
+            const categoryId = document.getElementById('category_id').value;
+            const canonicalUrl = document.getElementById('canonical_url').value.trim();
+            const featuredImageAlt = document.getElementById('featured_image_alt').value.trim();
+
+            // Get content from TinyMCE
+            let content = '';
+            try {
+                content = tinymce.get('content').getContent({
+                    format: 'text'
+                });
+            } catch (e) {
+                content = document.getElementById('content').value;
+            }
+
+            // Check if featured image exists (current or new)
+            const featuredImage = document.getElementById('featured_image').files[0];
+            const hasExistingImage = document.getElementById('preview-img').src &&
+                document.getElementById('preview-img').src !== window.location.origin + '/';
+            const hasFeaturedImage = featuredImage || hasExistingImage;
+
+            // Check selected tags
+            const selectedTags = document.querySelectorAll('input[name="tags[]"]:checked');
 
             let score = 0;
-            let maxScore = 100;
+            const maxScore = 10;
             let suggestions = [];
 
-            // Title evaluation (20 points)
-            if (title.length >= 30 && title.length <= 60) {
-                score += 20;
-            } else if (title.length > 0) {
-                score += 10;
-                suggestions.push('Judul sebaiknya 30-60 karakter');
+            // 1. Title length evaluation (2 points)
+            const titleLength = title.length;
+            if (titleLength >= 30 && titleLength <= 60) {
+                score += 2;
+            } else if (titleLength >= 20 && titleLength <= 80) {
+                score += 1;
+            } else if (titleLength > 0) {
+                if (titleLength < 30) {
+                    suggestions.push('Judul terlalu pendek. Ideal: 30-60 karakter');
+                } else {
+                    suggestions.push('Judul terlalu panjang. Ideal: 30-60 karakter');
+                }
             }
 
-            // Excerpt evaluation (15 points)
-            if (excerpt.length >= 120 && excerpt.length <= 160) {
-                score += 15;
-            } else if (excerpt.length > 0) {
-                score += 8;
-                suggestions.push('Ringkasan sebaiknya 120-160 karakter');
+            // 2. Meta description evaluation (2 points)
+            const effectiveMetaDesc = metaDescription || excerpt;
+            const metaDescLength = effectiveMetaDesc.length;
+            if (metaDescLength >= 120 && metaDescLength <= 160) {
+                score += 2;
+            } else if (metaDescLength >= 100 && metaDescLength <= 180) {
+                score += 1;
+            } else if (metaDescLength > 0) {
+                if (metaDescLength < 120) {
+                    suggestions.push('Meta description terlalu pendek. Ideal: 120-160 karakter');
+                } else {
+                    suggestions.push('Meta description terlalu panjang. Ideal: 120-160 karakter');
+                }
             }
 
-            // Content length evaluation (20 points)
+            // 3. Featured image evaluation (1 point)
+            if (hasFeaturedImage) {
+                score += 1;
+            } else {
+                suggestions.push('Tambahkan gambar unggulan untuk meningkatkan SEO');
+            }
+
+            // 4. Image alt text evaluation (1 point)
+            if (hasFeaturedImage && featuredImageAlt) {
+                score += 1;
+            } else if (hasFeaturedImage && !featuredImageAlt) {
+                suggestions.push('Tambahkan alt text untuk gambar unggulan');
+            }
+
+            // 5. Content length evaluation (2 points)
             const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
             if (wordCount >= 300) {
-                score += 20;
+                score += 2;
             } else if (wordCount >= 150) {
-                score += 15;
+                score += 1;
             } else if (wordCount > 0) {
-                score += 5;
-                suggestions.push('Konten sebaiknya minimal 300 kata');
+                suggestions.push(`Konten terlalu pendek (${wordCount} kata). Minimal 300 kata untuk SEO optimal`);
             }
 
-            // Meta title evaluation (15 points)
-            if (metaTitle.length >= 30 && metaTitle.length <= 60) {
-                score += 15;
-            } else if (metaTitle.length > 0) {
-                score += 8;
-                suggestions.push('Meta title sebaiknya 30-60 karakter');
-            }
-
-            // Meta description evaluation (15 points)
-            if (metaDescription.length >= 120 && metaDescription.length <= 160) {
-                score += 15;
-            } else if (metaDescription.length > 0) {
-                score += 8;
-                suggestions.push('Meta description sebaiknya 120-160 karakter');
-            }
-
-            // Featured image evaluation (10 points)
-            const featuredImage = document.getElementById('featured_image').files[0];
-            if (featuredImage || '{{ $artikel->featured_image }}') {
-                score += 10;
+            // 6. Tags evaluation (1 point)
+            if (selectedTags.length > 0) {
+                score += 1;
             } else {
-                suggestions.push('Tambahkan gambar unggulan');
+                suggestions.push('Tambahkan tag untuk meningkatkan kategorisasi');
             }
 
-            // Category evaluation (5 points)
-            const categoryId = document.getElementById('category_id').value;
-            if (categoryId) {
-                score += 5;
+            // 7. Canonical URL evaluation (1 point)
+            if (canonicalUrl) {
+                score += 1;
             } else {
+                suggestions.push('Tambahkan canonical URL untuk mencegah duplicate content');
+            }
+
+            // Convert to percentage
+            const scorePercentage = Math.round((score / maxScore) * 100);
+
+            // Additional suggestions based on other factors
+            if (!categoryId) {
                 suggestions.push('Pilih kategori artikel');
             }
 
-            updateSeoScoreDisplay(score, suggestions);
+            if (!metaTitle && title) {
+                suggestions.push('Meta title akan otomatis diisi dari judul');
+            }
+
+            if (!metaDescription && excerpt) {
+                suggestions.push('Meta description akan otomatis diisi dari ringkasan');
+            }
+
+            updateSeoScoreDisplay(scorePercentage, suggestions, {
+                titleLength,
+                metaDescLength,
+                wordCount,
+                hasFeaturedImage,
+                hasImageAlt: featuredImageAlt.length > 0,
+                hasTagsSelected: selectedTags.length > 0,
+                hasCanonicalUrl: canonicalUrl.length > 0
+            });
+
+            return scorePercentage;
         }
 
-        function updateSeoScoreDisplay(score, suggestions) {
+        function updateSeoScoreDisplay(score, suggestions, details) {
             const seoScoreEl = document.getElementById('seo-score');
             const seoSuggestionsEl = document.getElementById('seo-suggestions');
 
             if (seoScoreEl) {
                 let className = 'seo-poor';
                 let icon = 'fas fa-times-circle';
+                let statusText = 'Perlu Perbaikan';
 
                 if (score >= 80) {
                     className = 'seo-excellent';
                     icon = 'fas fa-check-circle';
+                    statusText = 'Excellent';
                 } else if (score >= 60) {
                     className = 'seo-good';
                     icon = 'fas fa-exclamation-circle';
+                    statusText = 'Good';
                 }
 
-                seoScoreEl.className = `seo-score ${className}`;
                 seoScoreEl.innerHTML = `
-                    <i class="${icon}"></i>
-                    SEO Score: ${score}/100
+                    <span class="seo-score ${className}">
+                        <i class="${icon}"></i>
+                        SEO Score: ${score}/100 (${statusText})
+                    </span>
                 `;
             }
 
             if (seoSuggestionsEl) {
                 if (suggestions.length > 0) {
                     seoSuggestionsEl.innerHTML = `
-                        <div class="mt-2">
-                            <strong>Saran Perbaikan:</strong>
-                            <ul class="mb-0 mt-1">
-                                ${suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
-                            </ul>
-                        </div>
-                    `;
+                <div class="alert alert-info mt-3">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Saran Perbaikan SEO:
+                    </h6>
+                    <ul class="mb-0">
+                        ${suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
                 } else {
                     seoSuggestionsEl.innerHTML = `
-                        <div class="mt-2 text-success">
-                            <i class="fas fa-check me-1"></i>
-                            SEO sudah optimal!
-                        </div>
-                    `;
+                <div class="alert alert-success mt-3">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>SEO sudah optimal!</strong> Artikel Anda siap dipublikasikan.
+                </div>
+            `;
                 }
+
+                // Add SEO details breakdown
+                const detailsHtml = `
+            <div class="seo-details mt-3">
+                <h6>Detail SEO:</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="${details.titleLength >= 30 && details.titleLength <= 60 ? 'text-success' : 'text-warning'}">
+                                <i class="fas fa-${details.titleLength >= 30 && details.titleLength <= 60 ? 'check' : 'exclamation-triangle'}"></i>
+                                Judul: ${details.titleLength} karakter
+                            </li>
+                            <li class="${details.metaDescLength >= 120 && details.metaDescLength <= 160 ? 'text-success' : 'text-warning'}">
+                                <i class="fas fa-${details.metaDescLength >= 120 && details.metaDescLength <= 160 ? 'check' : 'exclamation-triangle'}"></i>
+                                Meta Description: ${details.metaDescLength} karakter
+                            </li>
+                            <li class="${details.wordCount >= 300 ? 'text-success' : 'text-warning'}">
+                                <i class="fas fa-${details.wordCount >= 300 ? 'check' : 'exclamation-triangle'}"></i>
+                                Konten: ${details.wordCount} kata
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="${details.hasFeaturedImage ? 'text-success' : 'text-warning'}">
+                                <i class="fas fa-${details.hasFeaturedImage ? 'check' : 'times'}"></i>
+                                Gambar Unggulan: ${details.hasFeaturedImage ? 'Ada' : 'Tidak Ada'}
+                            </li>
+                            <li class="${details.hasImageAlt ? 'text-success' : 'text-warning'}">
+                                <i class="fas fa-${details.hasImageAlt ? 'check' : 'times'}"></i>
+                                Alt Text: ${details.hasImageAlt ? 'Ada' : 'Tidak Ada'}
+                            </li>
+                            <li class="${details.hasTagsSelected ? 'text-success' : 'text-warning'}">
+                                <i class="fas fa-${details.hasTagsSelected ? 'check' : 'times'}"></i>
+                                Tags: ${details.hasTagsSelected ? 'Dipilih' : 'Belum Dipilih'}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+
+                seoSuggestionsEl.innerHTML += detailsHtml;
             }
         }
 
-        // Real-time SEO score calculation
+        // Improved event binding for real-time calculation
         function bindSeoCalculation() {
-            const fieldsToWatch = ['title', 'excerpt', 'meta_title', 'meta_description', 'category_id'];
+            const fieldsToWatch = ['title', 'excerpt', 'meta_title', 'meta_description', 'category_id', 'canonical_url',
+                'featured_image_alt'
+            ];
 
             fieldsToWatch.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
-                    field.addEventListener('input', calculateSeoScore);
+                    field.addEventListener('input', debounce(calculateSeoScore, 300));
+                    field.addEventListener('change', calculateSeoScore);
                 }
             });
 
             // Watch for TinyMCE content changes
-            tinymce.get('content').on('keyup', calculateSeoScore);
+            if (typeof tinymce !== 'undefined') {
+                tinymce.get('content').on('keyup', debounce(calculateSeoScore, 500));
+                tinymce.get('content').on('change', calculateSeoScore);
+            }
 
             // Watch for featured image changes
-            document.getElementById('featured_image').addEventListener('change', calculateSeoScore);
+            const featuredImageInput = document.getElementById('featured_image');
+            if (featuredImageInput) {
+                featuredImageInput.addEventListener('change', calculateSeoScore);
+            }
+
+            // Watch for tag selection changes
+            const tagCheckboxes = document.querySelectorAll('input[name="tags[]"]');
+            tagCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', calculateSeoScore);
+            });
+        }
+
+        // Debounce function to prevent excessive calculations
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
         // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize SEO calculation
-            setTimeout(() => {
-                bindSeoCalculation();
-                calculateSeoScore();
-            }, 1000); // Wait for TinyMCE to load
+            // setTimeout(() => {
+            //     bindSeoCalculation();
+            //     calculateSeoScore();
+            // }, 1000);
+
+            const initSeo = () => {
+                if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
+                    bindSeoCalculation();
+                    calculateSeoScore();
+                } else {
+                    setTimeout(initSeo, 500);
+                }
+            };
+
+            initSeo();
 
             // Initialize tooltips
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

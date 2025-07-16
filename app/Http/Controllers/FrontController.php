@@ -95,7 +95,7 @@ class FrontController extends Controller
         // Paginate results
         $articles = $query->paginate(9);
 
-        return view('landing.artikel.index', [
+        return view('landing.artikel.indexv2', [
             'articles' => $articles,
             'featuredArticles' => $featuredArticles,
             'popularArticles' => $popularArticles,
@@ -134,7 +134,7 @@ class FrontController extends Controller
         // Update SEO score
         $article->updateSeoScore();
 
-        return view('landing.artikel.show', [
+        return view('landing.artikel.showv2', [
             'article' => $article,
             'popularArticles' => $popularArticles,
         ]);

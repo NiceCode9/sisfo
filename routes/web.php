@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\KomentarController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
+use App\Models\Artikel;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['guest']], function () {
@@ -17,6 +19,7 @@ Route::group(['middleware' => ['guest']], function () {
         Route::prefix('/artikel')->group(function () {
             Route::get('/', 'artikel')->name('artikel.index');
             Route::get('/{artikel}', 'showArtikel')->name('artikel.read');
+            Route::post('/{artikel}/komentar', 'storeComment')->name('artikel.comment.store');
         });
     });
 
@@ -113,11 +116,27 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::get('riwayat-kelas', [\App\Http\Controllers\RiwayatKelasController::class, 'index'])->name('riwayat-kelas.index');
 
-    Route::prefix('artikel')->as('artikel.')->group(function () {
+    Route::prefix('/manage-artikel')->as('artikel.')->group(function () {
         Route::resource('kategori', KategoriController::class);
         Route::resource('tags', TagController::class);
         Route::resource('artikel', ArtikelController::class);
         Route::put('/artikel/{artikel}/toogle-status', [ArtikelController::class, 'toggleStatus'])->name('artikel.toggle-status');
+        Route::resource('komentar', KomentarController::class);
+
+        Route::get('/{artikel}/komentar', [ArtikelController::class, 'getKomentar'])->name('artikel.get-komentar');
+        // Single comment actions
+        Route::post('/comment/{komentar}/approve', [KomentarController::class, 'approve'])
+            ->name('komentar.approve');
+        Route::post('/comment/{komentar}/reject', [KomentarController::class, 'reject'])
+            ->name('komentar.reject');
+
+        // Bulk comment actions
+        Route::post('/comment/bulk-approve', [KomentarController::class, 'bulkApprove'])
+            ->name('komentar.bulk-approve');
+        Route::post('/comment/bulk-trash', [KomentarController::class, 'bulkReject'])
+            ->name('komentar.bulk-trash');
+        Route::delete('/comment/bulk-delete', [KomentarController::class, 'bulkDelete'])
+            ->name('komentar.bulk-delete');
     });
 });
 

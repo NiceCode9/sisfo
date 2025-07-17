@@ -740,10 +740,12 @@
                         </div>
                     </div>
                     <div class="col-6 animate-fade-in">
-                        <div class="metric-card">
-                            <div class="metric-number">{{ $artikel->comments_count ?? 0 }}</div>
-                            <div class="metric-label">Comments</div>
-                        </div>
+                        <a href="{{ route('artikel.artikel.get-komentar', $artikel->slug) }}">
+                            <div class="metric-card">
+                                <div class="metric-number">{{ $artikel->comments_count ?? 0 }}</div>
+                                <div class="metric-label">Comments</div>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-6 animate-fade-in">
                         <div class="metric-card">
@@ -901,7 +903,7 @@
                     // Create form and submit
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/artikel/artikel/${articleId}/toogle-status`;
+                    form.action = `/manage-artikel/artikel/${articleId}/toogle-status`;
 
                     const csrfToken = document.createElement('input');
                     csrfToken.type = 'hidden';

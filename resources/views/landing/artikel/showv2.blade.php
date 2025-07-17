@@ -626,7 +626,7 @@
                     @endif
 
                     <!-- Comments Section -->
-                    <div class="mt-20" id="comments">
+                    {{-- <div class="mt-20" id="comments">
                         <h3 class="text-2xl font-bold mb-8 text-gray-800">Komentar ({{ $article->comments_count }})</h3>
 
                         @if ($article->approvedComments->count() > 0)
@@ -634,11 +634,11 @@
                                 @foreach ($article->approvedComments as $comment)
                                     <div class="comment-card bg-white rounded-xl shadow-sm p-6">
                                         <div class="flex items-center gap-4 mb-4">
-                                            <img src="{{ $comment->user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->name) }}"
-                                                alt="{{ $comment->user->name }}"
+                                            <img src="{{ 'https://ui-avatars.com/api/?name=' . urlencode($comment->author_name) }}"
+                                                alt="{{ $comment->author_name }}"
                                                 class="w-12 h-12 rounded-full object-cover shadow-sm">
                                             <div>
-                                                <h4 class="font-bold text-gray-800">{{ $comment->user->name }}</h4>
+                                                <h4 class="font-bold text-gray-800">{{ $comment->author_name }}</h4>
                                                 <span
                                                     class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
                                             </div>
@@ -652,7 +652,7 @@
                         @auth
                             <div class="bg-white rounded-xl shadow-sm p-8">
                                 <h4 class="text-lg font-bold mb-6 text-gray-800">Tinggalkan Komentar</h4>
-                                <form action="{{ route('artikel.comment.store', $article->slug) }}" method="POST">
+                                <form action="" method="POST">
                                     @csrf
                                     <div class="mb-6">
                                         <textarea name="content" rows="5"
@@ -674,13 +674,140 @@
                                 </a>
                             </div>
                         @endauth
+                    </div> --}}
+                    <!-- Comments Section -->
+                    {{-- <div class="mt-20" id="comments">
+                        <h3 class="text-2xl font-bold mb-8 text-gray-800">Komentar ({{ $article->comments_count }})</h3>
+
+                        @if ($article->approvedComments->count() > 0)
+                            <div class="space-y-6 mb-10">
+                                @foreach ($article->approvedComments as $comment)
+                                    <div class="comment-card bg-white rounded-xl shadow-sm p-6">
+                                        <div class="flex items-center gap-4 mb-4">
+                                            <img src="{{ 'https://ui-avatars.com/api/?name=' . urlencode($comment->author_name) }}"
+                                                alt="{{ $comment->author_name }}"
+                                                class="w-12 h-12 rounded-full object-cover shadow-sm">
+                                            <div>
+                                                <h4 class="font-bold text-gray-800">{{ $comment->author_name }}</h4>
+                                                <span
+                                                    class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                                @if ($comment->author_website)
+                                                    <a href="{{ $comment->author_website }}" target="_blank"
+                                                        class="text-xs text-primary hover:underline">Website</a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-700">{{ $comment->content }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <div class="bg-white rounded-xl shadow-sm p-8">
+                            <h4 class="text-lg font-bold mb-6 text-gray-800">Tinggalkan Komentar</h4>
+                            <form action="{{ route('artikel.comment.store', $article->slug) }}" method="POST">
+                                @csrf
+                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="author_name"
+                                            class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
+                                        <input type="text" name="author_name" id="author_name" required
+                                            class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
+                                            placeholder="Nama Anda">
+                                    </div>
+                                    <div>
+                                        <label for="author_email"
+                                            class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                        <input type="email" name="author_email" id="author_email" required
+                                            class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
+                                            placeholder="Email Anda">
+                                    </div>
+                                </div>
+                                <div class="mb-6">
+                                    <label for="author_website"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Website (opsional)</label>
+                                    <input type="url" name="author_website" id="author_website"
+                                        class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
+                                        placeholder="https://example.com">
+                                </div>
+                                <div class="mb-6">
+                                    <label for="content"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Komentar</label>
+                                    <textarea name="content" id="content" rows="5" required
+                                        class="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
+                                        placeholder="Tulis komentar Anda..."></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="px-8 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl font-medium transition duration-300 shadow-md hover:shadow-lg">
+                                    Kirim Komentar
+                                </button>
+                            </form>
+                        </div>
+                    </div> --}}
+                    <!-- Comments Section -->
+                    <div class="mt-20" id="comments">
+                        <h3 class="text-2xl font-bold mb-8 text-gray-800">Komentar ({{ $article->comments_count }})</h3>
+
+                        @if ($article->approvedComments->count() > 0)
+                            <div class="space-y-6 mb-10">
+                                @foreach ($article->approvedComments->whereNull('parent_id') as $comment)
+                                    @include('landing.artikel.partials.comment', [
+                                        'comment' => $comment,
+                                        'depth' => 0,
+                                    ])
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <div class="bg-white rounded-xl shadow-sm p-8" id="comment-form">
+                            <h4 class="text-lg font-bold mb-6 text-gray-800">Tinggalkan Komentar</h4>
+                            <form action="{{ route('artikel.comment.store', $article->slug) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="parent_id" id="parent_id" value="">
+
+                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="author_name"
+                                            class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
+                                        <input type="text" name="author_name" id="author_name" required
+                                            class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
+                                            placeholder="Nama Anda">
+                                    </div>
+                                    <div>
+                                        <label for="author_email"
+                                            class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                        <input type="email" name="author_email" id="author_email" required
+                                            class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
+                                            placeholder="Email Anda">
+                                    </div>
+                                </div>
+                                <div class="mb-6">
+                                    <label for="author_website"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Website (opsional)</label>
+                                    <input type="url" name="author_website" id="author_website"
+                                        class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
+                                        placeholder="https://example.com">
+                                </div>
+                                <div class="mb-6">
+                                    <label for="content"
+                                        class="block text-sm font-medium text-gray-700 mb-2">Komentar</label>
+                                    <textarea name="content" id="content" rows="5" required
+                                        class="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
+                                        placeholder="Tulis komentar Anda..."></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="px-8 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl font-medium transition duration-300 shadow-md hover:shadow-lg">
+                                    Kirim Komentar
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Sidebar -->
                 <div class="lg:col-span-3 order-3">
                     <!-- SEO Score Widget -->
-                    <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+                    {{-- <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
                         <h3 class="text-xl font-bold mb-6 text-gray-800">SEO Score</h3>
                         <div class="flex items-center justify-center mb-6">
                             <div class="relative w-36 h-36">
@@ -722,7 +849,7 @@
                                 </ul>
                             </div>
                         @endif
-                    </div>
+                    </div> --}}
 
                     <!-- Popular Articles -->
                     <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
@@ -775,6 +902,20 @@
 
 @push('scripts')
     <script>
+        function setReplyTo(commentId, authorName) {
+            document.getElementById('parent_id').value = commentId;
+            const textarea = document.getElementById('content');
+            textarea.focus();
+            textarea.value = `@${authorName} `;
+            window.location.href = '#comment-form';
+        }
+
+        // Scroll to comment form if there's a reply
+        if (window.location.hash === '#comment-form') {
+            document.getElementById('comments').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
         // Update reading progress bar
         window.onscroll = function() {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;

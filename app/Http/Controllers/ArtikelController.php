@@ -114,7 +114,7 @@ class ArtikelController extends Controller
      */
     public function show(Artikel $artikel)
     {
-        $artikel->load(['category', 'author', 'tags', 'comments.author']);
+        $artikel->load(['category', 'author', 'tags', 'comments']);
         return view('artikel.artikel.show', compact('artikel'));
     }
 
@@ -235,6 +235,32 @@ class ArtikelController extends Controller
             'status' => $newStatus,
             'message' => "Status artikel berhasil diubah menjadi {$newStatus}"
         ]);
+    }
+
+    public function getKomentar(Artikel $artikel, Request $request)
+    {
+        $comments = $artikel->comments();
+
+        if ($request->filled('search')) {
+            $comments->whereAny(
+                [
+                    'content',
+                    'author_name',
+                    'author_email',
+                ],
+                'LIKE',
+                "%" . $request->search . "%"
+            );
+        }
+
+        if ($request->filled('status')) {
+            $comments->where('status', $request->status);
+        }
+
+        $comments->orderBy('created_at', 'DESC');
+        $comments = $comments->get();
+
+        return view('artikel.artikel.show_komentar', compact('comments'));
     }
 
     private function updateSitemap(Artikel $artikel)

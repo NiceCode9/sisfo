@@ -1949,69 +1949,69 @@
         // ====================
 
         // Debounce function
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
+        // function debounce(func, wait) {
+        //     let timeout;
+        //     return function executedFunction(...args) {
+        //         const later = () => {
+        //             clearTimeout(timeout);
+        //             func(...args);
+        //         };
+        //         clearTimeout(timeout);
+        //         timeout = setTimeout(later, wait);
+        //     };
+        // }
 
-        // Throttle function
-        function throttle(func, limit) {
-            let inThrottle;
-            return function() {
-                const args = arguments;
-                const context = this;
-                if (!inThrottle) {
-                    func.apply(context, args);
-                    inThrottle = true;
-                    setTimeout(() => inThrottle = false, limit);
-                }
-            }
-        }
+        // // Throttle function
+        // function throttle(func, limit) {
+        //     let inThrottle;
+        //     return function() {
+        //         const args = arguments;
+        //         const context = this;
+        //         if (!inThrottle) {
+        //             func.apply(context, args);
+        //             inThrottle = true;
+        //             setTimeout(() => inThrottle = false, limit);
+        //         }
+        //     }
+        // }
 
-        // Format number function
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return num.toString();
-        }
+        // // Format number function
+        // function formatNumber(num) {
+        //     if (num >= 1000000) {
+        //         return (num / 1000000).toFixed(1) + 'M';
+        //     } else if (num >= 1000) {
+        //         return (num / 1000).toFixed(1) + 'K';
+        //     }
+        //     return num.toString();
+        // }
 
-        // Smooth scroll to element
-        function scrollToElement(element, offset = 0) {
-            const elementPosition = element.offsetTop - offset;
-            window.scrollTo({
-                top: elementPosition,
-                behavior: 'smooth'
-            });
-        }
+        // // Smooth scroll to element
+        // function scrollToElement(element, offset = 0) {
+        //     const elementPosition = element.offsetTop - offset;
+        //     window.scrollTo({
+        //         top: elementPosition,
+        //         behavior: 'smooth'
+        //     });
+        // }
 
-        // Create ripple effect
-        function createRipple(event) {
-            const button = event.currentTarget;
-            const circle = document.createElement('span');
-            const diameter = Math.max(button.clientWidth, button.clientHeight);
-            const radius = diameter / 2;
+        // // Create ripple effect
+        // function createRipple(event) {
+        //     const button = event.currentTarget;
+        //     const circle = document.createElement('span');
+        //     const diameter = Math.max(button.clientWidth, button.clientHeight);
+        //     const radius = diameter / 2;
 
-            circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
-            circle.classList.add('ripple');
+        //     circle.style.width = circle.style.height = `${diameter}px`;
+        //     circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+        //     circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+        //     circle.classList.add('ripple');
 
-            const ripple = button.getElementsByClassName('ripple')[0];
-            if (ripple) {
-                ripple.remove();
-            }
+        //     const ripple = button.getElementsByClassName('ripple')[0];
+        //     if (ripple) {
+        //         ripple.remove();
+        //     }
 
-            button.appendChild(circle);
-        }
+        //     button.appendChild(circle);
+        // }
     </script>
 @endpush

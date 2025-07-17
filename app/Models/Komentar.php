@@ -33,7 +33,8 @@ class Komentar extends Model
 
     public function replies(): HasMany
     {
-        return $this->hasMany(Komentar::class, 'parent_id');
+        // return $this->hasMany(Komentar::class, 'parent_id');
+        return $this->hasMany(Komentar::class, 'parent_id')->with('replies');
     }
 
     public function scopeApproved($query)

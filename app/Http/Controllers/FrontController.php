@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Artikel;
 use App\Models\Kategori;
+use App\Models\Komentar;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 
@@ -107,10 +108,9 @@ class FrontController extends Controller
     {
         // Get the article with relationships
         $article = Artikel::published()
-            ->with(['category', 'author', 'tags', 'approvedComments.user', 'relatedArticles'])
+            ->with(['category', 'author', 'tags', 'approvedComments', 'relatedArticles'])
             ->where('slug', $slug)
             ->firstOrFail();
-        // dd($article->og_data);
 
         // Increment view count
         $article->incrementViews();
@@ -138,5 +138,37 @@ class FrontController extends Controller
             'article' => $article,
             'popularArticles' => $popularArticles,
         ]);
+    }
+
+    public function storeComment(Request $request, $slug)
+    {
+        $request->validate([
+            'author_name' => 'required|string|max:255',
+            'author_email' => 'required|email|max:255',
+            'author_website' => 'nullable|url|max:255',
+            'content' => 'required|string|min:5|max:1000',
+            'parent_id' => 'nullable|exists:komentar,id' // Tambahkan validasi untuk parent_id
+        ]);
+
+        $article = Artikel::where('slug', $slug)->firstOrFail();
+
+        $comment = new Komentar([
+            'article_id' => $article->id,
+            'parent_id' => $request->parent_id, // Tambahkan parent_id jika ada
+            'author_name' => $request->author_name,
+            'author_email' => $request->author_email,
+            'author_website' => $request->author_website,
+            'content' => $request->content,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+            'status' => 'pending',
+        ]);
+
+        $comment->save();
+
+        // Update comment count on article
+        $article->increment('comments_count');
+
+        return redirect()->to(url()->previous() . '#comments')->with('success', 'Komentar Anda telah berhasil dikirim dan menunggu persetujuan.');
     }
 }

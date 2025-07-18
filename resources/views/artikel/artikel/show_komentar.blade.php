@@ -63,13 +63,13 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <button class="btn btn-outline-success btn-sm me-2" id="bulkApproveBtn">
+                                <button class="btn btn-outline-success btn-sm me-2" id="bulk-approve" disabled>
                                     <i class="fas fa-check-circle"></i> Setujui
                                 </button>
-                                <button class="btn btn-outline-danger btn-sm me-2" id="bulkRejectBtn">
+                                <button class="btn btn-outline-warning btn-sm me-2" id="bulk-reject" disabled>
                                     <i class="fas fa-times-circle"></i> Tolak
                                 </button>
-                                <button class="btn btn-outline-dark btn-sm" id="bulkDeleteBtn">
+                                <button class="btn btn-outline-danger btn-sm" id="bulk-delete" disabled>
                                     <i class="fas fa-trash"></i> Hapus
                                 </button>
                             </div>
@@ -88,7 +88,7 @@
                                 <thead>
                                     <tr>
                                         <th width="50">
-                                            <input type="checkbox" id="selectAll">
+                                            <input type="checkbox" id="select-all">
                                         </th>
                                         <th>Komentar</th>
                                         <th>Artikel</th>
@@ -158,7 +158,7 @@
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     @endif
-                                                    @if ($comment->status !== 'rejected')
+                                                    @if ($comment->status !== 'trash')
                                                         <button class="btn btn-sm btn-outline-warning reject-btn"
                                                             data-id="{{ $comment->id }}" title="Tolak">
                                                             <i class="fas fa-times"></i>
@@ -284,9 +284,84 @@
             });
 
             // Select all checkbox
-            $('#selectAll').change(function() {
-                $('.comment-checkbox').prop('checked', $(this).prop('checked'));
+            $('#select-all').change(function() {
+                $('.comment-checkbox').prop('checked', $(this).is(':checked'));
+                toggleBulkButtons();
             });
+
+            $('.comment-checkbox').change(function() {
+                toggleBulkButtons();
+                updateSelectAllCheckbox();
+            });
+
+            function toggleBulkButtons() {
+                const checkedCount = $('.comment-checkbox:checked').length;
+                $('#bulk-approve, #bulk-reject, #bulk-delete').prop('disabled', checkedCount === 0);
+            }
+
+            function updateSelectAllCheckbox() {
+                $('#select-all').prop('checked',
+                    $('.comment-checkbox:checked').length === $('.comment-checkbox').length
+                );
+            }
+
+            // Handle bulk action
+            function bulkAction(action) {
+                const selectedIds = $('.comment-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                console.log(action)
+
+                if (selectedIds.length === 0) return;
+
+                const actionMap = {
+                    'approve': {
+                        url: '/manage-artikel/comment/bulk-approve',
+                        confirmMsg: 'Apakah Anda yakin ingin menyetujui komentar yang dipilih?',
+                        successMsg: 'Komentar berhasil disetujui.'
+                    },
+                    'trash': {
+                        url: '/manage-artikel/comment/bulk-trash',
+                        confirmMsg: 'Apakah Anda yakin ingin menolak komentar yang dipilih?',
+                        successMsg: 'Komentar berhasil ditolak.'
+                    },
+                    'delete': {
+                        url: '/manage-artikel/comment/bulk-delete',
+                        confirmMsg: 'Apakah Anda yakin ingin menghapus komentar yang dipilih?',
+                        successMsg: 'Komentar berhasil dihapus.',
+                        method: 'DELETE'
+                    }
+                };
+
+                const config = actionMap[action];
+
+                if (action === 'delete' && !confirm(config.confirmMsg)) {
+                    return;
+                }
+
+                $.ajax({
+                    url: config.url,
+                    type: config.method || 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        comment_ids: selectedIds
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            location.reload();
+                            showAlert('success', response.message || config.successMsg);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseJSON.message);
+                        showAlert('error', `Terjadi kesalahan saat melakukan aksi ${action}.`);
+                    }
+                });
+            }
+
+            $('#bulk-approve').click(() => bulkAction('approve'));
+            $('#bulk-reject').click(() => bulkAction('trash'));
+            $('#bulk-delete').click(() => bulkAction('delete'));
 
             // Bulk approve
             $('#bulkApproveBtn').click(function() {
@@ -373,7 +448,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/manage-artikel/komentar/${commentId}/approve`,
+                        url: `/manage-artikel/comment/${commentId}/approve`,
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}'
@@ -406,7 +481,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/artikel/komentar/${commentId}/reject`,
+                        url: `/manage-artikel/comment/${commentId}/reject`,
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}'

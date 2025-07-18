@@ -419,7 +419,6 @@
                                     </span>
                                 </label>
                                 <input type="url" class="form-control" id="canonical_url" name="canonical_url"
-                                    value="{{ old('canonical_url', base_url()) }}"
                                     placeholder="https://example.com/artikel-saya">
                             </div>
 

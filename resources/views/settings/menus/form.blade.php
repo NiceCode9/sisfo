@@ -86,7 +86,7 @@
                                     {{ old('group', $menu->group ?? '') == 'E-Learning' ? 'selected' : '' }}>Module
                                     E-Learning</option>
                                 <option value="Pengaturan"
-                                    {{ old('group', $menu->group ?? '') == 'Pengaturan' ? 'selected' : '' }}>Pengaturan
+                                    {{ old('group', $menu->group ?? '') == 'General' ? 'selected' : '' }}>General
                                 </option>
                             </select>
                             @error('group')

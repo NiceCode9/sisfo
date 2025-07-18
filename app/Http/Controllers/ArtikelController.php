@@ -73,7 +73,8 @@ class ArtikelController extends Controller
             'tags.*' => 'exists:tags,id',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'canonical_url' => 'nullable|url'
+            'meta_keywords' => 'nullable|string',
+            'canonical_url' => 'nullable|url',
         ]);
 
         $data = $request->all();
@@ -146,7 +147,8 @@ class ArtikelController extends Controller
             'tags.*' => 'exists:tags,id',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'canonical_url' => 'nullable|url'
+            'meta_keywords' => 'nullable|string',
+            'canonical_url' => 'nullable|url',
         ]);
 
         DB::beginTransaction();

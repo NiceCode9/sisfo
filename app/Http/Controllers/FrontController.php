@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Artikel;
+use App\Models\GeneralProfile;
 use App\Models\Kategori;
 use App\Models\Komentar;
 use App\Models\TahunAjaran;
@@ -170,5 +171,11 @@ class FrontController extends Controller
         $article->increment('comments_count');
 
         return redirect()->to(url()->previous() . '#comments')->with('success', 'Komentar Anda telah berhasil dikirim dan menunggu persetujuan.');
+    }
+
+    public function about()
+    {
+        $profile = GeneralProfile::firstOrFail();
+        return view('landing.aboutv2', compact('profile'));
     }
 }

@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\ArtikelController;
+use App\Http\Controllers\GeneralProfileController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KomentarController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
-use App\Models\Artikel;
+// use App\Models\Artikel;
+// use App\Models\GeneralProfile;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['guest']], function () {
@@ -21,6 +23,8 @@ Route::group(['middleware' => ['guest']], function () {
             Route::get('/{artikel}', 'showArtikel')->name('artikel.read');
             Route::post('/{artikel}/komentar', 'storeComment')->name('artikel.comment.store');
         });
+
+        Route::get('/about', 'about')->name('about');
     });
 
     Route::post('/pendaftaran', [\App\Http\Controllers\CalonSiswaController::class, 'store'])->name('pendaftaran.store');
@@ -138,6 +142,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::delete('/comment/bulk-delete', [KomentarController::class, 'bulkDelete'])
             ->name('komentar.bulk-delete');
     });
+
+    Route::resource('general-profile', GeneralProfileController::class)->except(['show', 'create', 'edit', 'destroy']);
 });
 
 

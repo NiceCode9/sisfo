@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Artikel;
 use App\Models\GeneralProfile;
+use App\Models\Guru;
 use App\Models\Kategori;
 use App\Models\Komentar;
+use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 
@@ -176,6 +178,12 @@ class FrontController extends Controller
     public function about()
     {
         $profile = GeneralProfile::firstOrFail();
-        return view('landing.aboutv2', compact('profile'));
+        $guruCount = Guru::count();
+        $siswaCount = Siswa::whereHas('riwayatKelas', function ($query) {
+            $query->where('tahun_ajaran_id', TahunAjaran::aktif()->first()->value('id'))->where('status', 'aktif');
+        })->count();
+        dd($siswaCount);
+
+        return view('landing.aboutv2', compact('profile', 'guruCount'));
     }
 }

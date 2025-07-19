@@ -182,7 +182,7 @@
                 const aktif = $(this).data('aktif');
 
                 // Set form action
-                $('#editForm').attr('action', `/admin/jalur-pendaftaran/${id}`);
+                $('#editForm').attr('action', `/jalur-pendaftaran/${id}`);
 
                 // Fill form fields
                 $('#edit_nama_jalur').val(nama);

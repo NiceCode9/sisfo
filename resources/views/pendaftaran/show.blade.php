@@ -658,6 +658,15 @@
                                         <option value="ditolak" class="text-danger">❌ Ditolak</option>
                                     </select>
                                 </div>
+                                <div class="col-12" style="display: none;" id="kelasSelect">
+                                    <label for="kelas_id">Kelas</label>
+                                    <select name="kelas_id" id="kelas_id" class="form-control">
+                                        <option value="">-- Pilih Kelas --</option>
+                                        @foreach ($kelas as $k)
+                                            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="col-12">
                                     <label for="catatan" class="form-label fw-semibold">
                                         <i class="fas fa-comment-alt text-info me-1"></i>Catatan/Alasan
@@ -679,79 +688,9 @@
             @endif
         </div>
     </div>
+@endsection
 
-    <!-- Enhanced JavaScript -->
-    <script>
-        // Function to set biaya ID for payment modal
-        function setBiayaId(biayaId, jumlah, mataUang) {
-            document.getElementById('selected_biaya_id').value = biayaId;
-            document.getElementById('jumlah').value = jumlah;
-            document.getElementById('mata-uang-addon').textContent = mataUang;
-        }
-
-        // Enhanced form validation and UX
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add animation to cards on load
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.3s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
-
-            // Add hover effects to info items
-            const infoItems = document.querySelectorAll('.info-item');
-            infoItems.forEach(item => {
-                item.addEventListener('mouseenter', function() {
-                    this.style.backgroundColor = '#f8f9fa';
-                    this.style.borderRadius = '0.375rem';
-                    this.style.padding = '0.5rem';
-                    this.style.transition = 'all 0.2s ease';
-                });
-                item.addEventListener('mouseleave', function() {
-                    this.style.backgroundColor = 'transparent';
-                    this.style.padding = '0';
-                });
-            });
-
-            // Format currency input
-            const jumlahInput = document.getElementById('jumlah');
-            if (jumlahInput) {
-                jumlahInput.addEventListener('input', function() {
-                    let value = this.value.replace(/\D/g, '');
-                    this.value = value;
-                });
-            }
-
-            // Add confirmation for status update
-            const statusForm = document.querySelector('form[action*="update-status"]');
-            if (statusForm) {
-                statusForm.addEventListener('submit', function(e) {
-                    const status = document.getElementById('status_pendaftaran').value;
-                    const confirmMessage = status === 'diterima' ?
-                        'Apakah Anda yakin ingin MENERIMA pendaftar ini?' :
-                        'Apakah Anda yakin ingin MENOLAK pendaftar ini?';
-
-                    if (!confirm(confirmMessage)) {
-                        e.preventDefault();
-                    }
-                });
-            }
-        });
-
-        // Smooth scroll to unpaid fees when payment button is clicked
-        function scrollToUnpaidFees() {
-            document.querySelector('.unpaid-fees')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest'
-            });
-        }
-    </script>
-
+@push('styles')
     <!-- Custom CSS for enhanced styling -->
     <style>
         .bg-gradient-primary {
@@ -855,4 +794,89 @@
             }
         }
     </style>
-@endsection
+@endpush
+
+@push('scripts')
+    <!-- Enhanced JavaScript -->
+    <script>
+        // Function to set biaya ID for payment modal
+        function setBiayaId(biayaId, jumlah, mataUang) {
+            document.getElementById('selected_biaya_id').value = biayaId;
+            document.getElementById('jumlah').value = jumlah;
+            document.getElementById('mata-uang-addon').textContent = mataUang;
+        }
+
+        // Enhanced form validation and UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation to cards on load
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Add hover effects to info items
+            const infoItems = document.querySelectorAll('.info-item');
+            infoItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#f8f9fa';
+                    this.style.borderRadius = '0.375rem';
+                    this.style.padding = '0.5rem';
+                    this.style.transition = 'all 0.2s ease';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = 'transparent';
+                    this.style.padding = '0';
+                });
+            });
+
+            // Format currency input
+            const jumlahInput = document.getElementById('jumlah');
+            if (jumlahInput) {
+                jumlahInput.addEventListener('input', function() {
+                    let value = this.value.replace(/\D/g, '');
+                    this.value = value;
+                });
+            }
+
+            // Add confirmation for status update
+            const statusForm = document.querySelector('form[action*="update-status"]');
+            if (statusForm) {
+                statusForm.addEventListener('submit', function(e) {
+                    const status = document.getElementById('status_pendaftaran').value;
+                    const confirmMessage = status === 'diterima' ?
+                        'Apakah Anda yakin ingin MENERIMA pendaftar ini?' :
+                        'Apakah Anda yakin ingin MENOLAK pendaftar ini?';
+
+                    if (!confirm(confirmMessage)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+
+        $('#status_pendaftaran').change(function(e) {
+            e.preventDefault();
+
+            let val = $(this).val();
+            if (val == 'diterima') {
+                $('#kelasSelect').show();
+            } else {
+                $('#kelasSelect').hide();
+            }
+        });
+
+        // Smooth scroll to unpaid fees when payment button is clicked
+        function scrollToUnpaidFees() {
+            document.querySelector('.unpaid-fees')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+    </script>
+@endpush

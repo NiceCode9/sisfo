@@ -256,7 +256,7 @@
                 const keterangan = $(this).data('keterangan');
 
                 // Set form action
-                $('#editForm').attr('action', `/admin/jadwal-ppdb/${id}`);
+                $('#editForm').attr('action', `/jadwal-ppdb/${id}`);
 
                 // Fill form fields
                 $('#edit_nama_jadwal').val(nama);

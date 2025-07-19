@@ -55,7 +55,7 @@ class KelasController extends Controller
             $kelas = Kelas::create([
                 'nama_kelas' => $request->nama_kelas,
                 'tingkat' => $request->tingkat,
-                'jurusan' => $request->jurusan,
+                // 'jurusan' => $request->jurusan,
                 'deskripsi' => $request->deskripsi,
             ]);
 
@@ -103,7 +103,7 @@ class KelasController extends Controller
             $kelas->update([
                 'nama_kelas' => $request->nama_kelas,
                 'tingkat' => $request->tingkat,
-                'jurusan' => $request->jurusan,
+                // 'jurusan' => $request->jurusan,
                 'deskripsi' => $request->deskripsi,
             ]);
 

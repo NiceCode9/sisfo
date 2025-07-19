@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CalonSiswa;
+use App\Models\Kelas;
+use App\Models\RiwayatKelas;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -133,6 +135,7 @@ class CalonSiswaController extends Controller
      */
     public function show($id)
     {
+        $kelas = Kelas::orderBy('tingkat', 'asc')->get();
         $calonSiswa = CalonSiswa::with([
             'berkasCalonSiswa',
             'jalurPendaftaran',
@@ -140,7 +143,7 @@ class CalonSiswaController extends Controller
             'tahunAjaran.biayaPendaftaran',
             'pembayaran.biayaPendaftaran',
         ])->findOrFail($id);
-        return view('pendaftaran.show', compact('calonSiswa'));
+        return view('pendaftaran.show', compact('calonSiswa', 'kelas'));
     }
 
     /**
@@ -182,6 +185,21 @@ class CalonSiswaController extends Controller
                 'terisi' => $jalurPendaftaran->kuotaPendaftaran->terisi + 1,
             ]);
 
+            $siswa = $calonSiswa->siswa()->create([
+                'tahun_ajaran_id' => $calonSiswa->tahun_ajaran_id,
+                'nis' => $calonSiswa->nisn,
+                'nisn' => $calonSiswa->nisn,
+                'kelas_awal' => $request->kelas_id,
+            ]);
+
+            RiwayatKelas::create([
+                'siswa_id' => $siswa->id,
+                'kelas_id' => $request->kelas_id,
+                'tahun_ajaran_id' => $calonSiswa->tahun_ajaran_id,
+                'status' => 'aktif',
+                'keterangan' => 'Siswa baru diterima',
+            ]);
+
             $calonSiswa->logStatusPendaftaran()->create([
                 'status_sebelumnya' => $calonSiswa->status_pendaftaran,
                 'status_baru' => $request->status_pendaftaran,
@@ -204,6 +222,7 @@ class CalonSiswaController extends Controller
                 ->with('success', 'Status pendaftaran berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
+            dd($e);
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }

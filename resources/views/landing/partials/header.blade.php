@@ -4,9 +4,10 @@
             <div class="flex-shrink-0 flex items-center">
                 <div
                     class="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-md">
-                    HB
+                    <img src="{{ $profileSekolah ? asset('storage/' . $profileSekolah->logo) : '' }}" alt="">
                 </div>
-                <span class="ml-3 text-xl font-bold text-gray-800">SMP Harapan Bangsa</span>
+                <span
+                    class="ml-3 text-xl font-bold text-gray-800">{{ $profileSekolah->nama_sekolah ?? 'SMP Harapan Bangsa' }}</span>
             </div>
 
             <div class="hidden md:block">

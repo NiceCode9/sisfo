@@ -47,7 +47,6 @@
                             <th>#</th>
                             <th>Nama Kelas</th>
                             <th>Tingkat</th>
-                            <th>Jurusan</th>
                             <th>Deskripsi</th>
                             <th>Aksi</th>
                         </tr>
@@ -77,15 +76,15 @@
                             <label for="tingkat" class="form-label">Tingkat</label>
                             <select class="form-select" id="tingkat" name="tingkat" required>
                                 <option value="">Pilih Tingkat</option>
-                                <option value="X">X (Sepuluh)</option>
-                                <option value="XI">XI (Sebelas)</option>
-                                <option value="XII">XII (Dua Belas)</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
                             </select>
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label for="jurusan" class="form-label">Jurusan</label>
                             <input type="text" class="form-control" id="jurusan" name="jurusan" required>
-                        </div>
+                        </div> --}}
                         <div class="mb-3">
                             <label for="deskripsi" class="form-label">Deskripsi</label>
                             <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3"></textarea>
@@ -122,10 +121,6 @@
                     {
                         data: 'tingkat',
                         name: 'tingkat'
-                    },
-                    {
-                        data: 'jurusan',
-                        name: 'jurusan'
                     },
                     {
                         data: 'deskripsi',
@@ -179,7 +174,6 @@
                     $('#kelas_id').val(data.id);
                     $('#nama_kelas').val(data.nama_kelas);
                     $('#tingkat').val(data.tingkat);
-                    $('#jurusan').val(data.jurusan);
                     $('#deskripsi').val(data.deskripsi);
                     $('#createKelasModal').modal('show');
                 });

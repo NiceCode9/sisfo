@@ -36,6 +36,11 @@ class TahunAjaranController extends Controller
             'status_aktif' => 'required|boolean',
         ]);
 
+        if ($request->status_aktif == true) {
+            TahunAjaran::where('status_aktif', true)
+                ->update(['status_aktif' => false]);
+        }
+
         TahunAjaran::create($request->all());
 
         return redirect()->route('tahun-ajaran.index')->with('success', 'Tahun Ajaran berhasil ditambahkan.');
@@ -69,7 +74,6 @@ class TahunAjaranController extends Controller
             'status_aktif' => 'required|boolean',
         ]);
 
-        // Jika status diubah menjadi aktif, nonaktifkan semua tahun ajaran lain
         if ($request->status_aktif == true) {
             TahunAjaran::where('id', '!=', $tahunAjaran->id)
                 ->update(['status_aktif' => false]);

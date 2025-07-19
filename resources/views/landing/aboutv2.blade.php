@@ -136,7 +136,7 @@
                         </div>
                         <div
                             class="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 text-white p-8 rounded-2xl hover:scale-105 transition-transform duration-300 shadow-2xl">
-                            <div class="text-4xl font-bold mb-2">30+</div>
+                            <div class="text-4xl font-bold mb-2">{{ $guruCount }}</div>
                             <div class="text-sm opacity-90">Tenaga Pengajar</div>
                             <div class="mt-4 opacity-60">
                                 <i class="fas fa-chalkboard-teacher text-2xl"></i>

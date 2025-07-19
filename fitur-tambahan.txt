@@ -1,0 +1,11 @@
+FITUR YANG SUDAH DI CEK :
+- Data master ppdb
+
+
+
+
+
+KEKURANGAN DAN OPSI TAMBAHAN FITUR :
+- Ubah menjadi datatable untuk halaman index Calon Siswa
+- fitur pengumuman belum ada
+- membuat fitur akuntan yang berguna untuk management pembayaran dalam satu menu tanpa harus membuka atau masuk ke menu siswa terlebih dahuly

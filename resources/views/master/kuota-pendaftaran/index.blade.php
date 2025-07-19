@@ -207,7 +207,7 @@
             $('.edit-btn').on('click', function() {
                 const id = $(this).data('id');
                 $.ajax({
-                    url: `/admin/kuota-pendaftaran/${id}`,
+                    url: `/kuota-pendaftaran/${id}`,
                     type: "GET",
                     success: function(response) {
                         if (response.success) {
@@ -231,7 +231,7 @@
                 const formData = new FormData(this);
 
                 $.ajax({
-                    url: `/admin/kuota-pendaftaran/${id}`,
+                    url: `/kuota-pendaftaran/${id}`,
                     type: "POST",
                     data: formData,
                     processData: false,
@@ -275,7 +275,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/kuota-pendaftaran/${id}`,
+                            url: `/kuota-pendaftaran/${id}`,
                             type: "DELETE",
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

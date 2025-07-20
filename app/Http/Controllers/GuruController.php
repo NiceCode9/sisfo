@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class GuruController extends Controller
@@ -34,10 +35,20 @@ class GuruController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            // Handle file upload
+            $fotoPath = null;
+            if ($request->hasFile('foto_path')) {
+                $fotoPath = $request->file('foto_path')->store('guru_fotos', 'public');
+            }
+
             $guru = Guru::create([
                 'nip' => $request->nip,
                 'biografi' => $request->biografi,
                 'bidang_keahlian' => $request->bidang_keahlian,
+                'gelar' => $request->gelar,
+                'telp' => $request->telp,
+                'foto_path' => $fotoPath,
             ]);
 
             $user = User::create([
@@ -49,7 +60,6 @@ class GuruController extends Controller
             ]);
 
             $user->assignRole('guru');
-
 
             DB::commit();
 
@@ -92,11 +102,25 @@ class GuruController extends Controller
             DB::beginTransaction();
 
             $guru = Guru::findOrFail($id);
-            $guru->update([
+
+            $data = [
                 'nip' => $request->nip,
                 'biografi' => $request->biografi,
                 'bidang_keahlian' => $request->bidang_keahlian,
-            ]);
+                'gelar' => $request->gelar,
+                'telp' => $request->telp,
+            ];
+
+            // Handle file upload if new file is provided
+            if ($request->hasFile('foto_path')) {
+                // Delete old file if exists
+                if ($guru->foto_path) {
+                    Storage::disk('public')->delete($guru->foto_path);
+                }
+                $data['foto_path'] = $request->file('foto_path')->store('guru_fotos', 'public');
+            }
+
+            $guru->update($data);
 
             $guru->user->update([
                 'name' => $request->nama,
@@ -128,6 +152,12 @@ class GuruController extends Controller
             DB::beginTransaction();
 
             $guru = Guru::findOrFail($id);
+
+            // Delete foto if exists
+            if ($guru->foto_path) {
+                Storage::disk('public')->delete($guru->foto_path);
+            }
+
             $guru->user->delete();
             $guru->delete();
 

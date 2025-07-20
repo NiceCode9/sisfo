@@ -36,10 +36,10 @@ class SiswaController extends Controller
                 return $row->calonSiswa->tahunAjaran ? $row->calonSiswa->tahunAjaran->nama_tahun_ajaran : 'Tidak diketahui';
             })
             ->addColumn('kelas_awal', function ($row) {
-                return $row->kelas_awal;
+                return $row->kelasAwal->tingkat . '-' . $row->kelasAwal->nama_kelas;
             })
             ->addColumn('current_class', function ($row) {
-                return $row->kelasAktif() ? $row->kelasAktif()->kelas->nama_kelas : 'Belum ada kelas';
+                return $row->kelasAktif() ? $row->kelasAktif()->kelas->tingkat . '-' . $row->kelasAktif()->kelas->nama_kelas : 'Belum ada kelas';
             })
             ->addColumn('status', function ($row) {
                 $status = $row->kelasAktif() ? $row->kelasAktif()->status : 'Belum Ada Kelas';

@@ -6,6 +6,14 @@ FITUR YANG SUDAH DI CEK :
 
 
 KEKURANGAN DAN OPSI TAMBAHAN FITUR :
+(PPDB)
 - Ubah menjadi datatable untuk halaman index Calon Siswa
+- Halaman Show ppdb tambahkan riwayat pendaftaran dan jika diterima ada pemberitahuan di tempatkan di kelas apa
+
+(DATA MASTER)
+- proses edit delete di master siswa belum
+- layout form di data master guru
+
+(OPSI TAMBAHAN)
 - fitur pengumuman belum ada
 - membuat fitur akuntan yang berguna untuk management pembayaran dalam satu menu tanpa harus membuka atau masuk ke menu siswa terlebih dahuly

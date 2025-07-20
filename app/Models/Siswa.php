@@ -34,6 +34,11 @@ class Siswa extends Model
         return $this->hasOne(User::class);
     }
 
+    public function kelasAwal()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_awal');
+    }
+
     public function riwayatKelas(): HasMany
     {
         return $this->hasMany(RiwayatKelas::class, 'siswa_id');

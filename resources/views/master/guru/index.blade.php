@@ -71,10 +71,14 @@
                     <h5 class="modal-title" id="modalTitle">Tambah Data Guru</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="guruForm">
+                <form id="guruForm" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" id="guru_id">
                     <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="foto_path" class="form-label">Foto</label>
+                            <input type="file" class="form-control" id="foto_path" name="foto_path" required>
+                        </div>
                         <div class="mb-3">
                             <label for="nip" class="form-label">NIP</label>
                             <input type="text" class="form-control" id="nip" name="nip" required>
@@ -84,16 +88,29 @@
                             <input type="text" class="form-control" id="nama" name="nama" required>
                         </div>
                         <div class="mb-3">
+                            <label for="gelar" class="form-label">Gelar</label>
+                            <input type="text" class="form-control" id="gelar" name="gelar" required>
+                        </div>
+                        <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
                         <div class="mb-3">
+                            <label for="telp" class="form-label">Telp</label>
+                            <input type="email" class="form-control" id="telp" name="telp" required>
+                        </div>
+                        <div class="mb-3">
                             <label for="bidang_keahlian" class="form-label">Bidang Keahlian</label>
-                            <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian" required>
+                            <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label for="biografi" class="form-label">Biografi</label>
                             <textarea class="form-control" id="biografi" name="biografi" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="alamat" class="form-label">Alamat</label>
+                            <textarea class="form-control" id="alamat" name="alamat" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -157,13 +174,17 @@
             $('#guruForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#guru_id').val();
-                let url = id ? `/admin/guru/${id}` : '/admin/guru';
+                let url = id ? `/guru/${id}` : '/guru';
                 let method = id ? 'PUT' : 'POST';
+
+                let formData = new FormData(this);
 
                 $.ajax({
                     url: url,
                     method: method,
-                    data: $(this).serialize(),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     success: function(response) {
                         $('#createGuruModal').modal('hide');
                         table.ajax.reload();
@@ -188,13 +209,16 @@
                 let id = $(this).data('id');
                 $('#modalTitle').text('Edit Data Guru');
 
-                $.get(`/admin/guru/${id}`, function(data) {
+                $.get(`/guru/${id}`, function(data) {
                     $('#guru_id').val(data.id);
                     $('#nip').val(data.nip);
                     $('#nama').val(data.user.name);
                     $('#email').val(data.user.email);
+                    $('#gelar').val(data.gelar);
+                    $('#telp').val(data.telp);
                     $('#bidang_keahlian').val(data.bidang_keahlian);
                     $('#biografi').val(data.biografi);
+                    $('#alamat').val(data.alamat);
                     $('#createGuruModal').modal('show');
                 });
             });
@@ -213,7 +237,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/guru/${id}`,
+                            url: `/guru/${id}`,
                             method: 'DELETE',
                             data: {
                                 _token: '{{ csrf_token() }}'

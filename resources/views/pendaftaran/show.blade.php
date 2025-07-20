@@ -663,7 +663,8 @@
                                     <select name="kelas_id" id="kelas_id" class="form-control">
                                         <option value="">-- Pilih Kelas --</option>
                                         @foreach ($kelas as $k)
-                                            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                                            <option value="{{ $k->id }}">{{ $k->tingkat . '-' . $k->nama_kelas }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>

@@ -22,7 +22,7 @@ class PengumpulanTugasController extends Controller
                 $query->whereHas('user', function ($q) use ($user) {
                     $q->where('id', $user->id);
                 });
-            })->with(['tugas', 'siswa'])->paginate(10);
+            })->with(['tugas', 'siswa.riwayatKelas', 'tugas.guruKelas.guruMataPelajaran'])->paginate(10);
         } else {
             $pengumpulan = PengumpulanTugas::where('siswa_id', $user->siswa->id)
                 ->with(['tugas'])->paginate(10);

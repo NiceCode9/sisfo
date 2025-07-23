@@ -65,4 +65,9 @@ class TahunAjaran extends Model
     {
         return $query->where('status_aktif', true);
     }
+
+    public function tugas(): HasMany
+    {
+        return $this->hasMany(Tugas::class);
+    }
 }

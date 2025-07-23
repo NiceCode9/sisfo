@@ -59,7 +59,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="info-box">
-                                    <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
+                                    <span class="info-box-icon bg-"><i class="fas fa-users"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Total Siswa</span>
                                         <span class="info-box-number">{{ $jumlahSiswa }}</span>
@@ -200,7 +200,7 @@
                         searchable: false
                     },
                     {
-                        data: 'nama_siswa',
+                        data: 'user.name',
                         name: 'user.name'
                     },
                     {

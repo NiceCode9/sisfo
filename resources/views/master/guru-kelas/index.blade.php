@@ -306,7 +306,7 @@
             $('#guruKelasForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#guru_kelas_id').val();
-                let url = id ? `/admin/guru-kelas/${id}` : '/admin/guru-kelas';
+                let url = id ? `/guru-kelas/${id}` : '/guru-kelas';
                 let method = id ? 'PUT' : 'POST';
 
                 $.ajax({
@@ -346,7 +346,7 @@
                 let id = $(this).data('id');
                 $('#modalTitle').text('Edit Data Guru Kelas');
 
-                $.get(`/admin/guru-kelas/${id}`, function(data) {
+                $.get(`/guru-kelas/${id}`, function(data) {
                     $('#guru_kelas_id').val(data.id);
                     $('#guru_mata_pelajaran_id').val(data.guru_mata_pelajaran_id);
                     $('#kelas_id').val(data.kelas_id);
@@ -371,7 +371,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/guru-kelas/${id}`,
+                            url: `/guru-kelas/${id}`,
                             method: 'DELETE',
                             data: {
                                 _token: '{{ csrf_token() }}'

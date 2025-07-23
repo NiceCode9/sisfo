@@ -77,9 +77,7 @@ class TugasController extends Controller
 
             // Filter tahun ajaran
             if ($request->filled('tahun_ajaran_id')) {
-                $query->whereHas('guruKelas', function ($q) use ($request) {
-                    $q->where('tahun_ajaran_id', $request->tahun_ajaran_id);
-                });
+                $query->where('tahun_ajaran_id', $request->tahun_ajaran_id);
             }
 
             // Filter kelas
@@ -108,7 +106,7 @@ class TugasController extends Controller
                     return $tugas->guruKelas->guruMataPelajaran->guru->user->name;
                 })
                 ->addColumn('jenis', function ($tugas) {
-                    return '<span class="badge bg-info">' . ucfirst(str_replace('_', ' ', $tugas->jenis)) . '</span>';
+                    return ucfirst(str_replace('_', ' ', $tugas->jenis));
                 })
                 ->addColumn('metode_pengerjaan', function ($tugas) {
                     $class = $tugas->metode_pengerjaan === 'online' ? 'bg-primary' : 'bg-success';
@@ -151,7 +149,8 @@ class TugasController extends Controller
                         $statusClass = $total === $dinilai ? 'bg-success' : 'bg-info';
                     }
 
-                    return '<span class="badge ' . $statusClass . '">' . $status . '</span>';
+                    // return '<span class="badge ' . $statusClass . '">' . $status . '</span>';
+                    return $status;
                 })
                 ->addColumn('action', function ($tugas) use ($user) {
                     $html = '<div class="btn-group">';
@@ -234,6 +233,7 @@ class TugasController extends Controller
             $tugas->file_tugas = $path;
         }
 
+        $tugas->tahun_ajaran_id = TahunAjaran::aktif()->first()->id;
         $tugas->save();
 
         if ($tugas->metode_pengerjaan === 'online') {
@@ -391,9 +391,9 @@ class TugasController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->addColumn('nama_siswa', function ($siswa) {
-                    return $siswa->user->name;
-                })
+                // ->addColumn('nama_siswa', function ($siswa) {
+                //     return $siswa->user->name;
+                // })
                 ->addColumn('kelas', function ($siswa) {
                     return $siswa->riwayatKelas()
                         ->where('tahun_ajaran_id', TahunAjaran::aktif()->first()->id)

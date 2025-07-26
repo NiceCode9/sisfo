@@ -810,7 +810,7 @@
                                                 <div class="answer-text">{{ $jawaban->soal->pertanyaan }}</div>
                                             </div>
 
-                                            @if ($jawaban->soal->jenis_soal === 'uraian')
+                                            @if ($jawaban->soal->jenis_soal == 'uraian')
                                                 <div class="answer-container">
                                                     <h6 class="mb-3">
                                                         <i class="fas fa-pencil-alt me-2"></i>
@@ -835,7 +835,7 @@
                                                     </div>
                                                 </div>
                                             @else
-                                                <div class="answer-container">
+                                                <div class="answer-container mb-5">
                                                     <h6 class="mb-3">
                                                         <i class="fas fa-check-circle me-2"></i>
                                                         Jawaban Siswa
@@ -848,11 +848,26 @@
                                                             </div>
                                                             <div>
                                                                 <strong>
-                                                                    {{ $jawaban->jawaban->teks_jawaban }} ({{ $jawaban->jawaban->jawaban_benar ? 'Benar' : 'Salah' }})
+                                                                    {{ $jawaban->jawaban->teks_jawaban }}
+                                                                    ({{ $jawaban->jawaban->jawaban_benar ? 'Benar' : 'Salah' }})
                                                                 </strong>
                                                             </div>
                                                         </div>
                                                     </div>
+                                            @endif
+
+                                            @if ($jawaban->soal->jenis_soal === 'uraian' && auth()->user()->hasRole('guru'))
+                                                <div class="grading-input">
+                                                    <label>Nilai (0-100)</label>
+                                                    <input type="number" class="form-control mb-2"
+                                                        data-jawaban-id="{{ $jawaban->id }}"
+                                                        value="{{ $jawaban->poin_diperoleh ?? 0 }}" min="0"
+                                                        max="100">
+                                                    <button class="btn btn-sm btn-primary save-grade"
+                                                        data-jawaban-id="{{ $jawaban->id }}">
+                                                        Simpan Nilai
+                                                    </button>
+                                                </div>
                                             @endif
                                         </div>
                                     </div>
@@ -863,63 +878,31 @@
                 @endif
 
                 <!-- Grading Section -->
-                @if (auth()->user()->hasRole('guru'))
+                @if (auth()->user()->hasRole('guru') &&
+                        $pengumpulanTuga->metode_pengerjaan === 'upload_file' &&
+                        is_null($pengumpulanTuga->nilai))
                     <div class="grading-section">
                         <h5>
                             <i class="fas fa-star me-2"></i>
                             Penilaian Tugas
                         </h5>
 
-                        <form action="{{ route('pengumpulan-tugas.grade', $pengumpulanTuga->id) }}" method="POST">
+                        <form id="gradeForm" action="{{ route('tugas.grade') }}" method="POST">
                             @csrf
-                            @method('PUT')
+                            <input type="hidden" name="pengumpulan_id" value="{{ $pengumpulanTuga->id }}">
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="nilai" class="form-label text-white">
-                                        <i class="fas fa-award me-2"></i>
-                                        Nilai (0-100)
-                                    </label>
-                                    <input type="number" class="form-control form-control-modern" id="nilai"
-                                        name="nilai" min="0" max="100"
-                                        value="{{ old('nilai', $pengumpulanTuga->nilai) }}" required>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="status" class="form-label text-white">
-                                        <i class="fas fa-clipboard-check me-2"></i>
-                                        Status
-                                    </label>
-                                    <select class="form-control form-control-modern" id="status" name="status"
-                                        required>
-                                        <option value="">Pilih Status</option>
-                                        <option value="dinilai"
-                                            {{ $pengumpulanTuga->status === 'dinilai' ? 'selected' : '' }}>
-                                            Dinilai
-                                        </option>
-                                        <option value="perlu_revisi"
-                                            {{ $pengumpulanTuga->status === 'perlu_revisi' ? 'selected' : '' }}>
-                                            Perlu Revisi
-                                        </option>
-                                    </select>
-                                </div>
+                            <div class="mb-3">
+                                <label for="nilai" class="form-label">Nilai (0-100)</label>
+                                <input type="number" class="form-control" id="nilai" name="nilai" min="0"
+                                    max="100" value="{{ $pengumpulanTuga->nilai }}" required>
                             </div>
 
-                            <div class="mb-4">
-                                <label for="feedback" class="form-label text-white">
-                                    <i class="fas fa-comment-alt me-2"></i>
-                                    Feedback untuk Siswa
-                                </label>
-                                <textarea class="form-control form-control-modern" id="feedback" name="feedback" rows="4"
-                                    placeholder="Berikan feedback yang konstruktif untuk siswa...">{{ old('feedback', $pengumpulanTuga->feedback) }}</textarea>
+                            <div class="mb-3">
+                                <label for="komentar" class="form-label">Komentar</label>
+                                <textarea class="form-control" id="komentar" name="komentar" rows="3">{{ $pengumpulanTuga->umpan_balik }}</textarea>
                             </div>
 
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-modern">
-                                    <i class="fas fa-save me-2"></i>
-                                    Simpan Penilaian
-                                </button>
-                            </div>
+                            <button type="submit" class="btn btn-primary">Simpan Nilai</button>
                         </form>
                     </div>
                 @endif
@@ -965,14 +948,17 @@
 
                                 <div class="col-md-4 mb-3">
                                     <div class="score-display">
-                                        <div class="h4 mb-0">
-                                            @if ($pengumpulanTuga->status === 'dinilai')
+                                        <div class="mb-0">
+                                            {{-- @if ($pengumpulanTuga->status === 'dinilai')
                                                 <i class="fas fa-check-circle text-success"></i>
                                                 <div class="mt-2">Selesai</div>
                                             @else
                                                 <i class="fas fa-redo text-warning"></i>
                                                 <div class="mt-2">Revisi</div>
-                                            @endif
+                                            @endif --}}
+                                            <i class="fas fa-comment-dots text-info"></i>
+                                            <div class="mt-2 text-black">
+                                                {{ $pengumpulanTuga->umpan_balik ?? 'Tidak ada feedback.' }}</div>
                                         </div>
                                     </div>
                                 </div>

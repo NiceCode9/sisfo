@@ -8,7 +8,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Daftar Pengumpulan Tugas</h3>
+                        <h3 class="card-title">Daftar Riwayat Pengumpulan Tugas</h3>
                     </div>
                     <div class="card-body">
                         @if (auth()->user()->hasRole('siswa'))
@@ -43,8 +43,9 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        @if (auth()->user()->hasRole('guru'))
+                                        @if (!auth()->user()->hasRole('siswa'))
                                             <th>Siswa</th>
+                                            <th>Kelas</th>
                                         @endif
                                         <th>Tugas</th>
                                         <th>Mata Pelajaran</th>
@@ -60,6 +61,13 @@
                                             <td>{{ $loop->iteration }}</td>
                                             @if (auth()->user()->hasRole('guru'))
                                                 <td>{{ $p->siswa->user->name }}</td>
+                                                @php
+                                                    $kelas = $p->siswa
+                                                        ->riwayatKelas()
+                                                        ->where('tahun_ajaran_id', $p->tugas->tahun_ajaran_id)
+                                                        ->first();
+                                                @endphp
+                                                <td>{{ $kelas->nama_kelas ?? '' }}</td>
                                             @endif
                                             <td>{{ $p->tugas->judul }}</td>
                                             <td>{{ $p->tugas->guruKelas->guruMataPelajaran->mataPelajaran->nama_pelajaran }}

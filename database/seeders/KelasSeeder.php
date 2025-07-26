@@ -12,22 +12,19 @@ class KelasSeeder extends Seeder
     {
         $kelasData = [
             [
-                'nama_kelas' => 'X IPA 1',
-                'tingkat' => 10,
-                'jurusan' => 'IPA',
-                'deskripsi' => 'Kelas X IPA 1 untuk siswa tingkat pertama jurusan IPA',
+                'nama_kelas' => 'A',
+                'tingkat' => 7,
+                'deskripsi' => 'Kelas 7 A untuk siswa tingkat pertama',
             ],
             [
-                'nama_kelas' => 'X IPA 2',
-                'tingkat' => 10,
-                'jurusan' => 'IPA',
-                'deskripsi' => 'Kelas X IPA 2 untuk siswa tingkat pertama jurusan IPA',
+                'nama_kelas' => 'B',
+                'tingkat' => 7,
+                'deskripsi' => 'Kelas X IPA 2 untuk siswa tingkat pertama',
             ],
             [
-                'nama_kelas' => 'X IPS 1',
-                'tingkat' => 10,
-                'jurusan' => 'IPS',
-                'deskripsi' => 'Kelas X IPS 1 untuk siswa tingkat pertama jurusan IPS',
+                'nama_kelas' => 'C',
+                'tingkat' => 7,
+                'deskripsi' => 'Kelas X IPS 1 untuk siswa tingkat pertama',
             ],
             [
                 'nama_kelas' => 'XI IPA 1',

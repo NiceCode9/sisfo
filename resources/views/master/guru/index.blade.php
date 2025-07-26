@@ -65,7 +65,7 @@
     <!-- Modal Create/Edit -->
     <div class="modal fade" id="createGuruModal" tabindex="-1" role="dialog" aria-labelledby="createGuruModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header border-0">
                     <h5 class="modal-title" id="modalTitle">Tambah Data Guru</h5>
@@ -75,42 +75,59 @@
                     @csrf
                     <input type="hidden" name="id" id="guru_id">
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="foto_path" class="form-label">Foto</label>
-                            <input type="file" class="form-control" id="foto_path" name="foto_path" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="nip" class="form-label">NIP</label>
-                            <input type="text" class="form-control" id="nip" name="nip" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="nama" class="form-label">Nama</label>
-                            <input type="text" class="form-control" id="nama" name="nama" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="gelar" class="form-label">Gelar</label>
-                            <input type="text" class="form-control" id="gelar" name="gelar" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="telp" class="form-label">Telp</label>
-                            <input type="email" class="form-control" id="telp" name="telp" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="bidang_keahlian" class="form-label">Bidang Keahlian</label>
-                            <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="biografi" class="form-label">Biografi</label>
-                            <textarea class="form-control" id="biografi" name="biografi" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="alamat" class="form-label">Alamat</label>
-                            <textarea class="form-control" id="alamat" name="alamat" rows="3"></textarea>
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="mb-3 text-center">
+                                    <div class="image-preview-container mb-3">
+                                        <img id="imagePreview" src="{{ asset('images/user-default.jpg') }}"
+                                            class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                    </div>
+                                    <label for="foto_path" class="form-label">Foto Guru</label>
+                                    <input type="file" class="form-control" id="foto_path" name="foto_path"
+                                        accept="image/*" onchange="previewImage(this)">
+                                    <small class="text-muted">Format: JPG, PNG (Max 2MB)</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="nip" class="form-label">NIP</label>
+                                    <input type="text" class="form-control" id="nip" name="nip" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="nama" class="form-label">Nama Lengkap</label>
+                                    <input type="text" class="form-control" id="nama" name="nama" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="gelar" class="form-label">Gelar</label>
+                                    <input type="text" class="form-control" id="gelar" name="gelar">
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="telp" class="form-label">No. Telepon</label>
+                                    <input type="text" class="form-control" id="telp" name="telp">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="bidang_keahlian" class="form-label">Bidang Keahlian</label>
+                                    <input type="text" class="form-control" id="bidang_keahlian"
+                                        name="bidang_keahlian" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="biografi" class="form-label">Biografi</label>
+                                    <textarea class="form-control" id="biografi" name="biografi" rows="3"></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -128,6 +145,21 @@
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script>
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
@@ -171,17 +203,20 @@
             });
 
             // Handle form submission
+            // Replace the current form submission handler with this:
             $('#guruForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#guru_id').val();
-                let url = id ? `/guru/${id}` : '/guru';
-                let method = id ? 'PUT' : 'POST';
-
                 let formData = new FormData(this);
 
+                // Append _method for Laravel to recognize PUT requests
+                if (id) {
+                    formData.append('_method', 'PUT');
+                }
+
                 $.ajax({
-                    url: url,
-                    method: method,
+                    url: id ? `/guru/${id}` : '/guru',
+                    method: 'POST', // Always use POST, Laravel will handle the method via _method
                     data: formData,
                     processData: false,
                     contentType: false,
@@ -198,7 +233,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: xhr.responseJSON.message
+                            text: xhr.responseJSON?.message || 'Terjadi kesalahan'
                         });
                     }
                 });
@@ -208,6 +243,7 @@
             $(document).on('click', '.btn-edit', function() {
                 let id = $(this).data('id');
                 $('#modalTitle').text('Edit Data Guru');
+                $('#imagePreview').attr('src', "{{ asset('images/user-default.jpg') }}");
 
                 $.get(`/guru/${id}`, function(data) {
                     $('#guru_id').val(data.id);
@@ -218,7 +254,12 @@
                     $('#telp').val(data.telp);
                     $('#bidang_keahlian').val(data.bidang_keahlian);
                     $('#biografi').val(data.biografi);
-                    $('#alamat').val(data.alamat);
+
+                    // Show existing photo if available
+                    if (data.foto_path) {
+                        $('#imagePreview').attr('src', "{{ asset('storage') }}/" + data.foto_path);
+                    }
+
                     $('#createGuruModal').modal('show');
                 });
             });
@@ -266,6 +307,7 @@
             $('#createGuruModal').on('hidden.bs.modal', function() {
                 $('#guruForm')[0].reset();
                 $('#guru_id').val('');
+                $('#imagePreview').attr('src', "{{ asset('images/user-default.jpg') }}");
                 $('#modalTitle').text('Tambah Data Guru');
             });
         });

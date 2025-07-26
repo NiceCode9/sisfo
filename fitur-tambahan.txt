@@ -1,5 +1,6 @@
 FITUR YANG SUDAH DI CEK :
 - Data master ppdb
+- fitur Tugas dan materi
 
 
 
@@ -13,6 +14,9 @@ KEKURANGAN DAN OPSI TAMBAHAN FITUR :
 (DATA MASTER)
 - proses edit delete di master siswa belum
 - layout form di data master guru
+
+(E-LEARNING)
+- ganti tampilan agar lebih menarik
 
 (OPSI TAMBAHAN)
 - fitur pengumuman belum ada

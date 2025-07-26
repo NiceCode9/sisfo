@@ -155,6 +155,13 @@ class MenuSeeder extends Seeder
                         'icon' => 'fas fa-tasks',
                         'group' => 'E-Learning',
                     ],
+                    [
+                        'name' => 'Data Pengumpulan Tugas',
+                        'route' => 'pengumpulan-tugas.index',
+                        // 'permission' => 'tugas.view',
+                        'icon' => 'fas fa-tasks',
+                        'group' => 'E-Learning',
+                    ],
                 ]
             ],
             [

@@ -21,7 +21,8 @@ class Tugas extends Model
         'file_tugas',
         'visibilitas',
         'tanggal_terbit',
-        'aktif'
+        'aktif',
+        'tahun_ajaran_id'
     ];
 
     protected $casts = [
@@ -81,5 +82,10 @@ class Tugas extends Model
     public function pengumpulanTugas()
     {
         return $this->hasMany(PengumpulanTugas::class);
+    }
+
+    public function tahunAjaran(): BelongsTo
+    {
+        return $this->belongsTo(TahunAjaran::class);
     }
 }

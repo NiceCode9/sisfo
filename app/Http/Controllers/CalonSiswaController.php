@@ -8,6 +8,7 @@ use App\Models\RiwayatKelas;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CalonSiswaController extends Controller
 {
@@ -191,6 +192,16 @@ class CalonSiswaController extends Controller
                 'nisn' => $calonSiswa->nisn,
                 'kelas_awal' => $request->kelas_id,
             ]);
+
+            $siswa_account=$siswa->user()->create([
+                'name' => $calonSiswa->nama_lengkap,
+                'username' => $calonSiswa->nisn,
+                'email' => $calonSiswa->email,
+                'password' => bcrypt('password'),
+                'slug' => Str::slug($calonSiswa->nama_lengkap . '-' . $calonSiswa->nisn),
+            ]);
+
+            $siswa_account->assignRole('siswa');
 
             RiwayatKelas::create([
                 'siswa_id' => $siswa->id,

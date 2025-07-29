@@ -193,7 +193,7 @@ class CalonSiswaController extends Controller
                 'kelas_awal' => $request->kelas_id,
             ]);
 
-            $siswa_account=$siswa->user()->create([
+            $siswa_account = $siswa->user()->create([
                 'name' => $calonSiswa->nama_lengkap,
                 'username' => $calonSiswa->nisn,
                 'email' => $calonSiswa->email,

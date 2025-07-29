@@ -132,6 +132,7 @@ class PpdbSeeder extends Seeder
                 'jumlah' => 2500000,
                 'mata_uang' => 'IDR',
                 'wajib_bayar' => true,
+                'dapat_diangsur' => true,
                 'keterangan' => 'Uang pangkal untuk siswa baru'
             ],
             [

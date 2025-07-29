@@ -27,7 +27,7 @@ class RencanaAngsuran extends Model
         return $this->belongsTo(BiayaPendaftaran::class);
     }
 
-    public function detailAngsurans()
+    public function detailAngsuran()
     {
         return $this->hasMany(DetailAngsuran::class);
     }

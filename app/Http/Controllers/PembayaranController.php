@@ -119,7 +119,7 @@ class PembayaranController extends Controller
 
                 // Validasi tambahan untuk angsuran
                 'jenis_pembayaran' => 'required|in:penuh,dp_angsuran,cicilan_angsuran',
-                'detail_angsuran_id' => 'nullable|exists:detail_angsuran,id',
+                'detail_angsuran_id' => 'nullable|exists:detail_angsurans,id',
 
                 // Untuk pembayaran angsuran baru (DP)
                 'jumlah_cicilan' => 'nullable|integer|min:2|max:12',

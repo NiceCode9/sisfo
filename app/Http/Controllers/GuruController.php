@@ -36,6 +36,31 @@ class GuruController extends Controller
         try {
             DB::beginTransaction();
 
+            // Validasi input
+            $request->validate([
+                'nip' => 'required|string|max:20|unique:guru,nip',
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email',
+                'biografi' => 'nullable|string',
+                'bidang_keahlian' => 'required|string|max:255',
+                'gelar' => 'required|string|max:50',
+                'telp' => 'required|string|max:15',
+                'foto_path' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+            ], [
+                'nip.required' => 'NIP wajib diisi',
+                'nip.unique' => 'NIP sudah terdaftar',
+                'nama.required' => 'Nama wajib diisi',
+                'email.required' => 'Email wajib diisi',
+                'email.email' => 'Format email tidak valid',
+                'email.unique' => 'Email sudah terdaftar',
+                'bidang_keahlian.required' => 'Bidang keahlian wajib diisi',
+                'gelar.required' => 'Gelar wajib diisi',
+                'telp.required' => 'No. Telepon wajib diisi',
+                'foto_path.image' => 'File harus berupa gambar',
+                'foto_path.mimes' => 'Format gambar harus jpeg, png, atau jpg',
+                'foto_path.max' => 'Ukuran gambar maksimal 2MB',
+            ]);
+
             // Handle file upload
             $fotoPath = null;
             if ($request->hasFile('foto_path')) {
@@ -102,6 +127,31 @@ class GuruController extends Controller
             DB::beginTransaction();
 
             $guru = Guru::findOrFail($id);
+
+            // Validasi input
+            $request->validate([
+                'nip' => 'required|string|max:20|unique:guru,nip,' . $id,
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . $guru->user->id,
+                'biografi' => 'nullable|string',
+                'bidang_keahlian' => 'required|string|max:255',
+                'gelar' => 'required|string|max:50',
+                'telp' => 'required|string|max:15',
+                'foto_path' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+            ], [
+                'nip.required' => 'NIP wajib diisi',
+                'nip.unique' => 'NIP sudah terdaftar',
+                'nama.required' => 'Nama wajib diisi',
+                'email.required' => 'Email wajib diisi',
+                'email.email' => 'Format email tidak valid',
+                'email.unique' => 'Email sudah terdaftar',
+                'bidang_keahlian.required' => 'Bidang keahlian wajib diisi',
+                'gelar.required' => 'Gelar wajib diisi',
+                'telp.required' => 'No. Telepon wajib diisi',
+                'foto_path.image' => 'File harus berupa gambar',
+                'foto_path.mimes' => 'Format gambar harus jpeg, png, atau jpg',
+                'foto_path.max' => 'Ukuran gambar maksimal 2MB',
+            ]);
 
             $data = [
                 'nip' => $request->nip,

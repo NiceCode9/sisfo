@@ -27,21 +27,18 @@ class KelasSeeder extends Seeder
                 'deskripsi' => 'Kelas X IPS 1 untuk siswa tingkat pertama',
             ],
             [
-                'nama_kelas' => 'XI IPA 1',
-                'tingkat' => 11,
-                'jurusan' => 'IPA',
+                'nama_kelas' => 'A',
+                'tingkat' => 8,
                 'deskripsi' => 'Kelas XI IPA 1 untuk siswa tingkat kedua jurusan IPA',
             ],
             [
-                'nama_kelas' => 'XI IPS 1',
-                'tingkat' => 11,
-                'jurusan' => 'IPS',
+                'nama_kelas' => 'B',
+                'tingkat' => 8,
                 'deskripsi' => 'Kelas XI IPS 1 untuk siswa tingkat kedua jurusan IPS',
             ],
             [
-                'nama_kelas' => 'XII IPA 1',
-                'tingkat' => 12,
-                'jurusan' => 'IPA',
+                'nama_kelas' => 'A',
+                'tingkat' => 9,
                 'deskripsi' => 'Kelas XII IPA 1 untuk siswa tingkat ketiga jurusan IPA',
             ],
         ];

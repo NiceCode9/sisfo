@@ -384,11 +384,7 @@
                                                 <div class="fw-semibold">{{ $pembayaran->biayaPendaftaran->jenis_biaya }}
                                                 </div>
                                                 <small
-                                                    class="text-muted">{{ ucfirst($pembayaran->jenis_pembayaran) }}</small>
-                                                @if ($pembayaran->keterangan_angsuran)
-                                                    <div class="text-muted small">{{ $pembayaran->keterangan_angsuran }}
-                                                    </div>
-                                                @endif
+                                                    class="text-muted">{{ ucfirst($pembayaran->metode_pembayaran) }}</small>
                                             </td>
                                             <td class="px-4 py-3">
                                                 <div class="fw-bold text-success">Rp
@@ -396,9 +392,9 @@
                                             </td>
                                             <td class="px-4 py-3">
                                                 <span
-                                                    class="badge {{ $pembayaran->status === 'berhasil' ? 'bg-success' : ($pembayaran->status === 'pending' ? 'bg-warning text-dark' : 'bg-danger') }}">
+                                                    class="badge {{ $pembayaran->status === 'sukses' ? 'bg-success' : ($pembayaran->status === 'pending' ? 'bg-warning text-dark' : 'bg-danger') }}">
                                                     <i
-                                                        class="fas {{ $pembayaran->status === 'berhasil' ? 'fa-check' : ($pembayaran->status === 'pending' ? 'fa-clock' : 'fa-times') }} me-1"></i>
+                                                        class="fas {{ $pembayaran->status === 'sukses' ? 'fa-check' : ($pembayaran->status === 'pending' ? 'fa-clock' : 'fa-times') }} me-1"></i>
                                                     {{ ucfirst($pembayaran->status) }}
                                                 </span>
                                             </td>
@@ -444,13 +440,12 @@
                         $totalBiaya = 0;
                         $totalBayar = 0;
                         $biayaBelumLunas = [];
-                        $rencanaAngsuran = $calonSiswa->pembayaran->where('jenis_pembayaran', 'dp_angsuran')->first();
 
                         foreach ($calonSiswa->tahunAjaran->biayaPendaftaran as $biaya) {
                             $totalBiaya += $biaya->jumlah;
                             $pembayaran = $calonSiswa->pembayaran
                                 ->where('biaya_pendaftaran_id', $biaya->id)
-                                ->where('status', 'berhasil')
+                                ->where('status', 'sukses')
                                 ->first();
 
                             if ($pembayaran) {
@@ -463,8 +458,6 @@
                                     'wajib' => $biaya->wajib_bayar,
                                     'mata_uang' => $biaya->mata_uang,
                                     'keterangan' => $biaya->keterangan,
-                                    'dapat_diangsur' => $biaya->dapat_diangsur,
-                                    'min_dp' => $biaya->min_dp,
                                 ];
                             }
                         }
@@ -499,89 +492,6 @@
                         </div>
                     </div>
 
-                    <!-- Angsuran Info -->
-                    @if ($rencanaAngsuran)
-                        @php
-                            $rencana = App\Models\RencanaAngsuran::where('calon_siswa_id', $calonSiswa->id)
-                                ->where('biaya_pendaftaran_id', $rencanaAngsuran->biaya_pendaftaran_id)
-                                ->first();
-                            $detailAngsuran = $rencana->detailAngsuran ?? null;
-                        @endphp
-
-                        <div class="angsuran-info p-4 rounded-3 mb-4 bg-info bg-opacity-10 border border-info">
-                            <h6 class="fw-bold mb-3 text-info">
-                                <i class="fas fa-calendar-check me-2"></i>Info Angsuran
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label text-muted small fw-semibold">Total Biaya</label>
-                                        <div class="fw-bold">Rp {{ number_format($rencana->total_biaya, 0, ',', '.') }}
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label text-muted small fw-semibold">DP Dibayar</label>
-                                        <div class="fw-bold">Rp {{ number_format($rencana->dp_dibayar, 0, ',', '.') }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label text-muted small fw-semibold">Sisa Hutang</label>
-                                        <div class="fw-bold">Rp {{ number_format($rencana->sisa_hutang, 0, ',', '.') }}
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label text-muted small fw-semibold">Jumlah Cicilan</label>
-                                        <div class="fw-bold">{{ $rencana->jumlah_cicilan }}x</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <h6 class="fw-bold mt-4 mb-3 text-info">
-                                <i class="fas fa-list-ol me-2"></i>Daftar Cicilan
-                            </h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Cicilan Ke</th>
-                                            <th>Jatuh Tempo</th>
-                                            <th>Nominal</th>
-                                            <th>Status</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($detailAngsuran as $angsuran)
-                                            <tr>
-                                                <td>{{ $angsuran->cicilan_ke }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($angsuran->tanggal_jatuh_tempo)->format('d/m/Y') }}
-                                                </td>
-                                                <td>Rp {{ number_format($angsuran->nominal_cicilan, 0, ',', '.') }}</td>
-                                                <td>
-                                                    <span
-                                                        class="badge {{ $angsuran->status === 'dibayar' ? 'bg-success' : ($angsuran->status === 'belum_bayar' ? 'bg-warning text-dark' : 'bg-danger') }}">
-                                                        {{ ucfirst(str_replace('_', ' ', $angsuran->status)) }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    @if ($angsuran->status === 'belum_bayar')
-                                                        <button type="button" class="btn btn-sm btn-primary"
-                                                            onclick="setAngsuranId('{{ $angsuran->id }}', '{{ $angsuran->nominal_cicilan }}', '{{ $angsuran->rencanaAngsuran->biayaPendaftaran->mata_uang }}')"
-                                                            data-bs-toggle="modal" data-bs-target="#modalPembayaran">
-                                                            Bayar
-                                                        </button>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    @endif
-
                     @if (count($biayaBelumLunas) > 0)
                         <h6 class="fw-bold mb-3 text-danger">
                             <i class="fas fa-list-ul me-2"></i>Biaya yang Belum Dibayar
@@ -596,9 +506,6 @@
                                                 @if ($biaya['wajib'])
                                                     <span class="badge bg-danger ms-2">Wajib</span>
                                                 @endif
-                                                @if ($biaya['dapat_diangsur'])
-                                                    <span class="badge bg-info ms-2">Dapat Diangsur</span>
-                                                @endif
                                             </div>
                                             <div class="h5 mb-1 fw-bold text-primary">
                                                 {{ $biaya['mata_uang'] }}
@@ -610,7 +517,7 @@
                                         </div>
                                         <div>
                                             <button type="button" class="btn btn-primary"
-                                                onclick="setBiayaId('{{ $biaya['id'] }}', '{{ $biaya['jumlah'] }}', '{{ $biaya['mata_uang'] }}', {{ $biaya['dapat_diangsur'] ? 'true' : 'false' }}, {{ $biaya['min_dp'] ?? 0 }})"
+                                                onclick="setBiayaId('{{ $biaya['id'] }}', '{{ $biaya['jumlah'] }}', '{{ $biaya['mata_uang'] }}')"
                                                 data-bs-toggle="modal" data-bs-target="#modalPembayaran">
                                                 <i class="fas fa-credit-card me-1"></i>Bayar
                                             </button>
@@ -648,22 +555,8 @@
                             @csrf
                             <div class="modal-body p-4">
                                 <input type="hidden" id="selected_biaya_id" name="biaya_pendaftaran_id">
-                                <input type="hidden" id="selected_detail_angsuran_id" name="detail_angsuran_id">
 
                                 <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="jenis_pembayaran" class="form-label fw-semibold">
-                                            <i class="fas fa-money-bill-wave text-success me-1"></i>Jenis Pembayaran
-                                        </label>
-                                        <select class="form-select form-select-lg" id="jenis_pembayaran"
-                                            name="jenis_pembayaran" required>
-                                            <option value="">Pilih jenis pembayaran</option>
-                                            <option value="penuh">💵 Pembayaran Penuh</option>
-                                            <option value="dp_angsuran">💳 DP + Angsuran</option>
-                                            <option value="cicilan_angsuran">🔄 Pembayaran Cicilan</option>
-                                        </select>
-                                    </div>
-
                                     <div class="col-md-6">
                                         <label for="metode_pembayaran" class="form-label fw-semibold">
                                             <i class="fas fa-credit-card text-primary me-1"></i>Metode Pembayaran
@@ -686,8 +579,6 @@
                                             <input type="number" class="form-control" id="jumlah" name="jumlah"
                                                 required placeholder="0">
                                         </div>
-                                        <small id="min-dp-info" class="text-danger d-none">Minimal DP: Rp <span
-                                                id="min-dp-value">0</span></small>
                                     </div>
 
                                     <div class="col-md-6">
@@ -697,29 +588,6 @@
                                         <input type="date" class="form-control form-control-lg"
                                             id="tanggal_pembayaran" name="tanggal_pembayaran" required
                                             value="{{ date('Y-m-d') }}">
-                                    </div>
-
-                                    <!-- Angsuran Fields (Hidden by Default) -->
-                                    <div id="angsuran-fields" class="row g-3 d-none">
-                                        <div class="col-md-6">
-                                            <label for="jumlah_cicilan" class="form-label fw-semibold">
-                                                <i class="fas fa-calendar-day text-info me-1"></i>Jumlah Cicilan
-                                            </label>
-                                            <select class="form-select form-select-lg" id="jumlah_cicilan"
-                                                name="jumlah_cicilan">
-                                                <option value="">Pilih jumlah cicilan</option>
-                                                @for ($i = 2; $i <= 12; $i++)
-                                                    <option value="{{ $i }}">{{ $i }}x</option>
-                                                @endfor
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="tanggal_mulai_cicilan" class="form-label fw-semibold">
-                                                <i class="fas fa-calendar-plus text-info me-1"></i>Tanggal Mulai Cicilan
-                                            </label>
-                                            <input type="date" class="form-control form-control-lg"
-                                                id="tanggal_mulai_cicilan" name="tanggal_mulai_cicilan">
-                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
@@ -933,61 +801,10 @@
     <!-- Enhanced JavaScript -->
     <script>
         // Function to set biaya ID for payment modal
-        function setBiayaId(biayaId, jumlah, mataUang, dapatDiangsur = false, minDp = 0) {
+        function setBiayaId(biayaId, jumlah, mataUang) {
             document.getElementById('selected_biaya_id').value = biayaId;
-            document.getElementById('selected_detail_angsuran_id').value = '';
             document.getElementById('jumlah').value = jumlah;
             document.getElementById('mata-uang-addon').textContent = mataUang;
-
-            // Reset form fields
-            document.getElementById('jenis_pembayaran').value = '';
-            document.getElementById('metode_pembayaran').value = '';
-            document.getElementById('jumlah_cicilan').value = '';
-            document.getElementById('tanggal_mulai_cicilan').value = '';
-            document.getElementById('angsuran-fields').classList.add('d-none');
-
-            // Show/hide DP info
-            const minDpInfo = document.getElementById('min-dp-info');
-            if (dapatDiangsur && minDp > 0) {
-                minDpInfo.classList.remove('d-none');
-                document.getElementById('min-dp-value').textContent = minDp.toLocaleString('id-ID');
-            } else {
-                minDpInfo.classList.add('d-none');
-            }
-
-            // Auto-select payment type based on installments
-            if (dapatDiangsur) {
-                document.getElementById('jenis_pembayaran').value = 'dp_angsuran';
-                toggleAngsuranFields('dp_angsuran');
-            } else {
-                document.getElementById('jenis_pembayaran').value = 'penuh';
-            }
-        }
-
-        // Function to set angsuran ID for payment modal
-        function setAngsuranId(angsuranId, nominal, mataUang) {
-            document.getElementById('selected_detail_angsuran_id').value = angsuranId;
-            document.getElementById('selected_biaya_id').value = '';
-            document.getElementById('jumlah').value = nominal;
-            document.getElementById('mata-uang-addon').textContent = mataUang;
-
-            // Reset form fields
-            document.getElementById('jenis_pembayaran').value = 'cicilan_angsuran';
-            document.getElementById('metode_pembayaran').value = '';
-            document.getElementById('jumlah_cicilan').value = '';
-            document.getElementById('tanggal_mulai_cicilan').value = '';
-            document.getElementById('angsuran-fields').classList.add('d-none');
-            document.getElementById('min-dp-info').classList.add('d-none');
-        }
-
-        // Toggle angsuran fields based on payment type
-        function toggleAngsuranFields(paymentType) {
-            const angsuranFields = document.getElementById('angsuran-fields');
-            if (paymentType === 'dp_angsuran') {
-                angsuranFields.classList.remove('d-none');
-            } else {
-                angsuranFields.classList.add('d-none');
-            }
         }
 
         // Enhanced form validation and UX
@@ -1042,34 +859,25 @@
                     }
                 });
             }
+        });
 
-            // Toggle angsuran fields based on payment type
-            const jenisPembayaran = document.getElementById('jenis_pembayaran');
-            if (jenisPembayaran) {
-                jenisPembayaran.addEventListener('change', function() {
-                    toggleAngsuranFields(this.value);
-                });
-            }
+        $('#status_pendaftaran').change(function(e) {
+            e.preventDefault();
 
-            // Toggle kelas select based on status
-            $('#status_pendaftaran').change(function(e) {
-                e.preventDefault();
-
-                let val = $(this).val();
-                if (val == 'diterima') {
-                    $('#kelasSelect').show();
-                } else {
-                    $('#kelasSelect').hide();
-                }
-            });
-
-            // Smooth scroll to unpaid fees when payment button is clicked
-            function scrollToUnpaidFees() {
-                document.querySelector('.unpaid-fees')?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest'
-                });
+            let val = $(this).val();
+            if (val == 'diterima') {
+                $('#kelasSelect').show();
+            } else {
+                $('#kelasSelect').hide();
             }
         });
+
+        // Smooth scroll to unpaid fees when payment button is clicked
+        function scrollToUnpaidFees() {
+            document.querySelector('.unpaid-fees')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
     </script>
 @endpush

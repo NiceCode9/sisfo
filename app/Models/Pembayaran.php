@@ -13,9 +13,12 @@ class Pembayaran extends Model
     protected $fillable = [
         'calon_siswa_id',
         'biaya_pendaftaran_id',
+        'detail_angsuran_id',
         'kode_pembayaran',
         'jumlah',
         'metode_pembayaran',
+        'jenis_pembayaran', // penuh, dp_angsuran, cicilan_angsuran
+        'keterangan_angsuran',
         'bukti_pembayaran_path',
         'tanggal_pembayaran',
         'status',
@@ -30,5 +33,10 @@ class Pembayaran extends Model
     public function biayaPendaftaran()
     {
         return $this->belongsTo(BiayaPendaftaran::class);
+    }
+
+    public function detailAngsuran()
+    {
+        return $this->belongsTo(DetailAngsuran::class);
     }
 }

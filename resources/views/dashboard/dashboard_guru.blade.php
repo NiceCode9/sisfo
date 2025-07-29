@@ -654,12 +654,12 @@
                                 </thead>
                                 <tbody>
                                     ${data.siswa.map((siswa, index) => `
-                                                                                            <tr>
-                                                                                                <td>${index + 1}</td>
-                                                                                                <td>${siswa.nama_lengkap}</td>
-                                                                                                <td>${siswa.email}</td>
-                                                                                            </tr>
-                                                                                        `).join('')}
+                                                                                                <tr>
+                                                                                                    <td>${index + 1}</td>
+                                                                                                    <td>${siswa.nama_lengkap}</td>
+                                                                                                    <td>${siswa.email}</td>
+                                                                                                </tr>
+                                                                                            `).join('')}
                                 </tbody>
                             </table>
                         </div>

@@ -179,7 +179,7 @@
                             <select class="form-select" id="kelas_id" name="kelas_id" required>
                                 <option value="">Pilih Kelas</option>
                                 @foreach ($kelas as $k)
-                                    <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                                    <option value="{{ $k->id }}">{{ $k->tingkat }}{{ $k->nama_kelas }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback"></div>

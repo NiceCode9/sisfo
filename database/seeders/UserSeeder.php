@@ -88,20 +88,20 @@ class UserSeeder extends Seeder
             $user->assignRole('guru');
         }
 
-        $siswa = Siswa::all();
+        // $siswa = Siswa::all();
 
 
-        foreach ($siswa as $s) {
-            $userSiswa = User::create([
-                'name' => $s->calonSiswa->nama_lengkap,
-                'username' => strtolower(str_replace(' ', '', $s->calonSiswa->nama_lengkap)),
-                'email' => $s->calonSiswa->email ?? strtolower(str_replace(' ', '', $s->calonSiswa->nama_lengkap)) . '@sekolah.com',
-                'password' => Hash::make('password'),
-                'siswa_id' => $s->id,
-                'guru_id' => null,
-            ]);
+        // foreach ($siswa as $s) {
+        //     $userSiswa = User::create([
+        //         'name' => $s->calonSiswa->nama_lengkap,
+        //         'username' => strtolower(str_replace(' ', '', $s->calonSiswa->nama_lengkap)),
+        //         'email' => $s->calonSiswa->email ?? strtolower(str_replace(' ', '', $s->calonSiswa->nama_lengkap)) . '@sekolah.com',
+        //         'password' => Hash::make('password'),
+        //         'siswa_id' => $s->id,
+        //         'guru_id' => null,
+        //     ]);
 
-            $userSiswa->assignRole('siswa');
-        }
+        //     $userSiswa->assignRole('siswa');
+        // }
     }
 }

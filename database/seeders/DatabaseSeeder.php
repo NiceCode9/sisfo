@@ -23,28 +23,28 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             MenuSeeder::class,
-            // KelasSeeder::class,
-            // MataPelajaranSeeder::class,
-            // PpdbSeeder::class,
-            // GuruSeeder::class,
-            // GuruMataPelajaranSeeder::class,
-            // GuruKelasSeeder::class,
-            // // UserSeeder::class,
-            // CalonSiswaSeeder::class,
+            KelasSeeder::class,
+            MataPelajaranSeeder::class,
+            PpdbSeeder::class,
+            GuruSeeder::class,
+            GuruMataPelajaranSeeder::class,
+            GuruKelasSeeder::class,
+            UserSeeder::class,
+            CalonSiswaSeeder::class,
             // SiswaSeeder::class,
             // BerkasCalonSeeder::class,
             // RiwayatKelasSeeder::class,
             // UserSeeder::class,
             // TugasSeeder::class,
         ]);
-        $admin = User::create([
-            'name' => 'Administrator',
-            'username' => 'admin',
-            'email' => 'admin@admin.com',
-            'password' => bcrypt('admin'),
-            'siswa_id' => null,
-            'guru_id' => null,
-        ]);
-        $admin->assignRole('super-admin');
+        // $admin = User::create([
+        //     'name' => 'Administrator',
+        //     'username' => 'admin',
+        //     'email' => 'admin@admin.com',
+        //     'password' => bcrypt('admin'),
+        //     'siswa_id' => null,
+        //     'guru_id' => null,
+        // ]);
+        // $admin->assignRole('super-admin');
     }
 }

@@ -151,7 +151,7 @@
 
                 let formData = new FormData(this);
                 let id = $('#kategori_id').val();
-                let url = id ? `/artikel/kategori/${id}` : '/artikel/kategori';
+                let url = id ? `/manage-artikel/kategori/${id}` : '/manage-artikel/kategori';
                 // let method = id ? 'PUT' : 'POST';
 
                 if (id) {
@@ -197,7 +197,7 @@
             $(document).on('click', '.edit-btn', function() {
                 let id = $(this).data('id');
 
-                $.get('/artikel/kategori/' + id, function(data) {
+                $.get('/manage-artikel/kategori/' + id, function(data) {
                     $('#kategoriModalLabel').text('Edit Kategori');
                     $('#kategori_id').val(data.id);
                     $('#name').val(data.name);
@@ -226,7 +226,7 @@
             // Handle confirm delete
             $('#confirmDelete').click(function() {
                 $.ajax({
-                    url: '/artikel/kategori/' + deleteId,
+                    url: '/manage-artikel/kategori/' + deleteId,
                     type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}'

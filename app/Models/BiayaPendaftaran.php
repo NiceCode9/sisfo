@@ -16,7 +16,11 @@ class BiayaPendaftaran extends Model
         'jumlah',
         'mata_uang',
         'wajib_bayar',
-        'keterangan'
+        'dapat_diangsur',
+        'max_cicilan',
+        'min_dp',
+        'jangka_waktu_hari',
+        'keterangan',
     ];
 
     public function tahunAjaran()
@@ -27,5 +31,10 @@ class BiayaPendaftaran extends Model
     public function pembayaran()
     {
         return $this->hasMany(Pembayaran::class);
+    }
+
+    public function rencanaAngsuran()
+    {
+        return $this->hasMany(RencanaAngsuran::class);
     }
 }

@@ -130,7 +130,7 @@
             $('#mapelForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#mapel_id').val();
-                let url = id ? `/admin/mata-pelajaran/${id}` : '/admin/mata-pelajaran';
+                let url = id ? `/mata-pelajaran/${id}` : '/mata-pelajaran';
                 let method = id ? 'PUT' : 'POST';
 
                 $.ajax({
@@ -161,7 +161,7 @@
                 let id = $(this).data('id');
                 $('#modalTitle').text('Edit Mata Pelajaran');
 
-                $.get(`/admin/mata-pelajaran/${id}`, function(data) {
+                $.get(`/mata-pelajaran/${id}`, function(data) {
                     $('#mapel_id').val(data.id);
                     $('#kode_pelajaran').val(data.kode_pelajaran);
                     $('#nama_pelajaran').val(data.nama_pelajaran);
@@ -184,7 +184,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/mata-pelajaran/${id}`,
+                            url: `/mata-pelajaran/${id}`,
                             method: 'DELETE',
                             data: {
                                 _token: '{{ csrf_token() }}'

@@ -10,14 +10,23 @@ KEKURANGAN DAN OPSI TAMBAHAN FITUR :
 (PPDB)
 - Ubah menjadi datatable untuk halaman index Calon Siswa
 - Halaman Show ppdb tambahkan riwayat pendaftaran dan jika diterima ada pemberitahuan di tempatkan di kelas apa
+- Perbaiki logic pembayaran angsuran
 
 (DATA MASTER)
 - proses edit delete di master siswa belum
+- Tampilkan Email di list siswa
 - layout form di data master guru
+- ukuran foto guru maxnya di ganti jadi 5mb
 
 (E-LEARNING)
 - ganti tampilan agar lebih menarik
+- Proses eDit dan delete di materi belum (jangan tampilkan di akun siswa)
+
+(ARTIKEL)
+- Komentar langsugn di tampilkan tanpa tunggu acc dari admin
+
 
 (OPSI TAMBAHAN)
+- Tambah Fitur pendaftaran ekstrakurikuler
 - fitur pengumuman belum ada
 - membuat fitur akuntan yang berguna untuk management pembayaran dalam satu menu tanpa harus membuka atau masuk ke menu siswa terlebih dahuly

@@ -27,7 +27,7 @@ class CalonSiswaSeeder extends Seeder
             } elseif ($i <= 40) {
                 $status = 'ditolak'; // 10 siswa ditolak
             } elseif ($i <= 45) {
-                $status = 'verifikasi'; // 5 siswa dalam verifikasi
+                $status = 'menunggu'; // 5 siswa dalam verifikasi
             }
             // sisanya pending (5 siswa)
 
@@ -51,7 +51,7 @@ class CalonSiswaSeeder extends Seeder
                 'nama_ibu' => $faker->name('female'),
                 'pekerjaan_ibu' => $faker->jobTitle,
                 'no_hp_orang_tua' => $faker->phoneNumber,
-                'tahun_ajaran_id' => 2, // 2024/2025
+                'tahun_ajaran_id' => 1, // 2024/2025
                 'status_pendaftaran' => $status,
                 'created_at' => now(),
                 'updated_at' => now(),

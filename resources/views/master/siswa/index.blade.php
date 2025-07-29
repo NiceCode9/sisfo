@@ -25,15 +25,14 @@
             <p class="mb-0">Halaman untuk mengelola data siswa.</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <button class="btn btn-sm btn-gray-800 d-inline-flex align-items-center" data-bs-toggle="modal"
-                data-bs-target="#createMateriModal">
+            <a href="{{ route('siswa.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
                     </path>
                 </svg>
                 Tambah Siswa
-            </button>
+            </a>
         </div>
     </div>
 
@@ -104,6 +103,48 @@
                         searchable: false
                     }
                 ]
+            });
+
+            $(document).on('click', '.btn-delete', function() {
+                let id = $(this).data('id');
+                let url = "{{ route('siswa.destroy', ':id') }}";
+                url = url.replace(':id', id);
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data siswa akan dihapus secara permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                $('#tblsiswa').DataTable().ajax.reload();
+                                Swal.fire(
+                                    'Terhapus!',
+                                    'Data siswa berhasil dihapus.',
+                                    'success'
+                                );
+                            },
+                            error: function(xhr) {
+                                Swal.fire(
+                                    'Gagal!',
+                                    'Error: ' + xhr.responseJSON.message,
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>

@@ -25,7 +25,7 @@ return new class extends Migration
             $table->text('alamat');
             $table->string('no_hp')->nullable();
             $table->string('email')->nullable()->unique();
-            $table->string('asal_sekolah');
+            $table->string('asal_sekolah')->nullable();
             $table->string('nama_ayah')->nullable();
             $table->string('pekerjaan_ayah')->nullable();
             $table->string('nama_ibu')->nullable();

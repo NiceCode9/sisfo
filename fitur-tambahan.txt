@@ -9,8 +9,8 @@ FITUR YANG SUDAH DI CEK :
 KEKURANGAN DAN OPSI TAMBAHAN FITUR :
 (PPDB)
 - Ubah menjadi datatable untuk halaman index Calon Siswa
-- Halaman Show ppdb tambahkan riwayat pendaftaran dan jika diterima ada pemberitahuan di tempatkan di kelas apa
-- Perbaiki logic pembayaran angsuran
+- Halaman Show ppdb tambahkan riwayat pendaftaran dan jika diterima ada pemberitahuan di tempatkan di kelas apa (x)
+- Perbaiki logic pembayaran angsuran (x)
 
 (DATA MASTER)
 - proses edit delete di master siswa belum

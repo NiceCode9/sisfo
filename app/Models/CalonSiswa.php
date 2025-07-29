@@ -30,7 +30,6 @@ class CalonSiswa extends Model
         'pekerjaan_ibu',
         'no_hp_orang_tua',
         'tahun_ajaran_id',
-        'jalur_pendaftaran_id',
         'status_pendaftaran'
     ];
 

@@ -180,47 +180,74 @@ class CalonSiswaController extends Controller
             DB::beginTransaction();
 
             $calonSiswa = CalonSiswa::findOrFail($id);
-            $jalurPendaftaran = $calonSiswa->jalurPendaftaran;
-            $jalurPendaftaran->load('kuotaPendaftaran');
-            $jalurPendaftaran->kuotaPendaftaran->update([
-                'terisi' => $jalurPendaftaran->kuotaPendaftaran->terisi + 1,
+            $validated = $request->validate([
+                'status_pendaftaran' => 'required|in:diterima,ditolak,perlu_perbaikan',
+                'catatan' => 'required_if:status_pendaftaran,ditolak,perlu_perbaikan',
+                'berkas_perlu_perbaikan' => 'nullable|array', // Daftar field yang perlu diperbaiki
+                'berkas_perlu_perbaikan.*' => 'in:ijazah_path,kk_path,akta_path,foto_path,skl_path'
             ]);
 
-            $siswa = $calonSiswa->siswa()->create([
-                'tahun_ajaran_id' => $calonSiswa->tahun_ajaran_id,
-                'nis' => $calonSiswa->nisn,
-                'nisn' => $calonSiswa->nisn,
-                'kelas_awal' => $request->kelas_id,
-            ]);
+            if ($request->status_pendaftaran === 'ditolak' || $request->status_pendaftaran === 'perlu_perbaikan') {
+                $calonSiswa->berkasCalonSiswa->update([
+                    'alasan_penolakan' => $request->catatan,
+                    'berkas_perlu_perbaikan' => json_encode($request->berkas_perlu_perbaikan ?? [])
+                ]);
+            }
 
-            $siswa_account = $siswa->user()->create([
-                'name' => $calonSiswa->nama_lengkap,
-                'username' => $calonSiswa->nisn,
-                'email' => $calonSiswa->email,
-                'password' => bcrypt('password'),
-                'slug' => Str::slug($calonSiswa->nama_lengkap . '-' . $calonSiswa->nisn),
-            ]);
+            if ($request->status_pendaftaran === 'diterima') {
+                $jalurPendaftaran = $calonSiswa->jalurPendaftaran;
+                $jalurPendaftaran->load('kuotaPendaftaran');
+                $jalurPendaftaran->kuotaPendaftaran->update([
+                    'terisi' => $jalurPendaftaran->kuotaPendaftaran->terisi + 1,
+                ]);
 
-            $siswa_account->assignRole('siswa');
+                $siswa = $calonSiswa->siswa()->create([
+                    'tahun_ajaran_id' => $calonSiswa->tahun_ajaran_id,
+                    'nis' => $calonSiswa->nisn,
+                    'nisn' => $calonSiswa->nisn,
+                    'kelas_awal' => $request->kelas_id,
+                ]);
 
-            RiwayatKelas::create([
-                'siswa_id' => $siswa->id,
-                'kelas_id' => $request->kelas_id,
-                'tahun_ajaran_id' => $calonSiswa->tahun_ajaran_id,
-                'status' => 'aktif',
-                'keterangan' => 'Siswa baru diterima',
-            ]);
+                $siswa_account = $siswa->user()->create([
+                    'name' => $calonSiswa->nama_lengkap,
+                    'username' => $calonSiswa->nisn,
+                    'email' => $calonSiswa->email,
+                    'password' => bcrypt('password'),
+                    'slug' => Str::slug($calonSiswa->nama_lengkap . '-' . $calonSiswa->nisn),
+                ]);
+
+                $siswa_account->assignRole('siswa');
+
+                RiwayatKelas::create([
+                    'siswa_id' => $siswa->id,
+                    'kelas_id' => $request->kelas_id,
+                    'tahun_ajaran_id' => $calonSiswa->tahun_ajaran_id,
+                    'status' => 'aktif',
+                    'keterangan' => 'Siswa baru diterima',
+                ]);
+
+                $calonSiswa->logStatusPendaftaran()->create([
+                    'status_sebelumnya' => $calonSiswa->status_pendaftaran,
+                    'status_baru' => $request->status_pendaftaran,
+                    'catatan' => $request->catatan ?? null,
+                    'user_id' => auth()->id(),
+                ]);
+
+                $validated = $request->validate([
+                    'status_pendaftaran' => 'required|in:diterima,ditolak',
+                    'catatan' => 'nullable|string|max:255',
+                ]);
+
+                $calonSiswa->update([
+                    'status_pendaftaran' => $validated['status_pendaftaran']
+                ]);
+            }
 
             $calonSiswa->logStatusPendaftaran()->create([
                 'status_sebelumnya' => $calonSiswa->status_pendaftaran,
-                'status_baru' => $request->status_pendaftaran,
-                'catatan' => $request->catatan ?? null,
+                'status_baru' => $validated['status_pendaftaran'],
+                'catatan' => $validated['catatan'] ?? null,
                 'user_id' => auth()->id(),
-            ]);
-
-            $validated = $request->validate([
-                'status_pendaftaran' => 'required|in:diterima,ditolak',
-                'catatan' => 'nullable|string|max:255',
             ]);
 
             $calonSiswa->update([

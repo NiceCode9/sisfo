@@ -100,7 +100,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::put('/calon-siswa/{id}', 'update')->name('calon-siswa.update');
         Route::delete('/calon-siswa/{id}', 'destroy')->name('calon-siswa.destroy');
         Route::put('/calon-siswa/{id}/status', 'updateStatus')->name('calon-siswa.update-status');
+
+        Route::post('/calon-siswa/{id}/upload-ulang', 'uploadUlang')
+            ->name('calon-siswa.upload-ulang');
     });
+    // Route::post('/calon-siswa/{id}/upload-ulang', [CalonSiswaController::class, 'uploadUlang'])
+    //     ->name('calon-siswa.upload-ulang');
 
     Route::controller('\App\Http\Controllers\PembayaranController')->group(function () {
         Route::get('/pembayaran', 'index')->name('pembayaran.index');

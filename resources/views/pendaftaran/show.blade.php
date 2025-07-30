@@ -353,50 +353,54 @@
                     </h5>
                 </div>
                 <div class="card-body p-0">
-                    @if ($calonSiswa->pembayaran->count() > 0)
-                        <div class="payment-history">
-                            @foreach ($calonSiswa->pembayaran as $pembayaran)
-                                <div class="payment-item">
-                                    <div class="payment-date">
-                                        <div class="date-main">
-                                            {{ \Carbon\Carbon::parse($pembayaran->tanggal_pembayaran)->format('d/m/Y') }}
+                    <div class="table-responsive">
+                        @if ($calonSiswa->pembayaran->count() > 0)
+                            <div class="payment-history">
+                                @foreach ($calonSiswa->pembayaran as $pembayaran)
+                                    <div class="payment-item">
+                                        <div class="payment-date">
+                                            <div class="date-main">
+                                                {{ \Carbon\Carbon::parse($pembayaran->tanggal_pembayaran)->format('d/m/Y') }}
+                                            </div>
+                                            <div class="date-code">{{ $pembayaran->kode_pembayaran }}</div>
                                         </div>
-                                        <div class="date-code">{{ $pembayaran->kode_pembayaran }}</div>
-                                    </div>
-                                    <div class="payment-details">
-                                        <div class="payment-type">{{ $pembayaran->biayaPendaftaran->jenis_biaya }}</div>
-                                        <div class="payment-method">{{ ucfirst($pembayaran->jenis_pembayaran) }}</div>
-                                        @if ($pembayaran->keterangan_angsuran)
-                                            <div class="payment-note">{{ $pembayaran->keterangan_angsuran }}</div>
-                                        @endif
-                                    </div>
-                                    <div class="payment-amount">
-                                        <div class="amount">Rp {{ number_format($pembayaran->jumlah, 0, ',', '.') }}</div>
-                                        <div class="status-badge status-{{ $pembayaran->status }}">
-                                            <i
-                                                class="bi {{ $pembayaran->status === 'berhasil' ? 'bi-check-circle' : ($pembayaran->status === 'pending' ? 'bi-clock' : 'bi-x-circle') }}"></i>
-                                            {{ ucfirst($pembayaran->status) }}
+                                        <div class="payment-details">
+                                            <div class="payment-type">{{ $pembayaran->biayaPendaftaran->jenis_biaya }}
+                                            </div>
+                                            <div class="payment-method">{{ ucfirst($pembayaran->jenis_pembayaran) }}</div>
+                                            @if ($pembayaran->keterangan_angsuran)
+                                                <div class="payment-note">{{ $pembayaran->keterangan_angsuran }}</div>
+                                            @endif
+                                        </div>
+                                        <div class="payment-amount">
+                                            <div class="amount">Rp {{ number_format($pembayaran->jumlah, 0, ',', '.') }}
+                                            </div>
+                                            <div class="status-badge status-{{ $pembayaran->status }}">
+                                                <i
+                                                    class="bi {{ $pembayaran->status === 'berhasil' ? 'bi-check-circle' : ($pembayaran->status === 'pending' ? 'bi-clock' : 'bi-x-circle') }}"></i>
+                                                {{ ucfirst($pembayaran->status) }}
+                                            </div>
+                                        </div>
+                                        <div class="payment-proof">
+                                            @if ($pembayaran->bukti_pembayaran_path)
+                                                <a href="{{ Storage::url($pembayaran->bukti_pembayaran_path) }}"
+                                                    target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
                                         </div>
                                     </div>
-                                    <div class="payment-proof">
-                                        @if ($pembayaran->bukti_pembayaran_path)
-                                            <a href="{{ Storage::url($pembayaran->bukti_pembayaran_path) }}"
-                                                target="_blank" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="empty-state">
-                            <i class="bi bi-receipt empty-icon"></i>
-                            <p class="empty-text">Belum ada riwayat pembayaran</p>
-                        </div>
-                    @endif
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="empty-state">
+                                <i class="bi bi-receipt empty-icon"></i>
+                                <p class="empty-text">Belum ada riwayat pembayaran</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -539,33 +543,35 @@
                                 <i class="bi bi-list-ol me-2"></i>Daftar Cicilan
                             </h6>
                             <div class="installment-list">
-                                @foreach ($detailAngsuran as $angsuran)
-                                    <div class="installment-row">
-                                        <div class="installment-number">{{ $angsuran->cicilan_ke }}</div>
-                                        <div class="installment-details">
-                                            <div class="installment-date">
-                                                {{ \Carbon\Carbon::parse($angsuran->tanggal_jatuh_tempo)->format('d/m/Y') }}
+                                <div class="table-responsive">
+                                    @foreach ($detailAngsuran as $angsuran)
+                                        <div class="installment-row">
+                                            <div class="installment-number">{{ $angsuran->cicilan_ke }}</div>
+                                            <div class="installment-details">
+                                                <div class="installment-date">
+                                                    {{ \Carbon\Carbon::parse($angsuran->tanggal_jatuh_tempo)->format('d/m/Y') }}
+                                                </div>
+                                                <div class="installment-amount">Rp
+                                                    {{ number_format($angsuran->nominal_cicilan, 0, ',', '.') }}</div>
                                             </div>
-                                            <div class="installment-amount">Rp
-                                                {{ number_format($angsuran->nominal_cicilan, 0, ',', '.') }}</div>
+                                            <div class="installment-status">
+                                                <span
+                                                    class="status-badge status-{{ $angsuran->status === 'dibayar' ? 'berhasil' : ($angsuran->status === 'belum_bayar' ? 'pending' : 'ditolak') }}">
+                                                    {{ ucfirst(str_replace('_', ' ', $angsuran->status)) }}
+                                                </span>
+                                            </div>
+                                            <div class="installment-action">
+                                                @if ($angsuran->status === 'belum_bayar')
+                                                    <button type="button" class="btn btn-sm btn-primary"
+                                                        onclick="setAngsuranId('{{ $angsuran->id }}', '{{ $angsuran->nominal_cicilan }}', '{{ $angsuran->rencanaAngsuran->biayaPendaftaran->mata_uang }}', '{{ $angsuran->rencanaAngsuran->biayaPendaftaran->id }}')"
+                                                        data-bs-toggle="modal" data-bs-target="#modalPembayaran">
+                                                        Bayar
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
-                                        <div class="installment-status">
-                                            <span
-                                                class="status-badge status-{{ $angsuran->status === 'dibayar' ? 'berhasil' : ($angsuran->status === 'belum_bayar' ? 'pending' : 'ditolak') }}">
-                                                {{ ucfirst(str_replace('_', ' ', $angsuran->status)) }}
-                                            </span>
-                                        </div>
-                                        <div class="installment-action">
-                                            @if ($angsuran->status === 'belum_bayar')
-                                                <button type="button" class="btn btn-sm btn-primary"
-                                                    onclick="setAngsuranId('{{ $angsuran->id }}', '{{ $angsuran->nominal_cicilan }}', '{{ $angsuran->rencanaAngsuran->biayaPendaftaran->mata_uang }}', '{{ $angsuran->rencanaAngsuran->biayaPendaftaran->id }}')"
-                                                    data-bs-toggle="modal" data-bs-target="#modalPembayaran">
-                                                    Bayar
-                                                </button>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     @endif

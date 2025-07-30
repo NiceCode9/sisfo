@@ -18,7 +18,9 @@ class BerkasCalonSiswa extends Model
         'foto_path',
         'skl_path',
         'catatan_berkas',
-        'status_verifikasi'
+        'berkas_perlu_perbaikan',
+        'alasan_penolakan',
+        'status_verifikasi',
     ];
 
     public function calonSiswa()

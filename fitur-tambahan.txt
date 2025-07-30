@@ -10,13 +10,14 @@ KEKURANGAN DAN OPSI TAMBAHAN FITUR :
 (PPDB)
 - Ubah menjadi datatable untuk halaman index Calon Siswa
 - Halaman Show ppdb tambahkan riwayat pendaftaran dan jika diterima ada pemberitahuan di tempatkan di kelas apa (x)
-- Perbaiki logic pembayaran angsuran (x)
+- Perbaiki logic pembayaran angsuran(x)
 
 (DATA MASTER)
-- proses edit delete di master siswa belum
+- proses edit delete di master siswa belum (x)
 - Tampilkan Email di list siswa
-- layout form di data master guru
+- layout form di data master guru(x)
 - ukuran foto guru maxnya di ganti jadi 5mb
+- periksa halaman show yg normal v3
 
 (E-LEARNING)
 - ganti tampilan agar lebih menarik

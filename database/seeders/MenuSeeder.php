@@ -19,7 +19,7 @@ class MenuSeeder extends Seeder
                 'name' => 'Dashboard',
                 'icon' => 'fas fa-tachometer-alt',
                 'group' => null, // Dashboard tidak masuk ke group manapun
-                // 'route' => 'dashboard',
+                'route' => 'dashboard',
                 // 'permission' => 'dashboard.view',
                 'order' => 1,
             ],

@@ -45,7 +45,7 @@ class GuruController extends Controller
                 'bidang_keahlian' => 'required|string|max:255',
                 'gelar' => 'required|string|max:50',
                 'telp' => 'required|string|max:15',
-                'foto_path' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+                'foto_path' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // Max 5MB
             ], [
                 'nip.required' => 'NIP wajib diisi',
                 'nip.unique' => 'NIP sudah terdaftar',
@@ -137,7 +137,7 @@ class GuruController extends Controller
                 'bidang_keahlian' => 'required|string|max:255',
                 'gelar' => 'required|string|max:50',
                 'telp' => 'required|string|max:15',
-                'foto_path' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+                'foto_path' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // Max 5MB
             ], [
                 'nip.required' => 'NIP wajib diisi',
                 'nip.unique' => 'NIP sudah terdaftar',

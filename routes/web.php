@@ -1,11 +1,16 @@
 <?php
 
 use App\Http\Controllers\ArtikelController;
+use App\Http\Controllers\FrontController;
 use App\Http\Controllers\GeneralProfileController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KomentarController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
+use App\Models\GeneralProfile;
+use App\Models\Guru;
+use App\Models\Siswa;
+use App\Models\TahunAjaran;
 // use App\Models\Artikel;
 // use App\Models\GeneralProfile;
 use Illuminate\Support\Facades\Route;
@@ -24,7 +29,13 @@ Route::group(['middleware' => ['guest']], function () {
             Route::post('/{artikel}/komentar', 'storeComment')->name('artikel.comment.store');
         });
 
-        Route::get('/about', 'about')->name('about');
+        Route::get('/about', 'aboutUs')->name('about');
+    });
+
+    Route::prefix('data-guru')->name('landing.guru.')->group(function () {
+        Route::get('/', [FrontController::class, 'guru'])->name('index');
+        Route::get('/search', [FrontController::class, 'search'])->name('search');
+        Route::get('/{id}', [FrontController::class, 'showGuru'])->name('show');
     });
 
     Route::post('/pendaftaran', [\App\Http\Controllers\CalonSiswaController::class, 'store'])->name('pendaftaran.store');
@@ -68,6 +79,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('siswa', \App\Http\Controllers\SiswaController::class);
     Route::resource('jawaban-siswa', \App\Http\Controllers\JawabanSiswaController::class);
     Route::resource('guru-kelas', \App\Http\Controllers\GuruKelasController::class);
+
+    Route::name('siswa.')->group(function () {
+        Route::get('/import-data-siswa', [\App\Http\Controllers\SiswaController::class, 'import'])->name('import');
+        Route::post('/import', [\App\Http\Controllers\SiswaController::class, 'processImport'])->name('process-import');
+        Route::get('/download-template', [\App\Http\Controllers\SiswaController::class, 'downloadTemplate'])->name('download-template');
+    });
 
     // Tugas submission routes
     Route::get('/tugas/{tugas}/submissions', [\App\Http\Controllers\TugasController::class, 'submissions'])->name('tugas.submissions');

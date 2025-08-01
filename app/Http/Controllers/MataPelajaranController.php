@@ -30,7 +30,7 @@ class MataPelajaranController extends Controller
                         data-deskripsi="' . $row->deskripsi . '">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button type="button" class="btn btn-sm btn-danger btn-delete">
+                    <button type="button" data-id="' . $row->id . '" class="btn btn-sm btn-danger btn-delete">
                         <i class="fas fa-trash"></i>
                     </button>
                 ';

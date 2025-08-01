@@ -6,12 +6,21 @@ use App\Models\CalonSiswa;
 use App\Models\Kelas;
 use App\Models\RiwayatKelas;
 use App\Models\TahunAjaran;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Yajra\DataTables\DataTables;
 
 class CalonSiswaController extends Controller
 {
+    private $whatsAppService;
+
+    public function __construct(WhatsAppService $whatsAppService)
+    {
+        $this->whatsAppService = $whatsAppService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -20,28 +29,54 @@ class CalonSiswaController extends Controller
         $tahunAjaran = TahunAjaran::orderBy('nama_tahun_ajaran', 'desc')->get();
         $tahunAjaranId = $request->tahun_ajaran_id ?? TahunAjaran::where('status_aktif', true)->first()->id;
 
-        $query = CalonSiswa::with('berkasCalonSiswa')
-            ->where('tahun_ajaran_id', $tahunAjaranId);
+        if ($request->ajax()) {
+            $query = CalonSiswa::with('berkasCalonSiswa')
+                ->where('tahun_ajaran_id', $tahunAjaranId);
 
-        // Filter berdasarkan status
-        if ($request->status && in_array($request->status, ['menunggu', 'diterima', 'ditolak'])) {
-            $query->where('status_pendaftaran', $request->status);
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    return '<a href="' . route('calon-siswa.show', $row->id) . '" class="btn btn-primary btn-sm">Detail</a>';
+                })
+                ->addColumn('status_badge', function ($row) {
+                    switch ($row->status_pendaftaran) {
+                        case 'menunggu':
+                            return '<span class="badge bg-warning">Menunggu</span>';
+                        case 'diterima':
+                            return '<span class="badge bg-success">Diterima</span>';
+                        case 'ditolak':
+                            return '<span class="badge bg-danger">Ditolak</span>';
+                        case 'perlu_perbaikan':
+                            return '<span class="badge bg-info text-dark">Perlu Perbaikan</span>';
+                        default:
+                            return '<span class="badge bg-secondary">Unknown</span>';
+                    }
+                })
+                ->addColumn('ttl', function ($row) {
+                    return $row->tempat_lahir . ', ' . \Carbon\Carbon::parse($row->tanggal_lahir)->format('d/m/Y');
+                })
+                ->filter(function ($query) use ($request) {
+                    // Filter berdasarkan status
+                    if ($request->has('status_filter') && $request->status_filter != '') {
+                        $query->where('status_pendaftaran', $request->status_filter);
+                    }
+
+                    // Global search
+                    if ($request->has('search') && $request->search['value'] != '') {
+                        $search = $request->search['value'];
+                        $query->where(function ($q) use ($search) {
+                            $q->where('nama_lengkap', 'like', "%{$search}%")
+                                ->orWhere('nik', 'like', "%{$search}%")
+                                ->orWhere('nisn', 'like', "%{$search}%")
+                                ->orWhere('no_pendaftaran', 'like', "%{$search}%");
+                        });
+                    }
+                })
+                ->rawColumns(['action', 'status_badge'])
+                ->make(true);
         }
 
-        // Pencarian berdasarkan nama, nik, atau nisn
-        if ($request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_lengkap', 'like', "%{$search}%")
-                    ->orWhere('nik', 'like', "%{$search}%")
-                    ->orWhere('nisn', 'like', "%{$search}%")
-                    ->orWhere('no_pendaftaran', 'like', "%{$search}%");
-            });
-        }
-
-        $calonSiswa = $query->get();
-
-        return view('pendaftaran.index', compact('calonSiswa', 'tahunAjaran', 'tahunAjaranId'));
+        return view('pendaftaran.index', compact('tahunAjaran', 'tahunAjaranId'));
     }
 
     /**
@@ -190,7 +225,7 @@ class CalonSiswaController extends Controller
             if ($request->status_pendaftaran === 'ditolak' || $request->status_pendaftaran === 'perlu_perbaikan') {
                 $calonSiswa->berkasCalonSiswa->update([
                     'alasan_penolakan' => $request->catatan,
-                    'berkas_perlu_perbaikan' => json_encode($request->berkas_perlu_perbaikan ?? [])
+                    'berkas_perlu_perbaikan' => $request->berkas_select ?? []
                 ]);
             }
 
@@ -254,6 +289,24 @@ class CalonSiswaController extends Controller
                 'status_pendaftaran' => $validated['status_pendaftaran']
             ]);
 
+            $pesan = "SMP PIRI NGAGLIK\n\n";
+            $pesan .= "Status pendaftaran Anda telah diperbarui menjadi: " . strtoupper(str_replace('_', ' ', $validated['status_pendaftaran'])) . "\n";
+
+            if ($validated['status_pendaftaran'] === 'perlu_perbaikan') {
+                $berkasPerluPerbaikan = $calonSiswa->berkasCalonSiswa->berkas_perlu_perbaikan ?? [];
+                if (!empty($berkasPerluPerbaikan)) {
+                    $pesan .= "Silakan unggah ulang berkas berikut:\n";
+                    foreach ($berkasPerluPerbaikan as $berkas) {
+                        $pesan .= "- " . str_replace('_', ' ', pathinfo($berkas, PATHINFO_FILENAME)) . "\n";
+                    }
+                }
+            }
+
+            $pesan .= "\nTerima kasih telah mendaftar di SMP PIRI NGAGLIK.";
+
+            $target = $this->whatsAppService->formatPhoneNumber('081328006147');
+            $this->whatsAppService->sendMessage($target, $pesan);
+
             DB::commit();
 
             return redirect()->route('calon-siswa.show', $id)
@@ -263,5 +316,41 @@ class CalonSiswaController extends Controller
             dd($e);
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
+    }
+
+    public function uploadUlang(Request $request, $id)
+    {
+        $request->validate([
+            'berkas_type' => 'required|in:ijazah_path,kk_path,akta_path,foto_path,skl_path',
+            'berkas_file' => 'required|file|mimes:pdf,jpeg,png,jpg|max:5120'
+        ]);
+
+        $calonSiswa = CalonSiswa::findOrFail($id);
+
+        if ($calonSiswa->status_pendaftaran !== 'perlu_perbaikan') {
+            return back()->withErrors(['error' => 'Tidak bisa mengunggah ulang berkas saat ini']);
+        }
+
+        // Simpan file
+        $path = $request->file('berkas_file')->store(
+            'berkas/' . $request->berkas_type,
+            'public'
+        );
+
+        // Update path berkas
+        $calonSiswa->berkasCalonSiswa->update([
+            $request->berkas_type => $path
+        ]);
+
+        // Hapus dari daftar perlu perbaikan jika ada
+        $berkasPerluPerbaikan = $calonSiswa->berkasCalonSiswa->berkas_perlu_perbaikan;
+        if (($key = array_search($request->berkas_type, $berkasPerluPerbaikan)) !== false) {
+            unset($berkasPerluPerbaikan[$key]);
+            $calonSiswa->berkasCalonSiswa->update([
+                'berkas_perlu_perbaikan' => array_values($berkasPerluPerbaikan)
+            ]);
+        }
+
+        return back()->with('success', 'Berkas berhasil diunggah ulang');
     }
 }

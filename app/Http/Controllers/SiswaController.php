@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\SiswaImport;
 use App\Models\CalonSiswa;
 use App\Models\Kelas;
 use App\Models\Siswa;
@@ -10,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SiswaController extends Controller
 {
@@ -261,5 +263,122 @@ class SiswaController extends Controller
                 'message' => 'Gagal menghapus data siswa: ' . $th->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Show import form
+     */
+    public function import()
+    {
+        return view('master.siswa.import');
+    }
+
+    /**
+     * Process import from Excel
+     */
+    public function processImport(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120' // Max 5MB
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $import = new SiswaImport();
+
+            Excel::import($import, $file);
+
+            $successCount = $import->getSuccessCount();
+            $skipCount = $import->getSkipCount();
+            $errors = $import->getErrors();
+
+            $message = "Import selesai! {$successCount} data berhasil diimport";
+            if ($skipCount > 0) {
+                $message .= ", {$skipCount} data dilewati";
+            }
+
+            if (!empty($errors)) {
+                return redirect()->route('siswa.import')
+                    ->with('warning', $message)
+                    ->with('errors', $errors);
+            }
+
+            return redirect()->route('siswa.index')
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->route('siswa.import')
+                ->with('error', 'Gagal mengimport data: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download template Excel
+     */
+    public function downloadTemplate()
+    {
+        $headers = [
+            'nik',
+            'nisn',
+            'nis',
+            'nama_lengkap',
+            'jenis_kelamin',
+            'tempat_lahir',
+            'tanggal_lahir',
+            'agama',
+            'alamat',
+            'no_hp',
+            'email',
+            'asal_sekolah',
+            'nama_ayah',
+            'pekerjaan_ayah',
+            'nama_ibu',
+            'pekerjaan_ibu',
+            'no_hp_orang_tua',
+            'tingkat_kelas',
+            'nama_kelas',
+            'kelas_awal'
+        ];
+
+        // Sample data
+        $sampleData = [
+            [
+                '1234567890123456',
+                '1234567890',
+                '2024001',
+                'John Doe',
+                'L',
+                'Jakarta',
+                '2010-01-15',
+                'Islam',
+                'Jl. Contoh No. 123',
+                '081234567890',
+                'john@example.com',
+                'SD Negeri 1',
+                'Budi Santoso',
+                'Wiraswasta',
+                'Siti Aminah',
+                'Ibu Rumah Tangga',
+                '081234567891',
+                '7',
+                'A',
+                '7'
+            ]
+        ];
+
+        $data = array_merge([$headers], $sampleData);
+
+        return Excel::download(new class($data) implements \Maatwebsite\Excel\Concerns\FromArray {
+            private $data;
+
+            public function __construct($data)
+            {
+                $this->data = $data;
+            }
+
+            public function array(): array
+            {
+                return $this->data;
+            }
+        }, 'template_import_siswa.xlsx');
     }
 }

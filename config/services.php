@@ -39,6 +39,13 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
     ],
 
+    'whatsapp' => [
+        'api_url' => env('WHATSAPP_API_URL', 'https://api.fonnte.com/send'),
+        'token' => env('WHATSAPP_TOKEN'),
+        'country_code' => env('WHATSAPP_COUNTRY_CODE', '62'),
+        'default_delay' => env('WHATSAPP_DEFAULT_DELAY', '2'),
+    ],
+
     // 'permission' => [
     //     'super_admin_role' => 'super-admin',
     // ],

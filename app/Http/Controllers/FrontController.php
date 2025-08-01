@@ -175,15 +175,134 @@ class FrontController extends Controller
         return redirect()->to(url()->previous() . '#comments')->with('success', 'Komentar Anda telah berhasil dikirim dan menunggu persetujuan.');
     }
 
-    public function about()
+    public function aboutUs()
     {
-        $profile = GeneralProfile::firstOrFail();
+        $profile = GeneralProfile::first();
         $guruCount = Guru::count();
         $siswaCount = Siswa::whereHas('riwayatKelas', function ($query) {
             $query->where('tahun_ajaran_id', TahunAjaran::aktif()->first()->value('id'))->where('status', 'aktif');
         })->count();
-        dd($siswaCount);
 
-        return view('landing.aboutv2', compact('profile', 'guruCount'));
+        return view('landing.aboutv2', compact('profile', 'guruCount', 'siswaCount'));
+    }
+
+    public function guru()
+    {
+        $gurus = Guru::with(['user', 'mataPelajaran'])
+            ->whereHas('user') // Only show gurus with user accounts
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Add some statistics
+        $stats = [
+            'total_guru' => $gurus->count(),
+            'guru_s1' => $gurus->filter(function ($guru) {
+                return strpos(strtolower($guru->gelar ?? ''), 's.pd') !== false ||
+                    strpos(strtolower($guru->gelar ?? ''), 's1') !== false;
+            })->count(),
+            'guru_s2' => $gurus->filter(function ($guru) {
+                return strpos(strtolower($guru->gelar ?? ''), 'm.pd') !== false ||
+                    strpos(strtolower($guru->gelar ?? ''), 's2') !== false;
+            })->count(),
+        ];
+
+        return view('landing.guru', compact('gurus', 'stats'));
+    }
+
+    public function showGuru($id)
+    {
+        $guru = Guru::with(['user', 'mataPelajaran'])
+            ->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $guru->id,
+                'nama' => $guru->user->name ?? 'Nama tidak tersedia',
+                'nip' => $guru->nip,
+                'biografi' => $guru->biografi,
+                'bidang_keahlian' => $guru->bidang_keahlian,
+                'alamat' => $guru->alamat,
+                'gelar' => $guru->gelar,
+                'telp' => $guru->telp,
+                'foto' => $guru->foto_path ? asset('storage/' . $guru->foto_path) : asset('images/default-avatar.png'),
+                'mata_pelajaran' => $guru->mataPelajaran->map(function ($mp) {
+                    return [
+                        'id' => $mp->id,
+                        'nama' => $mp->nama,
+                        'icon' => $this->getMataPelajaranIcon($mp->nama)
+                    ];
+                })->toArray(),
+                'kelas_yang_diajar' => $guru->kelasYangDiajar()->pluck('nama')->toArray()
+            ]
+        ]);
+    }
+
+    /**
+     * Search gurus based on query
+     */
+    public function search(Request $request)
+    {
+        $query = $request->get('q', '');
+
+        $gurus = Guru::with(['user', 'mataPelajaran'])
+            ->whereHas('user', function ($q) use ($query) {
+                $q->where('name', 'like', '%' . $query . '%');
+            })
+            ->orWhere('bidang_keahlian', 'like', '%' . $query . '%')
+            ->orWhere('gelar', 'like', '%' . $query . '%')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $gurus->map(function ($guru) {
+                return [
+                    'id' => $guru->id,
+                    'nama' => $guru->user->name ?? 'Nama tidak tersedia',
+                    'gelar' => $guru->gelar,
+                    'bidang_keahlian' => $guru->bidang_keahlian,
+                    'foto' => $guru->foto_path ? asset('storage/' . $guru->foto_path) : asset('images/default-avatar.png'),
+                    'biografi_preview' => \Str::limit($guru->biografi, 80)
+                ];
+            })
+        ]);
+    }
+
+    /**
+     * Get icon for mata pelajaran
+     */
+    private function getMataPelajaranIcon($nama)
+    {
+        $icons = [
+            'matematika' => 'fas fa-calculator',
+            'bahasa indonesia' => 'fas fa-book',
+            'bahasa inggris' => 'fas fa-globe',
+            'ipa' => 'fas fa-flask',
+            'ips' => 'fas fa-map',
+            'fisika' => 'fas fa-atom',
+            'kimia' => 'fas fa-vial',
+            'biologi' => 'fas fa-seedling',
+            'sejarah' => 'fas fa-landmark',
+            'geografi' => 'fas fa-mountain',
+            'ekonomi' => 'fas fa-chart-line',
+            'sosiologi' => 'fas fa-users',
+            'pkn' => 'fas fa-flag',
+            'agama' => 'fas fa-pray',
+            'seni budaya' => 'fas fa-palette',
+            'olahraga' => 'fas fa-running',
+            'tik' => 'fas fa-laptop',
+            'prakarya' => 'fas fa-tools',
+        ];
+
+        $namaLower = strtolower($nama);
+
+        foreach ($icons as $subject => $icon) {
+            if (strpos($namaLower, $subject) !== false) {
+                return $icon;
+            }
+        }
+
+        return 'fas fa-book'; // default icon
     }
 }

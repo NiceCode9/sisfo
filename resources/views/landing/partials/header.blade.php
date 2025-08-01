@@ -22,7 +22,7 @@
                         <span
                             class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                     </a>
-                    <a href="#gallery" class="relative px-3 py-2 text-sm font-medium group">
+                    <a href="{{ route('landing.guru.index') }}" class="relative px-3 py-2 text-sm font-medium group">
                         <span class="text-gray-700 group-hover:text-primary">Gallery</span>
                         <span
                             class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>

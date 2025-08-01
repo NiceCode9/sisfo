@@ -23,6 +23,10 @@ class BerkasCalonSiswa extends Model
         'status_verifikasi',
     ];
 
+    protected $casts = [
+        'berkas_perlu_perbaikan' => 'array',
+    ];
+
     public function calonSiswa()
     {
         return $this->belongsTo(CalonSiswa::class);

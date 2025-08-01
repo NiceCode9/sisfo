@@ -18,123 +18,66 @@
                             </svg>
                         </a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Roles</li>
+                    <li class="breadcrumb-item active" aria-current="page">Data Pendaftaran</li>
                 </ol>
             </nav>
             <h2 class="h4">Data Pendaftaran</h2>
-            {{-- <p class="mb-0">Data Pendaftaran</p> --}}
         </div>
     </div>
 
-    <div class="table-settings mb-4">
-        <div class="row align-items-center justify-content-between">
-            <form action="{{ route('calon-siswa.index') }}" method="GET" class="row">
-                <div class="col-md-4">
-                    <div class="input-group me-2 me-lg-3">
-                        <span class="input-group-text">
-                            <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                    clip-rule="evenodd"></path>
-                            </svg>
-                        </span>
-                        <input type="text" class="form-control" name="search" value="{{ request('search') }}"
-                            placeholder="Cari berdasarkan nama, NIK, NISN..." aria-label="Search">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" name="tahun_ajaran_id" onchange="this.form.submit()">
+    <!-- Filter Section -->
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter & Pencarian</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="tahun_ajaran_filter" class="form-label">Tahun Ajaran</label>
+                    <select class="form-select" id="tahun_ajaran_filter">
                         @foreach ($tahunAjaran as $ta)
-                            <option value="{{ $ta->id }}"
-                                {{ request('tahun_ajaran_id', $tahunAjaranId) == $ta->id ? 'selected' : '' }}>
+                            <option value="{{ $ta->id }}" {{ $tahunAjaranId == $ta->id ? 'selected' : '' }}>
                                 {{ $ta->nama_tahun_ajaran }}
                             </option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select" name="status" onchange="this.form.submit()">
+                <div class="col-md-6">
+                    <label for="status_filter" class="form-label">Status</label>
+                    <select class="form-select" id="status_filter">
                         <option value="">Semua Status</option>
-                        <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
-                        <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                        <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                        <option value="menunggu">Menunggu</option>
+                        <option value="diterima">Diterima</option>
+                        <option value="ditolak">Ditolak</option>
+                        <option value="perlu_perbaikan">Perlu Perbaikan</option>
                     </select>
                 </div>
-                {{-- <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        Cari
-                    </button>
-                </div> --}}
-            </form>
+            </div>
         </div>
     </div>
 
+    <!-- Data Table -->
     <div class="card shadow border-0 mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Siswa</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Daftar Calon Siswa</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover" id="calon-siswa-table" style="width: 100%;">
                     <thead class="thead-light">
                         <tr>
                             <th>No</th>
-                            <th>NoMor Pendaftaran</th>
+                            <th>No. Pendaftaran</th>
                             <th>NIK</th>
                             <th>NISN</th>
                             <th>Nama Lengkap</th>
                             <th>Jenis Kelamin</th>
-                            <th>Tempat Tanggal Lahir</th>
+                            <th>Tempat, Tanggal Lahir</th>
                             <th>Status</th>
-                            <th>Profile</th>
-                            {{-- <th>Aksi</th> --}}
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($calonSiswa as $casis)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $casis->no_pendaftaran }}</td>
-                                <td>{{ $casis->nik }}</td>
-                                <td>{{ $casis->nisn }}</td>
-                                <td>{{ $casis->nama_lengkap }}</td>
-                                <td>{{ $casis->jenis_kelamin }}</td>
-                                <td>{{ $casis->tempat_lahir }},
-                                    {{ \Carbon\Carbon::parse($casis->tanggal_lahir)->format('d/m/Y') }}</td>
-                                <td>
-                                    @if ($casis->status_pendaftaran == 'menunggu')
-                                        <span class="badge bg-warning">Menunggu</span>
-                                    @elseif($casis->status_pendaftaran == 'diterima')
-                                        <span class="badge bg-success">Diterima</span>
-                                    @elseif($casis->status_pendaftaran == 'ditolak')
-                                        <span class="badge bg-danger">Ditolak</span>
-                                    @endif
-                                </td>
-                                <td><a href="{{ route('calon-siswa.show', $casis->id) }}"
-                                        class="btn btn-primary btn-sm">Detail</a></td>
-                                {{-- <td>
-                                    <div class="btn-group" role="group">
-                                        <a href="{{ route('calon-siswa.edit', $casis->id) }}"
-                                            class="btn btn-warning btn-sm">Edit</a>
-                                        <form action="{{ route('calon-siswa.destroy', $casis->id) }}" method="POST"
-                                            style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td> --}}
-                            </tr>
-                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -142,3 +85,132 @@
     </div>
 
 @endsection
+
+@push('styles')
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+@endpush
+
+@push('scripts')
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#calon-siswa-table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: "{{ route('calon-siswa.index') }}",
+                    data: function(d) {
+                        d.tahun_ajaran_id = $('#tahun_ajaran_filter').val();
+                        d.status_filter = $('#status_filter').val();
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        width: '5%'
+                    },
+                    {
+                        data: 'no_pendaftaran',
+                        name: 'no_pendaftaran',
+                        width: '12%'
+                    },
+                    {
+                        data: 'nik',
+                        name: 'nik',
+                        width: '12%'
+                    },
+                    {
+                        data: 'nisn',
+                        name: 'nisn',
+                        width: '10%'
+                    },
+                    {
+                        data: 'nama_lengkap',
+                        name: 'nama_lengkap',
+                        width: '18%'
+                    },
+                    {
+                        data: 'jenis_kelamin',
+                        name: 'jenis_kelamin',
+                        width: '8%',
+                        render: function(data) {
+                            return data === 'L' ? 'Laki-laki' : 'Perempuan';
+                        }
+                    },
+                    {
+                        data: 'ttl',
+                        name: 'ttl',
+                        orderable: false,
+                        width: '15%'
+                    },
+                    {
+                        data: 'status_badge',
+                        name: 'status_pendaftaran',
+                        width: '10%',
+                        orderable: false
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        width: '10%'
+                    }
+                ],
+                order: [
+                    [1, 'desc']
+                ],
+                pageLength: 25,
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "Semua"]
+                ],
+                // language: {
+                //     processing: "Memproses...",
+                //     search: "Pencarian:",
+                //     lengthMenu: "Tampilkan _MENU_ data per halaman",
+                //     info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                //     infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                //     infoFiltered: "(disaring dari _MAX_ total data)",
+                //     loadingRecords: "Memuat...",
+                //     zeroRecords: "Tidak ada data yang cocok",
+                //     emptyTable: "Tidak ada data tersedia",
+                //     paginate: {
+                //         first: "Pertama",
+                //         previous: "Sebelumnya",
+                //         next: "Selanjutnya",
+                //         last: "Terakhir"
+                //     }
+                // },
+                // dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                //     '<"row"<"col-sm-12"tr>>' +
+                //     '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+            });
+
+            // Filter by Tahun Ajaran
+            $('#tahun_ajaran_filter').change(function() {
+                table.draw();
+            });
+
+            // Filter by Status
+            $('#status_filter').change(function() {
+                table.draw();
+            });
+
+            // Custom search functionality
+            $('#calon-siswa-table_filter input').attr('placeholder',
+                'Cari berdasarkan nama, NIK, NISN, atau nomor pendaftaran...');
+        });
+    </script>
+@endpush

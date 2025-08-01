@@ -32,7 +32,7 @@
                     <span class="status-badge status-{{ $calonSiswa->status_pendaftaran }}">
                         <i
                             class="bi {{ $calonSiswa->status_pendaftaran === 'diterima' ? 'bi-check-circle' : ($calonSiswa->status_pendaftaran === 'ditolak' ? 'bi-x-circle' : 'bi-clock') }}"></i>
-                        {{ ucfirst($calonSiswa->status_pendaftaran) }}
+                        {{ ucfirst(str_replace('_', ' ', $calonSiswa->status_pendaftaran)) }}
                     </span>
                 </div>
             </div>
@@ -743,7 +743,7 @@
             </div>
 
             <!-- Status Update Card -->
-            @if ($calonSiswa->status_pendaftaran === 'menunggu')
+            @if ($calonSiswa->status_pendaftaran === 'menunggu' || $calonSiswa->status_pendaftaran === 'perlu_perbaikan')
                 <div class="card modern-card">
                     <div class="card-header card-header-warning">
                         <h5 class="card-title">
@@ -774,6 +774,7 @@
                                         required>
                                         <option value="">Pilih keputusan...</option>
                                         <option value="diterima">✅ Diterima</option>
+                                        <option value="perlu_perbaikan">🛠️ Perlu Perbaikan</option>
                                         <option value="ditolak">❌ Ditolak</option>
                                     </select>
                                 </div>
@@ -786,6 +787,20 @@
                                         @foreach ($kelas as $k)
                                             <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
                                         @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-12 d-none" id="berkasSelect">
+                                    <label for="berkas_select" class="form-label">
+                                        <i class="bi bi-file-earmark-text text-secondary me-1"></i>Berkas Perlu Perbaikan
+                                    </label>
+                                    <select class="form-control choices-multiple" id="berkas_select"
+                                        data-placeholder="Choose anything" name="berkas_select[]" multiple>
+                                        <option value="">Pilih berkas yang perlu diperbaiki...</option>
+                                        <option value="akta_path">Akta Kelahiran</option>
+                                        <option value="skl_path">Surat Keterangan Lulus</option>
+                                        <option value="kk_path">Kartu Keluarga</option>
+                                        <option value="foto_path">Foto Calon Siswa</option>
+                                        <option value="ijazah_path">Ijazah</option>
                                     </select>
                                 </div>
                                 <div class="col-12">
@@ -805,12 +820,86 @@
                     </div>
                 </div>
             @endif
+
+            <!-- Upload ulang berkas -->
+            @if ($calonSiswa->status_pendaftaran === 'perlu_perbaikan' && $calonSiswa->berkasCalonSiswa->berkas_perlu_perbaikan)
+                <div class="card modern-card mt-4">
+                    <div class="card-header card-header-warning">
+                        <h5 class="card-title">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Perlu Perbaikan Berkas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <strong>Alasan Penolakan:</strong>
+                            <p>{{ $calonSiswa->berkasCalonSiswa->alasan_penolakan }}</p>
+                        </div>
+
+                        <h6>Berkas yang perlu diperbaiki:</h6>
+                        <ul class="list-group">
+                            @foreach ($calonSiswa->berkasCalonSiswa->berkas_perlu_perbaikan as $berkas)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ ucfirst(str_replace('_', ' ', str_replace('_path', '', $berkas))) }}
+                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#uploadUlangModal" data-berkas-type="{{ $berkas }}">
+                                        <i class="bi bi-upload me-1"></i>Upload Ulang
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Modal Upload Ulang -->
+                <div class="modal fade" id="uploadUlangModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="{{ route('calon-siswa.upload-ulang', $calonSiswa->id) }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Upload Ulang Berkas</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" name="berkas_type" id="modalBerkasType">
+                                    <div class="mb-3">
+                                        <label for="berkas_file" class="form-label">File Berkas</label>
+                                        <input type="file" class="form-control" id="berkas_file" name="berkas_file"
+                                            required>
+                                        <div class="form-text">Format: PDF, JPG, PNG. Maksimal: 5MB</div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                @push('scripts')
+                    <script>
+                        $('#uploadUlangModal').on('show.bs.modal', function(event) {
+                            var button = $(event.relatedTarget);
+                            var berkasType = button.data('berkas-type');
+                            var modal = $(this);
+                            modal.find('#modalBerkasType').val(berkasType);
+                            modal.find('.modal-title').text('Upload Ulang ' + berkasType.replace('_path', '').replace('_', ' '));
+                        });
+                    </script>
+                @endpush
+            @endif
         </div>
     </div>
 @endsection
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <style>
         /* Modern CSS Variables */
         :root {
@@ -915,6 +1004,11 @@
         }
 
         .status-badge.status-menunggu {
+            background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+            color: #333;
+        }
+
+        .status-badge.status-perlu_perbaikan {
             background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
             color: #333;
         }
@@ -1786,8 +1880,10 @@
 @endpush
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         // Enhanced JavaScript with modern animations and interactions
+        new window.Choices(document.querySelector(".choices-multiple"));
 
         // Function to set biaya ID for payment modal
         function setBiayaId(biayaId, jumlah, mataUang, dapatDiangsur = false, minDp = 0) {
@@ -2013,25 +2109,57 @@
             if (statusSelect) {
                 statusSelect.addEventListener('change', function(e) {
                     const kelasSelect = document.getElementById('kelasSelect');
+                    const berkasSelect = document.getElementById('berkasSelect');
                     const value = this.value;
 
                     if (value === 'diterima') {
+                        // Show kelasSelect
                         kelasSelect.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
                         kelasSelect.style.maxHeight = '0';
                         kelasSelect.style.opacity = '0';
                         kelasSelect.classList.remove('d-none');
-
                         setTimeout(() => {
                             kelasSelect.style.maxHeight = '100px';
                             kelasSelect.style.opacity = '1';
                         }, 10);
-                    } else {
+                        // Hide berkasSelect
+                        berkasSelect.style.transition = 'all 0.3s ease';
+                        berkasSelect.style.maxHeight = '0';
+                        berkasSelect.style.opacity = '0';
+                        setTimeout(() => {
+                            berkasSelect.classList.add('d-none');
+                        }, 300);
+                    } else if (value === 'perlu_perbaikan') {
+                        // Hide kelasSelect
                         kelasSelect.style.transition = 'all 0.3s ease';
                         kelasSelect.style.maxHeight = '0';
                         kelasSelect.style.opacity = '0';
-
                         setTimeout(() => {
                             kelasSelect.classList.add('d-none');
+                        }, 300);
+                        // Show berkasSelect
+                        berkasSelect.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                        berkasSelect.style.maxHeight = '0';
+                        berkasSelect.style.opacity = '0';
+                        berkasSelect.classList.remove('d-none');
+                        setTimeout(() => {
+                            berkasSelect.style.maxHeight = '100px';
+                            berkasSelect.style.opacity = '1';
+                        }, 10);
+                    } else {
+                        // Hide both
+                        kelasSelect.style.transition = 'all 0.3s ease';
+                        kelasSelect.style.maxHeight = '0';
+                        kelasSelect.style.opacity = '0';
+                        setTimeout(() => {
+                            kelasSelect.classList.add('d-none');
+                        }, 300);
+
+                        berkasSelect.style.transition = 'all 0.3s ease';
+                        berkasSelect.style.maxHeight = '0';
+                        berkasSelect.style.opacity = '0';
+                        setTimeout(() => {
+                            berkasSelect.classList.add('d-none');
                         }, 300);
                     }
                 });

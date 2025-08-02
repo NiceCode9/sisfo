@@ -77,7 +77,7 @@ class Artikel extends Model
     // Relationships
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Kategori::class);
+        return $this->belongsTo(Kategori::class, 'category_id');
     }
 
     public function author(): BelongsTo

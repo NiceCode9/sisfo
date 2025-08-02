@@ -90,6 +90,7 @@ class User extends Authenticatable
         return $query->where('is_active', true);
     }
 
+
     // Methods
     // public function getUrlAttribute()
     // {

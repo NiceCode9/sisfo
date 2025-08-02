@@ -40,7 +40,7 @@ class Kategori extends Model
     // Relationships
     public function articles(): HasMany
     {
-        return $this->hasMany(Artikel::class);
+        return $this->hasMany(Artikel::class, 'category_id');
     }
 
     public function publishedArticles(): HasMany

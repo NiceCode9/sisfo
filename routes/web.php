@@ -30,7 +30,11 @@ Route::group(['middleware' => ['guest']], function () {
         });
 
         Route::get('/about', 'aboutUs')->name('about');
+
+        Route::get('/ekstrakurikuler-sekolah', 'ekstrakurikuler')->name('ekstrakurikuler.index');
     });
+
+    Route::get('ekstrakurikuler/daftar', [\App\Http\Controllers\EkstrakurikulerController::class, 'daftar'])->name('ekstrakurikuler.daftar');
 
     Route::prefix('data-guru')->name('landing.guru.')->group(function () {
         Route::get('/', [FrontController::class, 'guru'])->name('index');
@@ -79,6 +83,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('siswa', \App\Http\Controllers\SiswaController::class);
     Route::resource('jawaban-siswa', \App\Http\Controllers\JawabanSiswaController::class);
     Route::resource('guru-kelas', \App\Http\Controllers\GuruKelasController::class);
+    Route::resource('ekstrakurikuler', \App\Http\Controllers\EkstrakurikulerController::class);
 
     Route::name('siswa.')->group(function () {
         Route::get('/import-data-siswa', [\App\Http\Controllers\SiswaController::class, 'import'])->name('import');

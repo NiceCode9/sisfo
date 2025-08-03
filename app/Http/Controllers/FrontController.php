@@ -305,4 +305,18 @@ class FrontController extends Controller
 
         return 'fas fa-book'; // default icon
     }
+
+    public function ekstrakurikuler()
+    {
+        $ekstrakurikulers = \App\Models\Ekstrakurikuler::where('status', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $siswa = Siswa::whereHas('riwayatKelas', function ($query) {
+            $query->where('tahun_ajaran_id', TahunAjaran::aktif()->first()->value('id'))
+                ->where('status', 'aktif');
+        })->get();
+
+        return view('landing.ekstrakulikuler', compact('ekstrakurikulers', 'siswa'));
+    }
 }

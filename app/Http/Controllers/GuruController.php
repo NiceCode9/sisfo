@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class GuruController extends Controller
@@ -80,7 +81,7 @@ class GuruController extends Controller
                 'guru_id' => $guru->id,
                 'name' => $request->nama,
                 'email' => $request->email,
-                'username' => $request->nip,
+                'username' => $request->nip ?: Str::random(8),
                 'password' => Hash::make($request->nip), // Default password is NIP
             ]);
 
@@ -175,7 +176,7 @@ class GuruController extends Controller
             $guru->user->update([
                 'name' => $request->nama,
                 'email' => $request->email,
-                'username' => $request->nip,
+                'username' => $request->nip ?: Str::random(8),
             ]);
 
             DB::commit();

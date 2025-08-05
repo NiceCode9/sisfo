@@ -135,7 +135,7 @@ class SiswaImport implements ToCollection, WithHeadingRow, WithValidation, WithB
                 ]);
 
                 // Buat user account
-                $username = $row['nik'];
+                $username = $row['nisn'];
                 $email = $row['email'] ?? $username . '@smppiri.sch.id';
 
                 // Pastikan username unik

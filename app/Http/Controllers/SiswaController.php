@@ -131,7 +131,7 @@ class SiswaController extends Controller
             $siswa->user()->create([
                 'name' => $casis_dt->nama_lengkap,
                 'email' => $casis_dt->email ?? 'smppiri@sekolah.com',
-                'username' => $casis_dt->nik,
+                'username' => $casis_dt->nisn,
                 'password' => bcrypt('password'),
                 'slug' => Str::slug($casis_dt->nama_lengkap . '-' . $casis_dt->nik),
             ]);

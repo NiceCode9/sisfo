@@ -165,6 +165,14 @@ class MenuSeeder extends Seeder
                 ]
             ],
             [
+                'name' => 'Dashboard',
+                'icon' => 'fas fa-tachometer-alt',
+                'group' => null, // Dashboard tidak masuk ke group manapun
+                'route' => 'dashboard',
+                // 'permission' => 'dashboard.view',
+                'order' => 1,
+            ],
+            [
                 'name' => 'Manajemen User',
                 'icon' => 'fas fa-users-cog',
                 'permission' => 'manage_user_management',
@@ -300,16 +308,16 @@ class MenuSeeder extends Seeder
                         'name' => 'Menu',
                         'route' => 'menus.index',
                         'permission' => 'manage_menus',
-                        'icon' => 'fas fa-bars',
+                        // 'icon' => 'fas fa-bars',
                         'group' => 'General',
                     ],
-                    // [
-                    //     'name' => 'Konfigurasi',
-                    //     'route' => 'settings.index',
-                    //     'permission' => 'settings.view',
-                    //     'icon' => 'fas fa-sliders-h',
-                    //     'group' => 'General',
-                    // ],
+                    [
+                        'name' => 'Konfigurasi',
+                        'route' => 'general-profile.index',
+                        'permission' => 'manage_general_profile',
+                        // 'icon' => 'fas fa-sliders-h',
+                        'group' => 'General',
+                    ],
                     // [
                     //     'name' => 'Backup Database',
                     //     'route' => 'backup.index',

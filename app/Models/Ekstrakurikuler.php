@@ -26,6 +26,16 @@ class Ekstrakurikuler extends Model
         return 'slug';
     }
 
+    public function pendaftaranEkskul()
+    {
+        return $this->hasMany(PendaftaranEkskul::class);
+    }
+
+    public function anggotaAktif()
+    {
+        return $this->pendaftaranEkskul()->where('status', true)->count();
+    }
+
     // Accessor untuk status (untuk display)
     public function getStatusLabelAttribute()
     {

@@ -56,6 +56,8 @@ class RolePermissionSeeder extends Seeder
             'manage_tags',
             'manage_artikel',
             'manage_komentar',
+            'manage_ekstrakurikuler',
+            'manage_general_profile',
             // 'manage_jawaban',
             // 'manage_pengumpulan_tugas',
             // 'manage_jawaban_siswa',

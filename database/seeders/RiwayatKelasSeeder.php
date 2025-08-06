@@ -22,9 +22,9 @@ class RiwayatKelasSeeder extends Seeder
         $siswaList = DB::table('siswa')->get();
 
         // Ambil kelas berdasarkan tingkat
-        $kelasX = DB::table('kelas')->where('tingkat', 10)->pluck('id')->toArray();
-        $kelasXI = DB::table('kelas')->where('tingkat', 11)->pluck('id')->toArray();
-        $kelasXII = DB::table('kelas')->where('tingkat', 12)->pluck('id')->toArray();
+        $kelasX = DB::table('kelas')->where('tingkat', 7)->pluck('id')->toArray();
+        $kelasXI = DB::table('kelas')->where('tingkat', 8)->pluck('id')->toArray();
+        $kelasXII = DB::table('kelas')->where('tingkat', 9)->pluck('id')->toArray();
 
         // Pastikan ada kelas untuk setiap tingkat
         if (empty($kelasX) || empty($kelasXI) || empty($kelasXII)) {

@@ -21,6 +21,7 @@
                                         <th width="20%">Nama Ekstrakurikuler</th>
                                         <th width="30%">Deskripsi</th>
                                         <th width="10%">Status</th>
+                                        <th width="10%">Anggota Aktif</th>
                                         <th width="20%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -40,7 +41,12 @@
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td>{{ $ekskul->nama_ekskul }}</td>
+                                            <td>
+                                                <a href="{{ route('ekstrakurikuler.show', $ekskul->slug) }}"
+                                                    class="text-decoration-none fw-bold">
+                                                    {{ $ekskul->nama_ekskul }}
+                                                </a>
+                                            </td>
                                             <td>{{ Str::limit($ekskul->deskripsi, 100) }}</td>
                                             <td>
                                                 @if ($ekskul->getRawOriginal('status'))
@@ -50,20 +56,27 @@
                                                 @endif
                                             </td>
                                             <td>
+                                                <span class="badge bg-info">
+                                                    {{ $ekskul->anggotaAktif() }}
+                                                </span>
+                                            </td>
+                                            <td>
                                                 <div class="btn-group" role="group">
-                                                    <button type="button" class="btn btn-sm btn-info btn-show"
-                                                        data-id="{{ $ekskul->slug }}" title="Lihat Detail">
+                                                    <a href="{{ route('ekstrakurikuler.show', $ekskul->slug) }}"
+                                                        class="btn btn-sm btn-info" title="Lihat Detail">
                                                         <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-warning btn-edit"
-                                                        data-id="{{ $ekskul->slug }}" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-danger btn-delete"
-                                                        data-id="{{ $ekskul->slug }}" data-name="{{ $ekskul->nama_ekskul }}"
-                                                        title="Hapus">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
+                                                    </a>
+                                                    @if (!auth()->user()->hasRole('siswa'))
+                                                        <button type="button" class="btn btn-sm btn-warning btn-edit"
+                                                            data-id="{{ $ekskul->slug }}" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-danger btn-delete"
+                                                            data-id="{{ $ekskul->slug }}"
+                                                            data-name="{{ $ekskul->nama_ekskul }}" title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -150,51 +163,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal Show Detail -->
-    <div class="modal fade" id="showModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detail Ekstrakurikuler</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <img id="detail-foto" src="" alt="Foto Ekstrakurikuler"
-                                    class="img-fluid rounded" style="max-height: 200px;">
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td width="30%"><strong>Nama</strong></td>
-                                    <td>: <span id="detail-nama"></span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Slug</strong></td>
-                                    <td>: <span id="detail-slug"></span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Status</strong></td>
-                                    <td>: <span id="detail-status"></span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Deskripsi</strong></td>
-                                    <td>: <span id="detail-deskripsi"></span></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('scripts')
@@ -245,42 +213,6 @@
                         }
                     },
                     error: function() {
-                        Swal.fire('Error!', 'Gagal memuat data', 'error');
-                    }
-                });
-            });
-
-            // Show Button
-            $(document).on('click', '.btn-show', function() {
-                const id = $(this).data('id');
-
-                $.ajax({
-                    url: `/ekstrakurikuler/${id}`,
-                    type: 'GET',
-                    success: function(response) {
-                        if (response.success) {
-                            const data = response.data;
-
-                            $('#detail-nama').text(data.nama_ekskul);
-                            $('#detail-slug').text(data.slug);
-                            $('#detail-status').html(
-                                data.status ?
-                                '<span class="badge bg-success">Aktif</span>' :
-                                '<span class="badge bg-danger">Tidak Aktif</span>'
-                            );
-                            $('#detail-deskripsi').text(data.deskripsi);
-
-                            if (data.foto) {
-                                $('#detail-foto').attr('src', `/storage/${data.foto}`).show();
-                            } else {
-                                $('#detail-foto').hide();
-                            }
-
-                            $('#showModal').modal('show');
-                        }
-                    },
-                    error: function(xhr) {
-                        console.log(xhr.responseJSON);
                         Swal.fire('Error!', 'Gagal memuat data', 'error');
                     }
                 });

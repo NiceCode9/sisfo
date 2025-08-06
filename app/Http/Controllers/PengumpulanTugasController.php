@@ -23,9 +23,11 @@ class PengumpulanTugasController extends Controller
                     $q->where('id', $user->id);
                 });
             })->with(['tugas', 'siswa.riwayatKelas', 'tugas.guruKelas.guruMataPelajaran'])->paginate(10);
-        } else {
+        } elseif ($user->hasRole('siswa')) {
             $pengumpulan = PengumpulanTugas::where('siswa_id', $user->siswa->id)
                 ->with(['tugas'])->paginate(10);
+        } else {
+            $pengumpulan = PengumpulanTugas::with(['tugas', 'siswa.riwayatKelas', 'tugas.guruKelas.guruMataPelajaran'])->paginate(10);
         }
 
         return view('pengumpulan-tugas.index', compact('pengumpulan'));

@@ -23,6 +23,67 @@ class SiswaController extends Controller
         return view('master.siswa.index');
     }
 
+
+    /**
+     * Get students list for select dropdown (API endpoint)
+     */
+    public function getStudentsForSelect(Request $request)
+    {
+        try {
+            $query = Siswa::with(['kelas']);
+
+            // Filter berdasarkan pencarian jika ada
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama', 'like', "%{$search}%")
+                        ->orWhere('nis', 'like', "%{$search}%");
+                });
+            }
+
+            // Filter berdasarkan kelas jika ada
+            if ($request->filled('kelas_id')) {
+                $query->where('kelas_id', $request->kelas_id);
+            }
+
+            // Filter siswa yang belum terdaftar di ekstrakurikuler tertentu (jika ada)
+            if ($request->filled('exclude_ekstrakurikuler_id')) {
+                $tahunAjaranAktif = TahunAjaran::aktif()->first();
+                if ($tahunAjaranAktif) {
+                    $query->whereNotIn('id', function ($subQuery) use ($request, $tahunAjaranAktif) {
+                        $subQuery->select('siswa_id')
+                            ->from('pendaftaran_ekskuls')
+                            ->where('ekstrakurikuler_id', $request->exclude_ekstrakurikuler_id)
+                            ->where('tahun_ajaran_id', $tahunAjaranAktif->id);
+                    });
+                }
+            }
+
+            $students = $query->orderBy('nama')
+                ->limit(100) // Batasi hasil untuk performa
+                ->get()
+                ->map(function ($siswa) {
+                    return [
+                        'id' => $siswa->id,
+                        'nis' => $siswa->nis,
+                        'nama' => $siswa->nama,
+                        'kelas' => $siswa->kelas->nama_kelas ?? '-',
+                        'text' => "{$siswa->nis} - {$siswa->nama} (" . ($siswa->kelas->nama_kelas ?: '-') . ")"
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $students
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat data siswa'
+            ], 500);
+        }
+    }
+
     public function datatable()
     {
         $siswa = Siswa::with(['calonSiswa.tahunAjaran', 'riwayatKelas'])

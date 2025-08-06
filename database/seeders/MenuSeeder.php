@@ -153,7 +153,7 @@ class MenuSeeder extends Seeder
                         'route' => 'tugas.index',
                         // 'permission' => 'tugas.view',
                         'icon' => 'fas fa-tasks',
-                        'group' => 'E-Learning',
+                        // 'group' => 'E-Learning',
                     ],
                     [
                         'name' => 'Data Pengumpulan Tugas',
@@ -165,19 +165,19 @@ class MenuSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Dashboard',
-                'icon' => 'fas fa-tachometer-alt',
-                'group' => null, // Dashboard tidak masuk ke group manapun
-                'route' => 'dashboard',
-                // 'permission' => 'dashboard.view',
-                'order' => 1,
+                'name' => 'Ekstrakurikuler',
+                'icon' => 'fas fa-futbol',
+                'group' => 'E-Learning', // Dashboard tidak masuk ke group manapun
+                'route' => 'ekstrakurikuler.index',
+                'permission' => 'manage_ekstrakurikuler',
+                'order' => 6,
             ],
             [
                 'name' => 'Manajemen User',
                 'icon' => 'fas fa-users-cog',
                 'permission' => 'manage_user_management',
                 'group' => 'General',
-                'order' => 6,
+                'order' => 7,
                 'children' => [
                     [
                         'name' => 'User',
@@ -207,7 +207,7 @@ class MenuSeeder extends Seeder
                 'icon' => 'fas fa-database',
                 'permission' => 'manage_data_master',
                 'group' => 'General',
-                'order' => 6,
+                'order' => 8,
                 'children' => [
                     [
                         'name' => 'Guru',
@@ -265,7 +265,7 @@ class MenuSeeder extends Seeder
                 'icon' => 'fas fa-newspaper',
                 'permission' => 'manage_module_artikel',
                 'group' => 'General',
-                'order' => 7,
+                'order' => 9,
                 'children' => [
                     [
                         'name' => 'Kategori',

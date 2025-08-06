@@ -34,7 +34,7 @@ Route::group(['middleware' => ['guest']], function () {
         Route::get('/ekstrakurikuler-sekolah', 'ekstrakurikuler')->name('ekstrakurikuler.index');
     });
 
-    Route::get('ekstrakurikuler/daftar', [\App\Http\Controllers\EkstrakurikulerController::class, 'daftar'])->name('ekstrakurikuler.daftar');
+    // Route::get('ekstrakurikuler/daftar', [\App\Http\Controllers\EkstrakurikulerController::class, 'daftar'])->name('ekstrakurikuler.daftar');
 
     Route::prefix('data-guru')->name('landing.guru.')->group(function () {
         Route::get('/', [FrontController::class, 'guru'])->name('index');
@@ -83,7 +83,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('siswa', \App\Http\Controllers\SiswaController::class);
     Route::resource('jawaban-siswa', \App\Http\Controllers\JawabanSiswaController::class);
     Route::resource('guru-kelas', \App\Http\Controllers\GuruKelasController::class);
+
     Route::resource('ekstrakurikuler', \App\Http\Controllers\EkstrakurikulerController::class);
+    Route::get('ekstrakurikuler/{ekstrakurikuler}/members', [\App\Http\Controllers\EkstrakurikulerController::class, 'getMembers'])->name('ekstrakurikuler.members');
+    Route::get('ekstrakurikuler/member/{id}/detail', [\App\Http\Controllers\EkstrakurikulerController::class, 'getMemberDetail'])->name('ekstrakurikuler.member.detail');
+    Route::POST('ekstrakurikuler/member/{id}/remove', [\App\Http\Controllers\EkstrakurikulerController::class, 'toggleMemberStatus'])->name('ekstrakurikuler.member.remove');
+    Route::get('ekstrakurikuler/{ekstrakurikuler}/check-registration', [\App\Http\Controllers\EkstrakurikulerController::class, 'checkRegistration'])->name('ekstrakurikuler.check-registration');
+    Route::post('ekstrakurikuler/daftar', [\App\Http\Controllers\EkstrakurikulerController::class, 'daftar'])->name('ekstrakurikuler.daftar');
 
     Route::name('siswa.')->group(function () {
         Route::get('/import-data-siswa', [\App\Http\Controllers\SiswaController::class, 'import'])->name('import');
@@ -171,6 +177,22 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     });
 
     Route::resource('general-profile', GeneralProfileController::class)->except(['show', 'create', 'edit', 'destroy']);
+    Route::get('/api/students', [\App\Http\Controllers\SiswaController::class, 'getStudentsForSelect'])->name('api.students');
+
+
+    // KENAIKAN KELAS
+    Route::prefix('kenaikan-kelas')->group(function () {
+        Route::get('/', [\App\Http\Controllers\KenaikanKelasController::class, 'index'])->name('kenaikan-kelas.index');
+        Route::get('/get-siswa', [\App\Http\Controllers\KenaikanKelasController::class, 'getSiswa'])->name('kenaikan-kelas.get-siswa');
+        Route::get('/get-kelas-tujuan', [\App\Http\Controllers\KenaikanKelasController::class, 'getKelasTujuan'])->name('kenaikan-kelas.get-kelas-tujuan');
+        Route::post('/proses', [\App\Http\Controllers\KenaikanKelasController::class, 'prosesKenaikan'])->name('kenaikan-kelas.proses');
+    });
+
+    // KELULUSAN (Optional - untuk mengelola siswa kelas 12)
+    Route::prefix('kelulusan')->group(function () {
+        Route::get('/', [\App\Http\Controllers\KenaikanKelasController::class, 'kelulusan'])->name('kelulusan.index');
+        Route::post('/proses', [\App\Http\Controllers\KenaikanKelasController::class, 'prosesKelulusan'])->name('kelulusan.proses');
+    });
 });
 
 

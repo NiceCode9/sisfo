@@ -20,15 +20,15 @@ class PpdbSeeder extends Seeder
         // 1. Seeder Tahun Ajaran
         $tahunAjaran = [
             [
-                'nama_tahun_ajaran' => '2024/2025',
-                'tanggal_mulai' => '2024-07-01',
-                'tanggal_selesai' => '2025-06-30',
-                'status_aktif' => true
-            ],
-            [
                 'nama_tahun_ajaran' => '2025/2026',
                 'tanggal_mulai' => '2025-07-01',
                 'tanggal_selesai' => '2026-06-30',
+                'status_aktif' => true
+            ],
+            [
+                'nama_tahun_ajaran' => '2024/2025',
+                'tanggal_mulai' => '2024-07-01',
+                'tanggal_selesai' => '2025-06-30',
                 'status_aktif' => false
             ],
             [

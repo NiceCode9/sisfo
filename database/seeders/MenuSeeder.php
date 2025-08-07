@@ -74,36 +74,36 @@ class MenuSeeder extends Seeder
                     ],
                 ]
             ],
-            [
-                'name' => 'Pembayaran',
-                'icon' => 'fas fa-credit-card',
-                'permission' => 'manage_pembayaran',
-                'group' => 'PPDB',
-                'order' => 3,
-                'children' => [
-                    [
-                        'name' => 'Data Pembayaran',
-                        'route' => 'pembayaran.index',
-                        // 'permission' => 'pembayaran.view',
-                        'icon' => 'fas fa-list',
-                        'group' => 'PPDB',
-                    ],
-                    // [
-                    //     'name' => 'Verifikasi Pembayaran',
-                    //     'route' => 'pembayaran.verifikasi',
-                    //     'permission' => 'pembayaran.verify',
-                    //     'icon' => 'fas fa-check-circle',
-                    //     'group' => 'PPDB',
-                    // ],
-                    [
-                        'name' => 'Laporan Pembayaran',
-                        'route' => 'laporan.pembayaran',
-                        // 'permission' => 'pembayaran.report',
-                        'icon' => 'fas fa-chart-bar',
-                        'group' => 'PPDB',
-                    ],
-                ]
-            ],
+            // [
+            //     'name' => 'Pembayaran',
+            //     'icon' => 'fas fa-credit-card',
+            //     'permission' => 'manage_pembayaran',
+            //     'group' => 'PPDB',
+            //     'order' => 3,
+            //     'children' => [
+            //         [
+            //             'name' => 'Data Pembayaran',
+            //             'route' => 'pembayaran.index',
+            //             // 'permission' => 'pembayaran.view',
+            //             'icon' => 'fas fa-list',
+            //             'group' => 'PPDB',
+            //         ],
+            //         // [
+            //         //     'name' => 'Verifikasi Pembayaran',
+            //         //     'route' => 'pembayaran.verifikasi',
+            //         //     'permission' => 'pembayaran.verify',
+            //         //     'icon' => 'fas fa-check-circle',
+            //         //     'group' => 'PPDB',
+            //         // ],
+            //         [
+            //             'name' => 'Laporan Pembayaran',
+            //             'route' => 'laporan.pembayaran',
+            //             // 'permission' => 'pembayaran.report',
+            //             'icon' => 'fas fa-chart-bar',
+            //             'group' => 'PPDB',
+            //         ],
+            //     ]
+            // ],
             [
                 'name' => 'Laporan',
                 'icon' => 'fas fa-file-alt',
@@ -112,7 +112,7 @@ class MenuSeeder extends Seeder
                 'order' => 4,
                 'children' => [
                     [
-                        'name' => 'Laporan Pendaftar',
+                        'name' => 'Laporan Pendaftaran',
                         // 'route' => 'laporan.pendaftar',
                         'permission' => 'manage_laporan_pendaftar',
                         'icon' => 'fas fa-user-friends',
@@ -120,7 +120,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'Laporan Keuangan',
-                        // 'route' => 'laporan.keuangan',
+                        'route' => 'laporan.pembayaran',
                         'permission' => 'manage_laporan_keuangan',
                         'icon' => 'fas fa-coins',
                         'group' => 'PPDB',
@@ -169,6 +169,14 @@ class MenuSeeder extends Seeder
                 'icon' => 'fas fa-futbol',
                 'group' => 'E-Learning', // Dashboard tidak masuk ke group manapun
                 'route' => 'ekstrakurikuler.index',
+                'permission' => 'manage_ekstrakurikuler',
+                'order' => 6,
+            ],
+            [
+                'name' => 'Kenaikan Kelas',
+                'icon' => 'fas fa-graduation-cap',
+                'group' => 'E-Learning',
+                'route' => 'kenaikan-kelas.index',
                 'permission' => 'manage_ekstrakurikuler',
                 'order' => 6,
             ],

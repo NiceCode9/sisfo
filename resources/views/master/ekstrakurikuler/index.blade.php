@@ -66,7 +66,7 @@
                                                         class="btn btn-sm btn-info" title="Lihat Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    @if (!auth()->user()->hasRole('siswa'))
+                                                    @if (!auth()->user()->isSiswa())
                                                         <button type="button" class="btn btn-sm btn-warning btn-edit"
                                                             data-id="{{ $ekskul->slug }}" title="Edit">
                                                             <i class="fas fa-edit"></i>

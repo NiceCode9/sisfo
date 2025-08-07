@@ -9,7 +9,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Detail Soal</h3>
-                        @if (auth()->user()->hasRole('guru'))
+                        @if (auth()->user()->isGuru())
                             <div class="card-tools">
                                 <a href="{{ route('soal.edit', $soal->id) }}" class="btn btn-warning btn-sm">
                                     <i class="fas fa-edit"></i> Edit Soal

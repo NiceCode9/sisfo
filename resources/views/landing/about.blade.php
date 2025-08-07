@@ -197,26 +197,21 @@
                             <h3 class="text-3xl font-bold text-dark">Misi</h3>
                         </div>
                         <ul class="space-y-4">
-                            @php
-                                $misi = is_string($profile->misi ?? '')
-                                    ? json_decode($profile->misi, true)
-                                    : [
-                                        'Menyelenggarakan pendidikan yang berkualitas dengan kurikulum yang relevan dan inovatif',
-                                        'Mengembangkan potensi siswa dalam bidang akademik, non-akademik, dan karakter',
-                                        'Menciptakan lingkungan belajar yang kondusif, aman, dan nyaman',
-                                        'Membangun kerjasama yang baik dengan orang tua dan masyarakat',
-                                        'Menggunakan teknologi pendidikan yang modern dan terkini',
-                                    ];
-                            @endphp
-                            @foreach ($misi as $item)
-                                <li class="flex items-start">
-                                    <div
-                                        class="w-6 h-6 bg-success rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
-                                        <i class="fas fa-check text-white text-xs"></i>
-                                    </div>
-                                    <span class="text-gray-600 leading-relaxed">{{ $item }}</span>
-                                </li>
-                            @endforeach
+                            @if (isset($profile) && !empty($profile->misi) && is_array($profile->misi))
+                                @forelse ($profile->misi as $item)
+                                    <li class="flex items-start">
+                                        <div
+                                            class="w-6 h-6 bg-success rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                        <span class="text-gray-600 leading-relaxed">{{ $item }}</span>
+                                    </li>
+                                @empty
+                                    <li class="text-gray-400 italic">Belum ada misi yang ditambahkan.</li>
+                                @endforelse
+                            @else
+                                <li class="text-gray-400 italic">Data misi tidak tersedia.</li>
+                            @endif
                         </ul>
                     </div>
                 </div>

@@ -30,7 +30,7 @@ class MateriController extends Controller
             })
             ->get();
 
-        if ($user->hasRole('guru')) {
+        if ($user->isGuru()) {
             $guru = $user->guru;
             $tahunAjaranAktif = TahunAjaran::aktif()->first();
 
@@ -60,12 +60,12 @@ class MateriController extends Controller
     public function datatable(Request $request)
     {
         $materi = Materi::with(['guruKelas.guruMataPelajaran.guru.user', 'guruKelas.guruMataPelajaran.mataPelajaran'])
-            ->when(Auth::user()->hasRole('guru'), function ($query) {
+            ->when(Auth::user()->isGuru(), function ($query) {
                 return $query->whereHas('guruKelas.guruMataPelajaran.guru.user', function ($q) {
                     $q->where('id', Auth::id());
                 });
             })
-            ->when(Auth::user()->hasRole('siswa'), function ($query) {
+            ->when(Auth::user()->isSiswa(), function ($query) {
                 return $query->whereHas('guruKelas', function ($q) {
                     $q->where('kelas_id', Auth::user()->siswa->kelasAktif()->kelas_id);
                 });

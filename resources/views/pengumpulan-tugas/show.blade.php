@@ -856,7 +856,7 @@
                                                     </div>
                                             @endif
 
-                                            @if ($jawaban->soal->jenis_soal === 'uraian' && auth()->user()->hasRole('guru'))
+                                            @if ($jawaban->soal->jenis_soal === 'uraian' && auth()->user()->isGuru())
                                                 <div class="grading-input">
                                                     <label>Nilai (0-100)</label>
                                                     <input type="number" class="form-control mb-2"
@@ -878,7 +878,7 @@
                 @endif
 
                 <!-- Grading Section -->
-                @if (auth()->user()->hasRole('guru') &&
+                @if (auth()->user()->isGuru() &&
                         $pengumpulanTuga->metode_pengerjaan === 'upload_file' &&
                         is_null($pengumpulanTuga->nilai))
                     <div class="grading-section">
@@ -990,7 +990,7 @@
                 </div>
 
                 <!-- Alert for ungraded submissions -->
-                @if (is_null($pengumpulanTuga->nilai) && !auth()->user()->hasRole('guru'))
+                @if (is_null($pengumpulanTuga->nilai) && !auth()->user()->isGuru())
                     <div class="alert-modern">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-info-circle me-3"></i>

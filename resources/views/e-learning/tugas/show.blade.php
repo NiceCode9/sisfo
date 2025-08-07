@@ -19,7 +19,7 @@
                         </nav>
                     </div>
                     <div class="d-flex gap-2">
-                        @if (auth()->user()->hasRole('guru') && $tuga->guruKelas->guruMataPelajaran->guru->user->id === auth()->id())
+                        @if (auth()->user()->isGuru() && $tuga->guruKelas->guruMataPelajaran->guru->user->id === auth()->id())
                             <a href="{{ route('tugas.edit', $tuga->id) }}" class="btn btn-warning btn-sm shadow-sm">
                                 <i class="fas fa-edit me-1"></i> Edit Tugas
                             </a>
@@ -182,7 +182,7 @@
                                             <div class="fw-bold text-primary fs-5">{{ $soal->poin }}</div>
                                             <small class="text-muted">poin</small>
                                         </div>
-                                        @if (auth()->user()->hasRole('guru'))
+                                        @if (auth()->user()->isGuru())
                                             <div class="col-md-2 text-end">
                                                 <div class="btn-group shadow-sm">
                                                     <a href="{{ route('soal.show', $soal->id) }}"
@@ -219,7 +219,7 @@
             <!-- Sidebar -->
             <div class="col-lg-4">
                 <!-- Student Action Card -->
-                @if (auth()->user()->hasRole('siswa'))
+                @if (auth()->user()->isSiswa())
                     <div class="card shadow-sm border-0 sticky-top" style="top: 2rem;">
                         <div class="card-header bg-success text-white border-0">
                             <h5 class="card-title mb-0">

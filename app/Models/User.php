@@ -58,6 +58,57 @@ class User extends Authenticatable
         ];
     }
 
+
+    /**
+     * Check if user has specific role
+     */
+    // public function hasRole($role)
+    // {
+    //     return $this->roles()->where('name', $role)->exists();
+    // }
+
+    /**
+     * Get user's primary role name
+     */
+    public function getRoleName()
+    {
+        $role = $this->roles()->first();
+        return $role ? $role->name : null;
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin()
+    {
+        return $this->hasRole('super-admin');
+    }
+
+    /**
+     * Check if user is guru
+     */
+    public function isGuru()
+    {
+        return $this->hasRole('guru');
+    }
+
+    /**
+     * Check if user is siswa
+     */
+    public function isSiswa()
+    {
+        return $this->hasRole('siswa');
+    }
+
+    /**
+     * Get display name with role
+     */
+    public function getDisplayNameAttribute()
+    {
+        $roleName = $this->getRoleName();
+        return $this->name . ($roleName ? " ({$roleName})" : '');
+    }
+
     public function siswa()
     {
         return $this->belongsTo(Siswa::class);

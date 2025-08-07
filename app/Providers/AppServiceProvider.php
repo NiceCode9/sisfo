@@ -23,13 +23,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer(['landing.guest'], function ($view) {
+        View::composer(['landing.guest', 'landing.index', 'landing.about', 'landing.pendaftaran'], function ($view) {
             $profileSekolah = GeneralProfile::first();
             $view->with('profileSekolah', $profileSekolah);
         });
 
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('super-admin') ? true : null;
+            return $user->isAdmin() ? true : null;
         });
         view()->composer(
             ['layouts.sidebar'], // Sesuaikan dengan template Anda

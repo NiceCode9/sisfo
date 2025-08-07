@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -72,6 +73,13 @@ class Artikel extends Model
                 'source' => ['title', 'category.name']
             ]
         ];
+    }
+
+    protected function title(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => ucfirst($value),
+        );
     }
 
     // Relationships

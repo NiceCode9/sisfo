@@ -17,13 +17,13 @@ class PengumpulanTugasController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasRole('guru')) {
+        if ($user->isGuru()) {
             $pengumpulan = PengumpulanTugas::whereHas('tugas.guruKelas.guruMataPelajaran.guru', function ($query) use ($user) {
                 $query->whereHas('user', function ($q) use ($user) {
                     $q->where('id', $user->id);
                 });
             })->with(['tugas', 'siswa.riwayatKelas', 'tugas.guruKelas.guruMataPelajaran'])->paginate(10);
-        } elseif ($user->hasRole('siswa')) {
+        } elseif ($user->isSiswa()) {
             $pengumpulan = PengumpulanTugas::where('siswa_id', $user->siswa->id)
                 ->with(['tugas'])->paginate(10);
         } else {

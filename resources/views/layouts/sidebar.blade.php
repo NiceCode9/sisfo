@@ -72,10 +72,7 @@
             @endphp
 
             @foreach ($sidebarMenu as $menu)
-                @if (
-                    !$menu->permission ||
-                        ($menu->permission && $user->hasPermissionTo($menu->permission)) ||
-                        $user->hasRole('super-admin'))
+                @if (!$menu->permission || ($menu->permission && $user->hasPermissionTo($menu->permission)) || $user->isAdmin())
                     @if ($menu->group !== $currentGroup)
                         <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
                         <li class="nav-item">
@@ -110,9 +107,7 @@
                                 aria-expanded="@if ($menu->isActive()) true @else false @endif">
                                 <ul class="flex-column nav">
                                     @foreach ($menu->children as $child)
-                                        @if (
-                                            !$child->permission ||
-                                                ($child->permission && ($user->hasPermissionTo($child->permission) || $user->hasRole('super-admin'))))
+                                        @if (!$child->permission || ($child->permission && ($user->hasPermissionTo($child->permission) || $user->isAdmin())))
                                             <li class="nav-item @if ($child->isActive()) active @endif">
                                                 <a class="nav-link" href="{{ $child->full_url }}">
                                                     <span class="sidebar-text">{{ $child->name }}</span>

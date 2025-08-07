@@ -52,7 +52,7 @@
                         </select>
                     </div>
                 </div>
-                @if (!auth()->user()->hasRole('siswa'))
+                @if (!auth()->user()->isSiswa())
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="kelas_id">Kelas</label>

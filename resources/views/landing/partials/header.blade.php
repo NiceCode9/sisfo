@@ -2,16 +2,37 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             <div class="flex-shrink-0 flex items-center">
-                <div
+                {{-- <div
                     class="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-md">
-                    <img src="{{ $profileSekolah ? asset('storage/' . $profileSekolah->logo) : '' }}" alt="">
+
+                    <img src="{{ $profileSekolah ? asset('storage/' . $profileSekolah->logo) : $uiavatars }}"
+                        alt="">
+                </div> --}}
+                {{-- @php
+                    $namaSekolah = $profileSekolah->nama_sekolah ?? 'SMP Harapan Bangsa';
+                    $namaSekolah = preg_replace('/\b(SMP|MTS)\b/i', '', $namaSekolah);
+                    $namaSekolah = preg_replace('/\s+/', ' ', trim($namaSekolah));
+                    $namaSekolahEncoded = urlencode($namaSekolah);
+                    $uiavatars = "https://ui-avatars.com/api/?name={$namaSekolahEncoded}&bold=true&background=0D8ABC&color=fff";
+                @endphp --}}
+
+                {{-- <div
+                    class="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <img src="{{ $profileSekolah && $profileSekolah->logo ? asset('storage/' . $profileSekolah->logo) : $uiavatars }}"
+                        alt="{{ $namaSekolah }}" class="h-full w-full object-cover rounded-full">
+                </div> --}}
+                <div
+                    class="h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <img src="{{ $profileSekolah && $profileSekolah->logo ? asset('storage/' . $profileSekolah->logo) : $uiavatars }}"
+                        alt="{{ $namaSekolah }}" class="h-full w-full object-cover rounded-full">
                 </div>
+
                 <span
                     class="ml-3 text-xl font-bold text-gray-800">{{ $profileSekolah->nama_sekolah ?? 'SMP Harapan Bangsa' }}</span>
             </div>
 
             <div class="hidden md:block">
-                <div class="ml-10 flex items-center space-x-6">
+                <div class="ml-10 flex items-center space-x-4">
                     <a href="{{ route('home') }}" class="relative px-3 py-2 text-sm font-medium group">
                         <span class="text-gray-700 group-hover:text-primary">Home</span>
                         <span
@@ -23,12 +44,18 @@
                             class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                     </a>
                     <a href="{{ route('landing.guru.index') }}" class="relative px-3 py-2 text-sm font-medium group">
-                        <span class="text-gray-700 group-hover:text-primary">Gallery</span>
+                        <span class="text-gray-700 group-hover:text-primary">Pendidik</span>
                         <span
                             class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                     </a>
                     <a href="{{ route('pendaftaran') }}" class="relative px-3 py-2 text-sm font-medium group">
                         <span class="text-gray-700 group-hover:text-primary">Pendaftaran</span>
+                        <span
+                            class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="{{ url('/ekstrakurikuler-sekolah') }}"
+                        class="relative px-3 py-2 text-sm font-medium group">
+                        <span class="text-gray-700 group-hover:text-primary">Ekstrakurikuler</span>
                         <span
                             class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                     </a>

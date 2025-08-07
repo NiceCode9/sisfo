@@ -21,7 +21,7 @@ class CalonSiswaSeeder extends Seeder
             $firstName = $gender === 'L' ? $faker->firstNameMale : $faker->firstNameFemale;
 
             // Tentukan status berdasarkan ID untuk konsistensi
-            $status = 'pending';
+            $status = 'menunggu';
             if ($i <= 30) {
                 $status = 'diterima'; // 30 siswa pertama diterima
             } elseif ($i <= 40) {

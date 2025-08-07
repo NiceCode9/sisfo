@@ -291,6 +291,7 @@
                             <select id="jalur_pendaftaran_id" name="jalur_pendaftaran_id" required
                                 class="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all duration-200 @error('jalur_pendaftaran_id') border-red-500 ring-2 ring-red-200 @enderror">
                                 <option value="">🎯 Pilih Jalur Pendaftaran</option>
+
                                 @foreach ($jalurPendaftarans as $jalur)
                                     @if ($jalur->aktif)
                                         <option value="{{ $jalur->id }}"
@@ -788,15 +789,15 @@
             <p class="text-xl text-indigo-100 mb-8">Tim kami siap membantu Anda dalam proses pendaftaran</p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="tel:(021)1234567"
+                <a href="tel:{{ $profileSekolah->telp }}"
                     class="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
                     <i class="fas fa-phone mr-2"></i>
-                    (021) 1234567
+                    {{ $profileSekolah->telp }}
                 </a>
-                <a href="mailto:info@sekolah.sch.id"
+                <a href="mailto:{{ $profileSekolah->email }}"
                     class="inline-flex items-center px-6 py-3 bg-indigo-500 text-white rounded-lg font-semibold hover:bg-indigo-400 transition-colors duration-200">
                     <i class="fas fa-envelope mr-2"></i>
-                    info@sekolah.sch.id
+                    {{ $profileSekolah->email }}
                 </a>
             </div>
         </div>

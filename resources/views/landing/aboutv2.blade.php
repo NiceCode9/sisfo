@@ -205,26 +205,21 @@
                                 Misi</h3>
                         </div>
                         <ul class="space-y-4">
-                            @php
-                                $misi = is_string($profile->misi ?? '')
-                                    ? json_decode($profile->misi, true)
-                                    : [
-                                        'Menyelenggarakan pendidikan yang berkualitas dengan kurikulum yang relevan dan inovatif',
-                                        'Mengembangkan potensi siswa dalam bidang akademik, non-akademik, dan karakter',
-                                        'Menciptakan lingkungan belajar yang kondusif, aman, dan nyaman',
-                                        'Membangun kerjasama yang baik dengan orang tua dan masyarakat',
-                                        'Menggunakan teknologi pendidikan yang modern dan terkini',
-                                    ];
-                            @endphp
-                            @foreach ($misi as $item)
-                                <li class="flex items-start">
-                                    <div
-                                        class="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
-                                        <i class="fas fa-check text-white text-xs"></i>
-                                    </div>
-                                    <span class="text-gray-600 leading-relaxed">{{ $item }}</span>
-                                </li>
-                            @endforeach
+                            @if (isset($profile) && !empty($profile->misi) && is_array($profile->misi))
+                                @forelse ($profile->misi as $item)
+                                    <li class="flex items-start">
+                                        <div
+                                            class="w-6 h-6 bg-success rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                        <span class="text-gray-600 leading-relaxed">{{ $item }}</span>
+                                    </li>
+                                @empty
+                                    <li class="text-gray-400 italic">Belum ada misi yang ditambahkan.</li>
+                                @endforelse
+                            @else
+                                <li class="text-gray-400 italic">Data misi tidak tersedia.</li>
+                            @endif
                         </ul>
                     </div>
                 </div>
@@ -720,7 +715,7 @@
                 </p>
 
                 <div class="flex flex-col sm:flex-row justify-center gap-4 animate-slide-up animation-delay-200">
-                    <a href="#"
+                    <a href="{{ route('pendaftaran') }}"
                         class="bg-white text-primary px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
                         <i class="fas fa-user-plus mr-2"></i>
                         Daftar Sekarang

@@ -9,7 +9,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Daftar Soal - {{ $tugas->judul }}</h3>
-                        @if (auth()->user()->hasRole('guru'))
+                        @if (auth()->user()->isGuru())
                             <div class="card-tools">
                                 <a href="{{ route('soal.create', ['tugas' => $tugas->id]) }}" class="btn btn-primary">
                                     <i class="fas fa-plus"></i> Tambah Soal
@@ -47,7 +47,7 @@
                                                         class="btn btn-sm btn-info" title="Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    @if (auth()->user()->hasRole('guru'))
+                                                    @if (auth()->user()->isGuru())
                                                         <a href="{{ route('soal.edit', $soal->id) }}"
                                                             class="btn btn-sm btn-warning" title="Edit">
                                                             <i class="fas fa-edit"></i>
@@ -59,7 +59,7 @@
                                                     @endif
                                                 </div>
 
-                                                @if (auth()->user()->hasRole('guru'))
+                                                @if (auth()->user()->isGuru())
                                                     <form id="delete-form-{{ $soal->id }}"
                                                         action="{{ route('soal.destroy', $soal->id) }}" method="POST"
                                                         class="d-none">

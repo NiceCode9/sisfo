@@ -24,7 +24,7 @@
                             <a href="{{ route('ekstrakurikuler.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Kembali
                             </a>
-                            @if (!auth()->user()->hasRole('siswa'))
+                            @if (!auth()->user()->isSiswa())
                                 <a href="{{ route('ekstrakurikuler.edit', $ekstrakurikuler->slug) }}"
                                     class="btn btn-warning">
                                     <i class="fas fa-edit"></i> Edit
@@ -170,7 +170,7 @@
                                 <option value="0">Nonaktif</option>
                             </select>
 
-                            @if (auth()->user()->hasRole('siswa'))
+                            @if (auth()->user()->isSiswa())
                                 @if ($ekstrakurikuler->status)
                                     <button type="button" class="btn btn-success btn-sm" id="btn-daftar">
                                         <i class="fas fa-user-plus"></i> <span id="btn-daftar-text">Daftar
@@ -181,7 +181,7 @@
                                         <i class="fas fa-times"></i> Pendaftaran Ditutup
                                     </button>
                                 @endif
-                            @elseif (!auth()->user()->hasRole('siswa') && $ekstrakurikuler->status)
+                            @elseif (!auth()->user()->isSiswa() && $ekstrakurikuler->status)
                                 <button type="button" class="btn btn-primary btn-sm" id="btn-add-member">
                                     <i class="fas fa-user-plus"></i> Tambah Anggota
                                 </button>
@@ -212,7 +212,7 @@
     </div>
 
     <!-- Modal Pendaftaran untuk Siswa -->
-    @if (auth()->user()->hasRole('siswa'))
+    @if (auth()->user()->isSiswa())
         <div class="modal fade" id="pendaftaranModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -270,7 +270,7 @@
     @endif
 
     <!-- Modal Tambah Anggota untuk Admin/Guru -->
-    @if (!auth()->user()->hasRole('siswa'))
+    @if (!auth()->user()->isSiswa())
         <div class="modal fade" id="addMemberModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -570,7 +570,7 @@
             });
 
             // Check registration status for student
-            @if (auth()->user()->hasRole('siswa'))
+            @if (auth()->user()->isSiswa())
                 function checkRegistrationStatus() {
                     $.ajax({
                         url: "{{ route('ekstrakurikuler.check-registration', $ekstrakurikuler->slug) }}",
@@ -665,7 +665,7 @@
             @endif
 
             // Add Member Button (for admin/guru)
-            @if (!auth()->user()->hasRole('siswa'))
+            @if (!auth()->user()->isSiswa())
                 $('#btn-add-member').click(function() {
                     // Load students list
                     loadStudentsList();

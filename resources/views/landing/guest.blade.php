@@ -396,6 +396,22 @@
 </head>
 
 <body class="font-sans antialiased bg-gray-50">
+    @php
+        function hexColorFromString($string)
+        {
+            $hash = md5($string);
+            return substr($hash, 0, 6);
+        }
+
+        $namaSekolah = $profileSekolah->nama_sekolah ?? 'SMP Harapan Bangsa';
+        $namaSekolah = preg_replace('/\b(SMP|MTS)\b/i', '', $namaSekolah);
+        $namaSekolah = preg_replace('/\s+/', ' ', trim($namaSekolah));
+        $namaSekolahEncoded = urlencode($namaSekolah);
+
+        // Buat warna HEX konsisten dari nama sekolah
+        $hexBackground = hexColorFromString($namaSekolah);
+        $uiavatars = "https://ui-avatars.com/api/?name={$namaSekolahEncoded}&bold=true&color=fff&background={$hexBackground}";
+    @endphp
     @include('landing.partials.header')
 
     <main>

@@ -18,7 +18,7 @@ class JalurPendaftaran extends Model
 
     public function kuotaPendaftaran()
     {
-        return $this->hasOne(KuotaPendaftaran::class);
+        return $this->hasMany(KuotaPendaftaran::class);
     }
 
     public function calonSiswa()

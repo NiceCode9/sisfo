@@ -347,7 +347,7 @@
                         <h3 class="card-title-modern">Manajemen Tugas</h3>
                         <p class="card-subtitle mb-0">Lihat, kelola, dan monitor progress tugas siswa</p>
                     </div>
-                    @if (auth()->user()->hasRole('guru'))
+                    @if (auth()->user()->isGuru())
                         <div class="mt-3 mt-md-0">
                             <a href="{{ route('tugas.create') }}" class="btn btn-primary-modern btn-modern">
                                 <i class="fas fa-plus me-2"></i>Buat Tugas Baru
@@ -377,7 +377,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        @if (!auth()->user()->hasRole('siswa'))
+                        @if (!auth()->user()->isSiswa())
                             <div class="col-lg-4 col-md-6">
                                 <label for="kelas_id" class="filter-label">Kelas</label>
                                 <select class="form-control form-control-modern select2" id="kelas_id" name="kelas_id">
@@ -428,7 +428,7 @@
         </div>
 
         <!-- Floating Action Button for Mobile -->
-        @if (auth()->user()->hasRole('guru'))
+        @if (auth()->user()->isGuru())
             <div class="floating-action d-md-none">
                 <a href="{{ route('tugas.create') }}" class="fab-btn">
                     <i class="fas fa-plus"></i>

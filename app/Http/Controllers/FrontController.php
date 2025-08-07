@@ -15,7 +15,16 @@ class FrontController extends Controller
 {
     public function index()
     {
-        return view('landing.index');
+        $articlestops = Artikel::published()
+            ->with(['category', 'author'])
+            ->orderBy('published_at', 'desc')
+            ->limit(3)
+            ->get();
+        $ekstrakurikulers = \App\Models\Ekstrakurikuler::active()
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+        return view('landing.index', compact('articlestops', 'ekstrakurikulers'));
     }
 
     public function pendaftaran()

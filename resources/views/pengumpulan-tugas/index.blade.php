@@ -11,7 +11,7 @@
                         <h3 class="card-title">Daftar Riwayat Pengumpulan Tugas</h3>
                     </div>
                     <div class="card-body">
-                        @if (auth()->user()->hasRole('siswa'))
+                        @if (auth()->user()->isSiswa())
                             <div class="row mb-4">
                                 <div class="col-md-3">
                                     <div class="small-box bg-info">
@@ -43,7 +43,7 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        @if (!auth()->user()->hasRole('siswa'))
+                                        @if (!auth()->user()->isSiswa())
                                             <th>Siswa</th>
                                             <th>Kelas</th>
                                         @endif
@@ -59,7 +59,7 @@
                                     @forelse($pengumpulan as $p)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            @if (auth()->user()->hasRole('guru'))
+                                            @if (auth()->user()->isGuru())
                                                 <td>{{ $p->siswa->user->name }}</td>
                                                 @php
                                                     $kelas = $p->siswa
@@ -98,7 +98,7 @@
                                                         class="btn btn-sm btn-info" title="Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    @if (auth()->user()->hasRole('siswa') && !$p->nilai)
+                                                    @if (auth()->user()->isSiswa() && !$p->nilai)
                                                         <button type="button" class="btn btn-sm btn-danger"
                                                             onclick="confirmDelete('{{ $p->id }}')" title="Hapus">
                                                             <i class="fas fa-trash"></i>
@@ -106,7 +106,7 @@
                                                     @endif
                                                 </div>
 
-                                                @if (auth()->user()->hasRole('siswa') && !$p->nilai)
+                                                @if (auth()->user()->isSiswa() && !$p->nilai)
                                                     <form id="delete-form-{{ $p->id }}"
                                                         action="{{ route('pengumpulan-tugas.destroy', $p->id) }}"
                                                         method="POST" class="d-none">

@@ -152,7 +152,7 @@ class EkstrakurikulerController extends Controller
                 $btn .= '<i class="fas fa-eye"></i>';
                 $btn .= '</button>';
 
-                if (!auth()->user()->hasRole('siswa')) {
+                if (!auth()->user()->isSiswa()) {
                     // Toggle status button
                     if ($row->status) {
                         $btn .= '<button type="button" class="btn btn-sm btn-warning btn-toggle-status" data-id="' . $row->id . '" data-name="' . ($row->siswa->calonSiswa->nama_lengkap ?? '') . '" data-status="nonaktif" title="Nonaktifkan Anggota">';
@@ -331,7 +331,7 @@ class EkstrakurikulerController extends Controller
             $user = auth()->user();
 
             // Jika user adalah siswa, gunakan data siswa dari relasi user
-            if ($user->hasRole('siswa')) {
+            if ($user->isSiswa()) {
                 $siswa = $user->siswa; // Asumsi ada relasi user->siswa
 
                 if (!$siswa) {
@@ -441,7 +441,7 @@ class EkstrakurikulerController extends Controller
         try {
             $user = auth()->user();
 
-            if (!$user->hasRole('siswa')) {
+            if (!$user->isSiswa()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Akses ditolak'

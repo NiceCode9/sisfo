@@ -28,7 +28,7 @@ class TugasController extends Controller
         $tahunAjaran = TahunAjaran::orderBy('tanggal_mulai', 'desc')->get();
 
         // Filter kelas dan mata pelajaran berdasarkan role
-        if ($user->hasRole('guru')) {
+        if ($user->isGuru()) {
             $guru = $user->guru;
             $tahunAjaranAktif = TahunAjaran::aktif()->first();
 
@@ -59,7 +59,7 @@ class TugasController extends Controller
             ]);
 
             // Filter berdasarkan role
-            if ($user->hasRole('guru')) {
+            if ($user->isGuru()) {
                 $guru = $user->guru;
                 $query->whereHas('guruKelas.guruMataPelajaran', function ($q) use ($guru) {
                     $q->where('guru_id', $guru->id);
@@ -67,7 +67,7 @@ class TugasController extends Controller
             }
 
             // Filter berdasarkan siswa
-            if ($user->hasRole('siswa')) {
+            if ($user->isSiswa()) {
                 $query->whereHas('guruKelas', function ($q) use ($user) {
                     $q->whereHas('kelas.siswa', function ($qq) use ($user) {
                         $qq->where('siswa_id', $user->siswa->id);
@@ -133,7 +133,7 @@ class TugasController extends Controller
                     $status = 'Belum Dikumpulkan';
                     $statusClass = 'bg-warning';
 
-                    if ($user->hasRole('siswa')) {
+                    if ($user->isSiswa()) {
                         $pengumpulan = $tugas->pengumpulanTugas()
                             ->where('siswa_id', $user->siswa->id)
                             ->first();
@@ -156,10 +156,10 @@ class TugasController extends Controller
                     $html = '<div class="btn-group">';
                     $html .= '<a href="' . route('tugas.show', ['tuga' => $tugas->id]) . '" class="btn btn-sm btn-info" title="Detail"><i class="fas fa-eye"></i></a>';
 
-                    if ($user->hasRole('guru') && $tugas->guruKelas->guruMataPelajaran->guru->user->id === $user->id) {
+                    if ($user->isGuru() && $tugas->guruKelas->guruMataPelajaran->guru->user->id === $user->id) {
                         $html .= '<a href="' . route('tugas.edit', $tugas->id) . '" class="btn btn-sm btn-warning" title="Edit"><i class="fas fa-edit"></i></a>';
                         $html .= '<button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(\'' . $tugas->id . '\')" title="Hapus"><i class="fas fa-trash"></i></button>';
-                    } elseif ($user->hasRole('siswa') && !$tugas->batas_waktu->isPast()) {
+                    } elseif ($user->isSiswa() && !$tugas->batas_waktu->isPast()) {
                         if (!$tugas->pengumpulanTugas()->where('siswa_id', $user->siswa->id)->exists()) {
                             $html .= '<a href="' . route('pengumpulan-tugas.create', ['tugas' => $tugas->id]) . '" class="btn btn-sm btn-success" title="Kumpulkan"><i class="fas fa-upload"></i> Kumpulkan</a>';
                         }
@@ -169,7 +169,7 @@ class TugasController extends Controller
                     return $html;
                 })
                 ->addColumn('lihat_pengumpulan', function ($tugas) use ($user) {
-                    if ($user->hasRole('guru') && $tugas->guruKelas->guruMataPelajaran->guru->user->id === $user->id) {
+                    if ($user->isGuru() && $tugas->guruKelas->guruMataPelajaran->guru->user->id === $user->id) {
                         return '<a href="' . route('tugas.submissions', ['tugas' => $tugas->id]) . '" class="btn btn-sm btn-info" title="Lihat Pengumpulan">Pengumpulan</a>';
                     }
                     return '';
@@ -556,7 +556,7 @@ class TugasController extends Controller
 
         // Check if user has permission to grade
         $user = Auth::user();
-        if (!$user->hasRole('guru') || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
+        if (!$user->isGuru() || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -599,7 +599,7 @@ class TugasController extends Controller
 
         // Check if user has permission to grade
         $user = Auth::user();
-        if (!$user->hasRole('guru') || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
+        if (!$user->isGuru() || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -625,7 +625,7 @@ class TugasController extends Controller
         ])->findOrFail($id);
 
         $user = Auth::user();
-        if (!$user->hasRole(['guru', 'admin']) && ($user->hasRole('siswa') && $pengumpulan->siswa_id !== $user->siswa->id)) {
+        if (!$user->hasRole(['guru', 'admin']) && ($user->isSiswa() && $pengumpulan->siswa_id !== $user->siswa->id)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -664,7 +664,7 @@ class TugasController extends Controller
 
         // Check permission
         $user = Auth::user();
-        if (!$user->hasRole('guru') || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
+        if (!$user->isGuru() || $pengumpulan->tugas->guruKelas->guruMataPelajaran->guru->user->id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

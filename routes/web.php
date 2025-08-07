@@ -16,11 +16,9 @@ use App\Models\TahunAjaran;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['guest']], function () {
-    Route::get('/', function () {
-        return view('landing.index');
-    })->name('home');
 
     Route::controller('App\Http\Controllers\FrontController')->group(function () {
+        Route::get('/', 'index')->name('home');
         Route::get('/pendaftaran', 'pendaftaran')->name('pendaftaran');
 
         Route::prefix('/artikel')->group(function () {
@@ -57,6 +55,7 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
